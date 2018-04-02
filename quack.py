@@ -35,10 +35,11 @@ def hilite(string, color=None, bold=False, underline=False):
     return "\x1b[{}m{}\x1b[0m".format(";".join(attr), string)
 
 
-def print_error(message):
+def print_error(message, quit=True):
     print("{} {}".format(hilite("error :", "red", True), message),
           file=sys.stderr)
-    sys.exit(1)
+    if quit:
+        sys.exit(1)
 
 
 def print_info(message):
@@ -291,8 +292,8 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Quack, the Qualitative and "
                             "Usable Aur paCKage helper.",
                             usage="""%(prog)s -h
-       %(prog)s [--color COLOR] -C
-       %(prog)s [--color COLOR] -A [-l | -u | -s | -i] [--devel]
+       %(prog)s [--color WHEN] -C
+       %(prog)s [--color WHEN] -A [-l | -u | -s | -i] [--devel]
                  [package [package ...]]""", epilog="""
      _         _
   __(.)>    __(.)<  Quack Quack
@@ -301,7 +302,7 @@ if __name__ == "__main__":
 """, formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("--color", help="Specify when to enable "
                         "coloring. Valid options are always, "
-                        "never, or auto.")
+                        "never, or auto.", metavar="WHEN")
     cmd_group = parser.add_argument_group("Operations")
     cmd_group.add_argument("-C", "--list-garbage", action="store_true",
                            help="Find and list .pacsave, "
@@ -324,7 +325,10 @@ if __name__ == "__main__":
                         help="Include devel packages "
                         "(which name has a trailing -svn, -git…) "
                         "for list and upgrade operations")
-    parser.add_argument("package", nargs="*", default=[])
+    parser.add_argument("package", nargs="*", default=[],
+                        help="One or more package name to install, "
+                        "upgrade, display information about. Only "
+                        "usefull for the -A operation.")
     args = parser.parse_args()
 
     config = {
@@ -379,7 +383,8 @@ if __name__ == "__main__":
 
     have_subcommand = args.search or args.info or args.list or args.upgrade
     if not args.aur or (have_subcommand is False and len(args.package) == 0):
-        print_error("No operation given")
+        print_error("No operation given", False)
+        parser.print_usage()
         sys.exit(1)
 
     if args.search:
