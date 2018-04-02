@@ -18,6 +18,7 @@ gettext.textdomain("quack")
 _ = gettext.gettext
 
 
+VERSION="0.1"
 USE_COLOR = "never"
 
 
@@ -298,8 +299,8 @@ class AurHelper:
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description="Quack, the Qualitative and "
-                            "Usable Aur paCKage helper.",
+    quack_desc = "Quack, the Qualitative and Usable Aur paCKage helper"
+    parser = ArgumentParser(description=quack_desc,
                             usage="""%(prog)s -h
        %(prog)s [--color WHEN] -C
        %(prog)s [--color WHEN] -A [-l | -u | -s | -i] [--devel]
@@ -309,6 +310,9 @@ if __name__ == "__main__":
 ~~\___)~~~~~\___)~~~~~~~~~~~~~~~~~~
 
 """, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("-v", "--version", action="store_true",
+                        help=_("Display quack version information"
+                               " and exit."))
     parser.add_argument("--color", help="Specify when to enable "
                         "coloring. Valid options are always, "
                         "never, or auto.", metavar="WHEN")
@@ -339,6 +343,10 @@ if __name__ == "__main__":
                         "upgrade, display information about. Only "
                         "usefull for the -A operation.")
     args = parser.parse_args()
+
+    if args.version:
+        print("{} - v{}".format(quack_desc, VERSION))
+        sys.exit(0)
 
     config = {
         "color": "never",
