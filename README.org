@@ -2,7 +2,7 @@
 #+author: Étienne Deparis
 
 Quack, the Qualitative and Usable Aur paCKage helper. Also, it sounds
-like a duck and I find it funny. Quack Quack.
+like a duck. Quack Quack.
 
 * Goal of the project
 
@@ -19,3 +19,9 @@ Then, just run =make install=
 * Usage
 
 See =quack -h=
+
+#+begin_src
+     _         _
+  __(.)>    __(.)<  Quack Quack
+~~\___)~~~~~\___)~~~~~~~~~~~~~~~~~~
+#+end_src

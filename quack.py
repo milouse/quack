@@ -7,7 +7,7 @@ import time
 import requests
 import tempfile
 import subprocess
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from configparser import ConfigParser
 
 
@@ -288,7 +288,17 @@ class AurHelper:
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description="Yet Another Pacman Wrapper")
+    parser = ArgumentParser(description="Quack, the Qualitative and "
+                            "Usable Aur paCKage helper.",
+                            usage="""%(prog)s -h
+       %(prog)s [--color COLOR] -C
+       %(prog)s [--color COLOR] -A [-l | -u | -s | -i] [--devel]
+                 [package [package ...]]""", epilog="""
+     _         _
+  __(.)>    __(.)<  Quack Quack
+~~\___)~~~~~\___)~~~~~~~~~~~~~~~~~~
+
+""", formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("--color", help="Specify when to enable "
                         "coloring. Valid options are always, "
                         "never, or auto.")
