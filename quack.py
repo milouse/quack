@@ -7,8 +7,8 @@ import time
 import requests
 import tempfile
 import subprocess
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from configparser import ConfigParser
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 
 USE_COLOR = "never"
