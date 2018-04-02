@@ -1,0 +1,21 @@
+#+title: README
+#+author: Étienne Deparis
+
+Quack, the Qualitative and Usable Aur paCKage helper. Also, it sounds
+like a duck and I find it funny. Quack Quack.
+
+* Goal of the project
+
+This is a single file, readable AUR helper. It let you easily verify
+that it does nothing wrong. It aims to be a helper. Nothing more. Thus
+no complex parser or solver. You are intended to play this role.
+
+* Installation
+
+Requirements are listed in the =requirements.txt= file.
+
+Then, just run =make install=
+
+* Usage
+
+See =quack -h=
