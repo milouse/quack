@@ -10,6 +10,13 @@ import subprocess
 from configparser import ConfigParser
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
+import gettext
+QUACK_L10N_PATH = "./po"
+# Explicit declaration to avoid flake8 fear.
+gettext.bindtextdomain("quack", QUACK_L10N_PATH)
+gettext.textdomain("quack")
+_ = gettext.gettext
+
 
 USE_COLOR = "never"
 
@@ -36,7 +43,7 @@ def hilite(string, color=None, bold=False, underline=False):
 
 
 def print_error(message, quit=True):
-    print("{} {}".format(hilite("error :", "red", True), message),
+    print("{} {}".format(hilite(_("error :"), "red", True), message),
           file=sys.stderr)
     if quit:
         sys.exit(1)
@@ -89,7 +96,8 @@ class AurHelper:
     def color_pkg_with_version(self, package, version):
         version = hilite(version, "green", True)
         if self.current_version(package) is not None:
-            version += " {}".format(hilite("[installed]", "cyan", True))
+            version += " {}".format(hilite(_("[installed]"),
+                                           "cyan", True))
         return "{}{} {}".format(
             hilite("aur/", "magenta", True),
             hilite(package, bold=True),
@@ -146,8 +154,8 @@ class AurHelper:
                   hilite(p["Version"], "green")))
         if len(upgradable_pkgs) == 0:
             return True
-        upcheck = question("Do you want to upgrade the "
-                           "above packages? [y/N]")
+        upcheck = question(_("Do you want to upgrade the "
+                             "above packages?") + " [y/N]")
         if upcheck != "y":
             return True
         for p in upgradable_pkgs:
@@ -179,18 +187,19 @@ class AurHelper:
                                 "https://aur.archlinux.org/{}.git"
                                 .format(package)])
             if p.returncode != 0:
-                print_error("impossible to clone {} from AUR"
+                print_error(_("impossible to clone {} from AUR")
                             .format(package))
 
             os.chdir(package)
             if not os.path.isfile("PKGBUILD"):
-                print_error("{} is NOT an AUR package".format(package))
+                print_error(_("{} is NOT an AUR package").format(package))
 
-            print_info("Package {0} is ready to be built in {1}/{0}"
+            print_info(_("Package {0} is ready to be built in {1}/{0}")
                        .format(package, tmpdirname))
-            print_info("You should REALLY take time to inspect "
-                       "its PKGBUILD.")
-            check = question("When it's done, shall we continue? [y/N/q]")
+            print_info(_("You should REALLY take time to inspect "
+                         "its PKGBUILD."))
+            check = question(_("When it's done, shall we continue?") +
+                             " [y/N/q]")
             if check == "q":
                 sys.exit()
             elif check != "y":
@@ -204,12 +213,12 @@ class AurHelper:
                     built_packages.append(f)
             if len(built_packages) == 1:
                 return self.pacman_install([built_packages[0]])
-            print_info("The following packages have been built:")
+            print_info(_("The following packages have been built:"))
             i = 0
             for l in built_packages:
                 i += 1
                 print("[{}] {}".format(i, l))
-            ps = question("Which one do you really want to install?"
+            ps = question(_("Which one do you really want to install?") +
                           " [1…{}/A]".format(i))
             if ps == "a":
                 return self.pacman_install(built_packages)
@@ -221,7 +230,7 @@ class AurHelper:
                         raise ValueError
                     final_pkgs.append(built_packages[pi - 1])
             except ValueError:
-                print_error("{} is not a valid input".format(p))
+                print_error(_("{} is not a valid input").format(p))
             return self.pacman_install(final_pkgs)
 
     def search(self, terms_str):
@@ -276,13 +285,13 @@ class AurHelper:
                         continue
                     res[t][res[t].index(p)] = hilite(p, underline=True)
             if t == "Depends":
-                self.info_line(t, res, "Depends On")
+                self.info_line(t, res, _("Depends On"))
             elif t == "MakeDepends":
-                self.info_line(t, res, "Make Depends On")
+                self.info_line(t, res, _("Make Depends On"))
             elif t == "Conflicts":
-                self.info_line(t, res, "Conflicts With")
+                self.info_line(t, res, _("Conflicts With"))
             elif t == "NumVotes":
-                self.info_line(t, res, "Votes Number")
+                self.info_line(t, res, _("Votes Number"))
             else:
                 self.info_line(t, res)
         print()  # pacman -Qi print one last line
@@ -354,7 +363,7 @@ if __name__ == "__main__":
     config["color"] = USE_COLOR
 
     if args.list_garbage:
-        print_info("Pacman post transaction files")
+        print_info(_("Pacman post transaction files"))
         ignore_pathes = [
             "/dev", "/home", "/lost+found", "/proc", "/root",
             "/run", "/sys", "/tmp", "/var/db", "/var/log",
@@ -372,18 +381,18 @@ if __name__ == "__main__":
         cmd.pop()
         cmd += [")", "-print"]
         subprocess.run(cmd)
-        print_info("Orphaned packages")
+        print_info(_("Orphaned packages"))
         subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
         sys.exit()
 
     if os.getuid() == 0:
-        print_error("Do not run {} as root!".format(sys.argv[0]))
+        print_error(_("Do not run {} as root!").format(sys.argv[0]))
 
     aur = AurHelper(config)
 
     have_subcommand = args.search or args.info or args.list or args.upgrade
     if not args.aur or (have_subcommand is False and len(args.package) == 0):
-        print_error("No operation given", False)
+        print_error(_("no operation specified (use -h for help)"), False)
         parser.print_usage()
         sys.exit(1)
 

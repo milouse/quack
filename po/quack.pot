@@ -1,0 +1,99 @@
+# Quack Translation Effort
+# Copyright (C) 2018 Quack volunteers
+# This file is distributed under the same license as the Quack package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Quack 0.1\n"
+"Report-Msgid-Bugs-To: bugs@depar.is\n"
+"POT-Creation-Date: 2018-04-02 18:34+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: quack.py:47
+msgid "error :"
+msgstr ""
+
+#: quack.py:100
+msgid "[installed]"
+msgstr ""
+
+#: quack.py:158
+msgid "Do you want to upgrade the above packages?"
+msgstr ""
+
+#: quack.py:191
+msgid "impossible to clone {} from AUR"
+msgstr ""
+
+#: quack.py:196
+msgid "{} is NOT an AUR package"
+msgstr ""
+
+#: quack.py:198
+#, python-brace-format
+msgid "Package {0} is ready to be built in {1}/{0}"
+msgstr ""
+
+#: quack.py:200
+msgid "You should REALLY take time to inspect its PKGBUILD."
+msgstr ""
+
+#: quack.py:202
+msgid "When it's done, shall we continue?"
+msgstr ""
+
+#: quack.py:217
+msgid "The following packages have been built:"
+msgstr ""
+
+#: quack.py:222
+msgid "Which one do you really want to install?"
+msgstr ""
+
+#: quack.py:234
+msgid "{} is not a valid input"
+msgstr ""
+
+#: quack.py:289
+msgid "Depends On"
+msgstr ""
+
+#: quack.py:291
+msgid "Make Depends On"
+msgstr ""
+
+#: quack.py:293
+msgid "Conflicts With"
+msgstr ""
+
+#: quack.py:295
+msgid "Votes Number"
+msgstr ""
+
+#: quack.py:314
+msgid "Display quack version information and exit."
+msgstr ""
+
+#: quack.py:374
+msgid "Pacman post transaction files"
+msgstr ""
+
+#: quack.py:392
+msgid "Orphaned packages"
+msgstr ""
+
+#: quack.py:397
+msgid "Do not run {} as root!"
+msgstr ""
+
+#: quack.py:403
+msgid "no operation specified (use -h for help)"
+msgstr ""
