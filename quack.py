@@ -163,7 +163,8 @@ class AurHelper:
             self.install(p)
 
     def pacman_install(self, packages):
-        pacman_cmd = ["sudo", "pacman", "--color", USE_COLOR, "-U"]
+        pacman_cmd = ["sudo", "pacman", "--color", USE_COLOR,
+                      "--needed", "-U"]
         pkg_dest = "/var/cache/pacman/pkg"
         success = True
         p = subprocess.run(pacman_cmd + packages)
