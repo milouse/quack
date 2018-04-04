@@ -167,21 +167,18 @@ class AurHelper:
     def pacman_install(self, packages):
         pacman_cmd = ["sudo", "pacman", "--color", USE_COLOR,
                       "--needed", "-U"]
-        pkg_dest = "/var/cache/pacman/pkg"
-        success = True
         p = subprocess.run(pacman_cmd + packages)
         if p.returncode != 0:
             # Strange, pacman failed. May be a sudo timeout. Keep a copy
             # of the pkgs
-            pkg_dest = "/tmp"
-            success = False
+            for px in packages:
+                shutil.copyfile(px, "/tmp/{}".format(px))
             print_info("A copy of the built packages has been kept in /tmp.")
+            return False
         for p in packages:
-            cmd = ["cp", p, "{}/{}".format(pkg_dest, p)]
-            if success:
-                cmd.insert(0, "sudo")
-            subprocess.run(cmd)
-        return success
+            subprocess.run(
+                ["sudo", "cp", p, "/var/cache/pacman/pkg/{}".format(p)])
+        return True
 
     def install(self, package):
         package = self.clean_pkg_name(package)
