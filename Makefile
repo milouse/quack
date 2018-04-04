@@ -2,7 +2,7 @@ DEST = /usr
 
 PKGNAME     = quack
 PKGNAME_CAP = Quack
-VERSION     = $(shell sed -n "s/^VERSION=\"\(.*\)\"$$/\1/p" $(PKGNAME).py)
+VERSION     = $(shell sed -n "s/^VERSION = \"\(.*\)\"$$/\1/p" $(PKGNAME).py)
 
 L10N_PATH  = po
 L10N_LANGS = fr
