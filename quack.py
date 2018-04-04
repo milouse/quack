@@ -4,8 +4,10 @@ import os
 import re
 import sys
 import time
+import shutil
 import requests
 import tempfile
+import textwrap
 import subprocess
 from configparser import ConfigParser
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
@@ -256,7 +258,7 @@ class AurHelper:
             else:
                 value = str(obj[title])
         attr = hilite("{}: ".format(i18n_title.ljust(25)), bold=True)
-        print(attr + value)
+        print(self.tw.fill(attr + value))
 
     def info(self, package):
         package = self.clean_pkg_name(package)
@@ -267,6 +269,11 @@ class AurHelper:
         res = self.fetch_results([package], True)[0]
         if res is None:
             return False
+        self.tw = textwrap.TextWrapper(
+            width=shutil.get_terminal_size((80, 20)).columns,
+            subsequent_indent=27 * " ",
+            break_on_hyphens=False,
+            break_long_words=False)
         if "Maintainer" in res:
             res["Maintainer"] = "{0}  https://aur.archlinux.org/account/{0}" \
                 .format(res["Maintainer"])
