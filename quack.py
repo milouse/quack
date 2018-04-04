@@ -246,18 +246,16 @@ class AurHelper:
                 self.color_pkg_with_version(p["Name"], p["Version"]),
                 p["Description"]))
 
-    def info_line(self, title, obj, alt_title=None):
+    def info_line(self, title, obj, i18n_title):
         value = "--"
         if title in obj:
             if type(obj[title]) is list:
                 if len(obj[title]) != 0:
                     value = "  ".join(obj[title])
             else:
-                value = obj[title]
-        if alt_title is not None:
-            title = alt_title
-        print("{}: {}".format(hilite(title, bold=True).ljust(33),
-                              value))
+                value = str(obj[title])
+        attr = hilite("{}: ".format(i18n_title.ljust(25)), bold=True)
+        print(attr + value)
 
     def info(self, package):
         package = self.clean_pkg_name(package)
@@ -269,32 +267,27 @@ class AurHelper:
         if res is None:
             return False
         if "Maintainer" in res:
-            uri_m = "{0}  https://aur.archlinux.org/account/{0}" \
+            res["Maintainer"] = "{0}  https://aur.archlinux.org/account/{0}" \
                 .format(res["Maintainer"])
-            res["Last Maintainer"] = uri_m
-        res["Last Modified"] = time.strftime(
+        res["LastModified"] = time.strftime(
             "%c %Z", time.gmtime(res["LastModified"]))
-        res["AUR Page"] = "https://aur.archlinux.org/packages/{}" \
+        res["AurPage"] = "https://aur.archlinux.org/packages/{}" \
             .format(res["Name"])
-        for t in ["Name", "Version", "Description", "URL", "License",
-                  "Provides", "Depends", "MakeDepends", "Conflicts",
-                  "Last Maintainer", "Last Modified", "NumVotes",
-                  "Popularity", "AUR Page", "Keywords"]:
-            if t in ["Depends", "MakeDepends"] and t in res:
-                for p in res[t]:
-                    if p in self.all_pkgs:
-                        continue
-                    res[t][res[t].index(p)] = hilite(p, underline=True)
-            if t == "Depends":
-                self.info_line(t, res, _("Depends On"))
-            elif t == "MakeDepends":
-                self.info_line(t, res, _("Make Depends On"))
-            elif t == "Conflicts":
-                self.info_line(t, res, _("Conflicts With"))
-            elif t == "NumVotes":
-                self.info_line(t, res, _("Votes Number"))
-            else:
-                self.info_line(t, res)
+        self.info_line("Name",         res, _("Name"))
+        self.info_line("Version",      res, _("Version"))
+        self.info_line("Description",  res, _("Description"))
+        self.info_line("URL",          res, _("URL"))
+        self.info_line("License",      res, _("Licenses"))
+        self.info_line("Provides",     res, _("Provides"))
+        self.info_line("Depends",      res, _("Depends On"))
+        self.info_line("MakeDepends",  res, _("Make Depends On"))
+        self.info_line("Conflicts",    res, _("Conflicts With"))
+        self.info_line("Maintainer",   res, _("Last Maintainer"))
+        self.info_line("LastModified", res, _("Last Modified"))
+        self.info_line("NumVotes",     res, _("Votes Number"))
+        self.info_line("Popularity",   res, _("Popularity"))
+        self.info_line("AurPage",      res, _("AUR Page"))
+        self.info_line("Keywords",     res, _("Keywords"))
         print()  # pacman -Qi print one last line
 
 

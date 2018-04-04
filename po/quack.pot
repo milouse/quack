@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2018-04-02 18:34+0200\n"
+"POT-Creation-Date: 2018-04-04 10:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,83 +17,127 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: quack.py:47
+#: quack.py:59
 msgid "error :"
 msgstr ""
 
-#: quack.py:100
+#: quack.py:112
 msgid "[installed]"
 msgstr ""
 
-#: quack.py:158
+#: quack.py:170
 msgid "Do you want to upgrade the above packages?"
 msgstr ""
 
-#: quack.py:191
+#: quack.py:203
 msgid "impossible to clone {} from AUR"
 msgstr ""
 
-#: quack.py:196
+#: quack.py:208
 msgid "{} is NOT an AUR package"
 msgstr ""
 
-#: quack.py:198
+#: quack.py:210
 #, python-brace-format
 msgid "Package {0} is ready to be built in {1}/{0}"
 msgstr ""
 
-#: quack.py:200
+#: quack.py:212
 msgid "You should REALLY take time to inspect its PKGBUILD."
 msgstr ""
 
-#: quack.py:202
+#: quack.py:214
 msgid "When it's done, shall we continue?"
 msgstr ""
 
-#: quack.py:217
+#: quack.py:229
 msgid "The following packages have been built:"
 msgstr ""
 
-#: quack.py:222
+#: quack.py:234
 msgid "Which one do you really want to install?"
 msgstr ""
 
-#: quack.py:234
+#: quack.py:246
 msgid "{} is not a valid input"
 msgstr ""
 
-#: quack.py:289
-msgid "Depends On"
-msgstr ""
-
-#: quack.py:291
-msgid "Make Depends On"
+#: quack.py:292
+msgid "Name"
 msgstr ""
 
 #: quack.py:293
-msgid "Conflicts With"
+msgid "Version"
+msgstr ""
+
+#: quack.py:294
+msgid "Description"
 msgstr ""
 
 #: quack.py:295
+msgid "URL"
+msgstr ""
+
+#: quack.py:296
+msgid "Licenses"
+msgstr ""
+
+#: quack.py:297
+msgid "Provides"
+msgstr ""
+
+#: quack.py:298
+msgid "Depends On"
+msgstr ""
+
+#: quack.py:299
+msgid "Make Depends On"
+msgstr ""
+
+#: quack.py:300
+msgid "Conflicts With"
+msgstr ""
+
+#: quack.py:301
+msgid "Last Maintainer"
+msgstr ""
+
+#: quack.py:302
+msgid "Last Modified"
+msgstr ""
+
+#: quack.py:303
 msgid "Votes Number"
 msgstr ""
 
-#: quack.py:314
+#: quack.py:304
+msgid "Popularity"
+msgstr ""
+
+#: quack.py:305
+msgid "AUR Page"
+msgstr ""
+
+#: quack.py:306
+msgid "Keywords"
+msgstr ""
+
+#: quack.py:323
 msgid "Display quack version information and exit."
 msgstr ""
 
-#: quack.py:374
+#: quack.py:383
 msgid "Pacman post transaction files"
 msgstr ""
 
-#: quack.py:392
+#: quack.py:401
 msgid "Orphaned packages"
 msgstr ""
 
-#: quack.py:397
+#: quack.py:406
 msgid "Do not run {} as root!"
 msgstr ""
 
-#: quack.py:403
+#: quack.py:412
 msgid "no operation specified (use -h for help)"
 msgstr ""
