@@ -6,9 +6,14 @@ like a duck. Quack Quack.
 
 * Goal of the project
 
-This is a single file, readable AUR helper. It let you easily verify
-that it does nothing wrong. It aims to be a helper. Nothing more. Thus
-no complex parser or solver. You are intended to play this role.
+This is a single file, auditable and readable (at least I tryied) AUR
+helper. It let you easily verify that it does nothing wrong. Since it
+has to gain root privileges at some times, It is very important for me
+that you stay able to understand what it does.
+
+This script aims to stay only a helper. Nothing more. Thus, it will
+never include a parser or complex solver. You are intended to play this
+role and stay in command.
 
 * Installation
 
