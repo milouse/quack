@@ -396,9 +396,14 @@ if __name__ == "__main__":
 
     aur = AurHelper(config)
 
-    have_subcommand = args.search or args.info or args.list or args.upgrade
-    if not args.aur or (have_subcommand is False and len(args.package) == 0):
-        print_error(_("no operation specified (use -h for help)"), False)
+    package_less_subcommand = args.list or args.upgrade
+    if package_less_subcommand is False and len(args.package) == 0:
+        if args.info or args.search:
+            print_error(
+                _("no targets specified (use -h for help)\n"), False)
+        else:
+            print_error(
+                _("no operation specified (use -h for help)"), False)
         parser.print_usage()
         sys.exit(1)
 
