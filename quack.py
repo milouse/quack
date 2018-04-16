@@ -403,7 +403,7 @@ if __name__ == "__main__":
                 _("no targets specified (use -h for help)\n"), False)
         else:
             print_error(
-                _("no operation specified (use -h for help)"), False)
+                _("no operation specified (use -h for help)\n"), False)
         parser.print_usage()
         sys.exit(1)
 
