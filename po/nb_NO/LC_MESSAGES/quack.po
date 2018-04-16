@@ -1,0 +1,146 @@
+# Quack Translation Effort
+# Copyright (C) 2018 Quack volunteers
+# This file is distributed under the same license as the Quack package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Quack 0.1\n"
+"Report-Msgid-Bugs-To: bugs@depar.is\n"
+"POT-Creation-Date: 2018-04-04 10:17+0200\n"
+"PO-Revision-Date: 2018-04-16 16:33+0000\n"
+"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
+"Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
+"translations/nb_NO/>\n"
+"Language: nb_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 3.0-dev\n"
+
+#: quack.py:59
+msgid "error :"
+msgstr "feil:"
+
+#: quack.py:112
+msgid "[installed]"
+msgstr "[installert]"
+
+#: quack.py:170
+msgid "Do you want to upgrade the above packages?"
+msgstr "Ønsker du å oppgradere pakkene ovenfor?"
+
+#: quack.py:203
+msgid "impossible to clone {} from AUR"
+msgstr "Kunne ikke klone {} fra AUR"
+
+#: quack.py:208
+msgid "{} is NOT an AUR package"
+msgstr "{} er IKKE en AUR-pakke"
+
+#: quack.py:210
+#, python-brace-format
+msgid "Package {0} is ready to be built in {1}/{0}"
+msgstr "Pakken {0} er klar til å bli bygd i {1}/{0}"
+
+#: quack.py:212
+msgid "You should REALLY take time to inspect its PKGBUILD."
+msgstr "Du burde VIRKELIG ta deg tid til å gjennomse dens PKGBUILD."
+
+#: quack.py:214
+msgid "When it's done, shall we continue?"
+msgstr "Når det er gjort, skal vi fortsette?"
+
+#: quack.py:229
+msgid "The following packages have been built:"
+msgstr "Følgende pakker har blitt bygd:"
+
+#: quack.py:234
+msgid "Which one do you really want to install?"
+msgstr "Hvilken ønsker du å installere?"
+
+#: quack.py:246
+msgid "{} is not a valid input"
+msgstr "{} er ikke gyldig inndata"
+
+#: quack.py:292
+msgid "Name"
+msgstr "Navn"
+
+#: quack.py:293
+msgid "Version"
+msgstr "Versjon"
+
+#: quack.py:294
+msgid "Description"
+msgstr "Beskrivelse"
+
+#: quack.py:295
+msgid "URL"
+msgstr "Nettadresse"
+
+#: quack.py:296
+msgid "Licenses"
+msgstr "Lisenser"
+
+#: quack.py:297
+msgid "Provides"
+msgstr "Tilbyr"
+
+#: quack.py:298
+msgid "Depends On"
+msgstr "Avhenger av"
+
+#: quack.py:299
+msgid "Make Depends On"
+msgstr "Makedepends-avhengigheter"
+
+#: quack.py:300
+#, fuzzy
+msgid "Conflicts With"
+msgstr "Krangler med"
+
+#: quack.py:301
+msgid "Last Maintainer"
+msgstr "Siste vedlikeholder"
+
+#: quack.py:302
+msgid "Last Modified"
+msgstr "Sist endret"
+
+#: quack.py:303
+msgid "Votes Number"
+msgstr "Stemmenummer"
+
+#: quack.py:304
+msgid "Popularity"
+msgstr "Popularitet"
+
+#: quack.py:305
+msgid "AUR Page"
+msgstr "AUR-side"
+
+#: quack.py:306
+msgid "Keywords"
+msgstr "Nøkkelord"
+
+#: quack.py:323
+msgid "Display quack version information and exit."
+msgstr "Vis Quack-versjonsinformasjon og avslutt."
+
+#: quack.py:383
+msgid "Pacman post transaction files"
+msgstr "Etteroverføringsfiler for Pacman"
+
+#: quack.py:401
+msgid "Orphaned packages"
+msgstr "Avsondrede pakker"
+
+#: quack.py:406
+msgid "Do not run {} as root!"
+msgstr "Ikke kjør {} som root!"
+
+#: quack.py:412
+msgid "no operation specified (use -h for help)"
+msgstr "ingen operasjon angitt (bruk -h for hjelp)"

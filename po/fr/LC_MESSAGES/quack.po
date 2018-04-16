@@ -8,15 +8,16 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-04-16 18:45+0200\n"
-"PO-Revision-Date: 2018-04-04 10:18+0200\n"
+"PO-Revision-Date: 2018-04-16 17:15+0000\n"
 "Last-Translator: Étienne Deparis <etienne@depar.is>\n"
-"Language-Team: French\n"
+"Language-Team: French <https://hosted.weblate.org/projects/quack/"
+"translations/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.0.6\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 3.0-dev\n"
 
 #: quack.py:49
 msgid "error :"
@@ -140,14 +141,12 @@ msgid "Do not run {} as root!"
 msgstr "Ne lancez pas {} en tant que root !"
 
 #: quack.py:403
-#, fuzzy
 msgid "no targets specified (use -h for help)\n"
-msgstr "aucune opération spécifiée (utiliser -h pour l’aide)"
+msgstr "aucune cible spécifiée (utiliser -h pour l’aide)\n"
 
 #: quack.py:406
-#, fuzzy
 msgid "no operation specified (use -h for help)\n"
-msgstr "aucune opération spécifiée (utiliser -h pour l’aide)"
+msgstr "aucune opération spécifiée (utiliser -h pour l’aide)\n"
 
 #~ msgid "No operation given"
 #~ msgstr "Aucune opération demandée"
