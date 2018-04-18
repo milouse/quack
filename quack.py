@@ -13,7 +13,12 @@ from configparser import ConfigParser
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 import gettext
-QUACK_L10N_PATH = "./po"
+loc_po = os.path.join(os.path.dirname(os.path.realpath(__file__)), "po")
+if os.path.exists(loc_po):
+    QUACK_L10N_PATH = loc_po
+else:
+    QUACK_L10N_PATH = "/usr/share/locale"
+
 # Explicit declaration to avoid flake8 fear.
 gettext.bindtextdomain("quack", QUACK_L10N_PATH)
 gettext.textdomain("quack")
