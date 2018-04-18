@@ -24,6 +24,7 @@ clean:
 	rm -f $(MO_FILES)
 
 install: build $(DEST_MO)
+	git checkout $(L10N_PATH)/$(PKGNAME).pot
 	install -d -m755 $(DEST)/bin
 	install -d -m755 $(DEST)/share/licenses/$(PKGNAME)
 	install -D -m755 $(PKGNAME).py $(DEST)/bin/$(PKGNAME)
