@@ -12,5 +12,7 @@ and send your changes as a pull request.
 * Code
 
 The canonical repository is located at
-[[https://git.deparis.io/quack]]. Mirror exists on [[https://hosted.weblate.org/projects/quack/][Framagit]] and
-Github (link is coming). Merge request are accepted on both websites.
+[[https://git.deparis.io/quack]]. Mirror exists on [[https://framagit.org/milouse/quack][Framagit]], on [[https://gitlab.com/milouse/quack][Gitlab]] and
+on [[https://github.com/milouse/quack][Github]].
+
+Merge request and issues are accepted on all mirrors.
