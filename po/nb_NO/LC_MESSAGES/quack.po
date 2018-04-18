@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-04-18 18:01+0200\n"
-"PO-Revision-Date: 2018-04-16 16:33+0000\n"
-"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
+"PO-Revision-Date: 2018-04-18 16:17+0000\n"
+"Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
 "translations/nb_NO/>\n"
 "Language: nb_NO\n"
@@ -20,7 +20,6 @@ msgstr ""
 "X-Generator: Weblate 3.0-dev\n"
 
 #: quack.py:54
-#, fuzzy
 msgid "error:"
 msgstr "feil:"
 
@@ -37,19 +36,19 @@ msgid "A copy of the built packages has been kept in /tmp."
 msgstr ""
 
 #: quack.py:197
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "impossible to clone {pkg} from AUR"
-msgstr "Kunne ikke klone {} fra AUR"
+msgstr "Kunne ikke klone {pkg} fra AUR"
 
 #: quack.py:202
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "{pkg} is NOT an AUR package"
-msgstr "{} er IKKE en AUR-pakke"
+msgstr "{pkg} er IKKE en AUR-pakke"
 
 #: quack.py:205
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Package {pkg} is ready to be built in {path}/{pkg}"
-msgstr "Pakken {0} er klar til å bli bygd i {1}/{0}"
+msgstr "Pakken {pkg} er klar til å bli bygd i {path}/{pkg}"
 
 #: quack.py:207
 msgid "You should REALLY take time to inspect its PKGBUILD."
@@ -68,9 +67,9 @@ msgid "Which one do you really want to install?"
 msgstr "Hvilken ønsker du å installere?"
 
 #: quack.py:241
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "{str} is not a valid input"
-msgstr "{} er ikke gyldig inndata"
+msgstr "{str} er ikke gyldig inndata"
 
 #: quack.py:289
 msgid "Name"
@@ -101,9 +100,8 @@ msgid "Depends On"
 msgstr "Avhenger av"
 
 #: quack.py:296
-#, fuzzy
 msgid "Build Depends On"
-msgstr "Avhenger av"
+msgstr ""
 
 #: quack.py:297
 #, fuzzy
@@ -135,7 +133,6 @@ msgid "Keywords"
 msgstr "Nøkkelord"
 
 #: quack.py:320
-#, fuzzy
 msgid "Display Quack version information and exit."
 msgstr "Vis Quack-versjonsinformasjon og avslutt."
 
@@ -148,19 +145,17 @@ msgid "Orphaned packages"
 msgstr "Avsondrede pakker"
 
 #: quack.py:403
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Do not run {quack_cmd} as root!"
-msgstr "Ikke kjør {} som root!"
+msgstr "Ikke kjør {quack_cmd} som root!"
 
 #: quack.py:412
-#, fuzzy
 msgid "no targets specified (use -h for help)\n"
-msgstr "ingen operasjon angitt (bruk -h for hjelp)"
+msgstr ""
 
 #: quack.py:415
-#, fuzzy
 msgid "no operation specified (use -h for help)\n"
-msgstr "ingen operasjon angitt (bruk -h for hjelp)"
+msgstr "ingen operasjon angitt (bruk -h for hjelp)\n"
 
 #~ msgid "Make Depends On"
 #~ msgstr "Makedepends-avhengigheter"
