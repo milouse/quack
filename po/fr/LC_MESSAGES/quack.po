@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2018-04-18 16:50+0200\n"
+"POT-Creation-Date: 2018-04-18 18:01+0200\n"
 "PO-Revision-Date: 2018-04-18 16:52+0200\n"
 "Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/quack/"
@@ -19,140 +19,140 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Generator: Poedit 2.0.6\n"
 
-#: quack.py:49
+#: quack.py:54
 msgid "error:"
 msgstr "erreur :"
 
-#: quack.py:102
+#: quack.py:107
 msgid "[installed]"
 msgstr "[installé]"
 
-#: quack.py:160
+#: quack.py:165
 msgid "Do you want to upgrade the above packages?"
 msgstr "Voulez-vous mettre à jour les paquets ci-dessus ?"
 
-#: quack.py:176
+#: quack.py:181
 msgid "A copy of the built packages has been kept in /tmp."
 msgstr "Une copie du paquet construit a été conservée dans /tmp."
 
-#: quack.py:192
+#: quack.py:197
 #, python-brace-format
 msgid "impossible to clone {pkg} from AUR"
 msgstr "impossible de cloner {pkg} depuis AUR"
 
-#: quack.py:197
+#: quack.py:202
 #, python-brace-format
 msgid "{pkg} is NOT an AUR package"
 msgstr "{pkg} n'est PAS un paquet AUR"
 
-#: quack.py:200
+#: quack.py:205
 #, python-brace-format
 msgid "Package {pkg} is ready to be built in {path}/{pkg}"
 msgstr "Le paquet {pkg} est prêt à être construit dans {path}/{pkg}"
 
-#: quack.py:202
+#: quack.py:207
 msgid "You should REALLY take time to inspect its PKGBUILD."
 msgstr "Vous devriez VRAIMENT prendre le temps de vérifier le PKGBUILD."
 
-#: quack.py:204
+#: quack.py:209
 msgid "When it's done, shall we continue?"
 msgstr "Lorsque c'est fait, devons nous continuer ?"
 
-#: quack.py:219
+#: quack.py:224
 msgid "The following packages have been built:"
 msgstr "Les paquets suivant ont été construits :"
 
-#: quack.py:224
+#: quack.py:229
 msgid "Which one do you really want to install?"
 msgstr "Lequel d'entre eux voulez-vous réellement installer ?"
 
-#: quack.py:236
+#: quack.py:241
 #, python-brace-format
 msgid "{str} is not a valid input"
 msgstr "{str} n'est pas une entrée valide"
 
-#: quack.py:284
+#: quack.py:289
 msgid "Name"
 msgstr "Nom"
 
-#: quack.py:285
+#: quack.py:290
 msgid "Version"
 msgstr "Version"
 
-#: quack.py:286
+#: quack.py:291
 msgid "Description"
 msgstr "Description"
 
-#: quack.py:287
+#: quack.py:292
 msgid "URL"
 msgstr "URL"
 
-#: quack.py:288
+#: quack.py:293
 msgid "Licenses"
 msgstr "Licences"
 
-#: quack.py:289
+#: quack.py:294
 msgid "Provides"
 msgstr "Fournit"
 
-#: quack.py:290
+#: quack.py:295
 msgid "Depends On"
 msgstr "Dépend de"
 
-#: quack.py:291
+#: quack.py:296
 msgid "Build Depends On"
 msgstr "Construction dépend de"
 
-#: quack.py:292
+#: quack.py:297
 msgid "Conflicts With"
 msgstr "Est en conflit avec"
 
-#: quack.py:293
+#: quack.py:298
 msgid "Last Maintainer"
 msgstr "Dernier paqueteur"
 
-#: quack.py:294
+#: quack.py:299
 msgid "Last Modified"
 msgstr "Dernière modification"
 
-#: quack.py:295
+#: quack.py:300
 msgid "Votes Number"
 msgstr "Nombre de vote"
 
-#: quack.py:296
+#: quack.py:301
 msgid "Popularity"
 msgstr "Popularité"
 
-#: quack.py:297
+#: quack.py:302
 msgid "AUR Page"
 msgstr "Page AUR"
 
-#: quack.py:298
+#: quack.py:303
 msgid "Keywords"
 msgstr "Mots clés"
 
-#: quack.py:315
+#: quack.py:320
 msgid "Display Quack version information and exit."
 msgstr "Affiche les informations de version de Quack et quitte aussitôt."
 
-#: quack.py:375
+#: quack.py:380
 msgid "Pacman post transaction files"
 msgstr "Fichiers transactionnels de pacman"
 
-#: quack.py:393
+#: quack.py:398
 msgid "Orphaned packages"
 msgstr "Paquets orphelins"
 
-#: quack.py:398
+#: quack.py:403
 #, python-brace-format
 msgid "Do not run {quack_cmd} as root!"
 msgstr "Ne lancez pas {quack_cmd} en tant que root !"
 
-#: quack.py:407
+#: quack.py:412
 msgid "no targets specified (use -h for help)\n"
 msgstr "aucune cible spécifiée (utiliser -h pour l’aide)\n"
 
-#: quack.py:410
+#: quack.py:415
 msgid "no operation specified (use -h for help)\n"
 msgstr "aucune opération spécifiée (utiliser -h pour l’aide)\n"
 
