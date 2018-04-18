@@ -5,7 +5,7 @@ PKGNAME_CAP = Quack
 VERSION     = $(shell sed -n "s/^VERSION = \"\(.*\)\"$$/\1/p" $(PKGNAME).py)
 
 L10N_PATH  = po
-L10N_LANGS = fr
+L10N_LANGS = fr nb_NO
 PO_FILES   = $(L10N_LANGS:%=$(L10N_PATH)/%/LC_MESSAGES/$(PKGNAME).po)
 PU_FILES   = $(PO_FILES:%.po=%.pu)
 MO_FILES   = $(PO_FILES:%.po=%.mo)
