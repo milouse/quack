@@ -51,7 +51,7 @@ def hilite(string, color=None, bold=False, underline=False):
 
 
 def print_error(message, quit=True):
-    print("{} {}".format(hilite(_("error :"), "red", True), message),
+    print("{} {}".format(hilite(_("error:"), "red", True), message),
           file=sys.stderr)
     if quit:
         sys.exit(1)
@@ -178,7 +178,8 @@ class AurHelper:
             # of the pkgs
             for px in packages:
                 shutil.copyfile(px, "/tmp/{}".format(px))
-            print_info("A copy of the built packages has been kept in /tmp.")
+            print_info(_("A copy of the built packages "
+                         "has been kept in /tmp."))
             return False
         for p in packages:
             subprocess.run(
@@ -193,15 +194,16 @@ class AurHelper:
                                 "https://aur.archlinux.org/{}.git"
                                 .format(package)])
             if p.returncode != 0:
-                print_error(_("impossible to clone {} from AUR")
-                            .format(package))
+                print_error(_("impossible to clone {pkg} from AUR")
+                            .format(pkg=package))
 
             os.chdir(package)
             if not os.path.isfile("PKGBUILD"):
-                print_error(_("{} is NOT an AUR package").format(package))
+                print_error(_("{pkg} is NOT an AUR package")
+                            .format(pkg=package))
 
-            print_info(_("Package {0} is ready to be built in {1}/{0}")
-                       .format(package, tmpdirname))
+            print_info(_("Package {pkg} is ready to be built in {path}/{pkg}")
+                       .format(pkg=package, path=tmpdirname))
             print_info(_("You should REALLY take time to inspect "
                          "its PKGBUILD."))
             check = question(_("When it's done, shall we continue?") +
@@ -236,7 +238,8 @@ class AurHelper:
                         raise ValueError
                     final_pkgs.append(built_packages[pi - 1])
             except ValueError:
-                print_error(_("{} is not a valid input").format(p))
+                print_error(_("{str} is not a valid input")
+                            .format(str=p))
             return self.pacman_install(final_pkgs)
 
     def search(self, terms_str):
@@ -290,7 +293,7 @@ class AurHelper:
         self.info_line("License",      res, _("Licenses"))
         self.info_line("Provides",     res, _("Provides"))
         self.info_line("Depends",      res, _("Depends On"))
-        self.info_line("MakeDepends",  res, _("Make Depends On"))
+        self.info_line("MakeDepends",  res, _("Build Depends On"))
         self.info_line("Conflicts",    res, _("Conflicts With"))
         self.info_line("Maintainer",   res, _("Last Maintainer"))
         self.info_line("LastModified", res, _("Last Modified"))
@@ -314,7 +317,7 @@ if __name__ == "__main__":
 
 """, formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("-v", "--version", action="store_true",
-                        help=_("Display quack version information"
+                        help=_("Display Quack version information"
                                " and exit."))
     parser.add_argument("--color", help="Specify when to enable "
                         "coloring. Valid options are always, "
@@ -397,7 +400,8 @@ if __name__ == "__main__":
         sys.exit()
 
     if os.getuid() == 0:
-        print_error(_("Do not run {} as root!").format(sys.argv[0]))
+        print_error(_("Do not run {quack_cmd} as root!")
+                    .format(quack_cmd=sys.argv[0]))
 
     aur = AurHelper(config)
 
