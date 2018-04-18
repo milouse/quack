@@ -1,6 +1,8 @@
 #+title: README
 #+author: Étienne Deparis
 
+[[https://hosted.weblate.org/engage/quack/][https://hosted.weblate.org/widgets/quack/-/translations/svg-badge.svg]]
+
 Quack, the Qualitative and Usable Aur paCKage helper. Also, it sounds
 like a duck. Quack Quack.
 
@@ -24,6 +26,10 @@ Then, just run =make install=
 * Usage
 
 See =quack -h=
+
+* Contributing
+
+See [[./CONTRIBUTING.org]]
 
 #+begin_src
      _         _

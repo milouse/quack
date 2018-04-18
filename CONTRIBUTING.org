@@ -1,0 +1,16 @@
+#+title: CONTRIBUTING
+#+author: Étienne Deparis
+
+* Translations
+
+Quack is [[https://hosted.weblate.org/projects/quack/][being translated using Weblate]], a web tool designed to ease
+translating for both developers and translators.
+
+You can also fetch the gettext files directly from the source code tree
+and send your changes as a pull request.
+
+* Code
+
+The canonical repository is located at
+[[https://git.deparis.io/quack]]. Mirror exists on [[https://hosted.weblate.org/projects/quack/][Framagit]] and
+Github (link is coming). Merge request are accepted on both websites.
