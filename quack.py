@@ -189,22 +189,28 @@ class AurHelper:
 
     def install(self, package):
         package = self.clean_pkg_name(package)
+        no_pkg_err = _("{pkg} is NOT an AUR package").format(pkg=package)
+        res = self.fetch_pkg_infos([package])
+        if res is None or len(res) == 0:
+            print_error(no_pkg_err)
+        pkg_info = res[0]
+        git_name = pkg_info["PackageBase"]
+        deps = pkg_info["Depends"]
         with tempfile.TemporaryDirectory() as tmpdirname:
             os.chdir(tmpdirname)
             p = subprocess.run(["git", "clone",
                                 "https://aur.archlinux.org/{}.git"
-                                .format(package)])
+                                .format(git_name)])
             if p.returncode != 0:
                 print_error(_("impossible to clone {pkg} from AUR")
                             .format(pkg=package))
 
-            os.chdir(package)
+            os.chdir(git_name)
             if not os.path.isfile("PKGBUILD"):
-                print_error(_("{pkg} is NOT an AUR package")
-                            .format(pkg=package))
+                print_error(no_pkg_err)
 
-            print_info(_("Package {pkg} is ready to be built in {path}/{pkg}")
-                       .format(pkg=package, path=tmpdirname))
+            print_info(_("Package {pkg} is ready to be built in {path}/{git}")
+                       .format(pkg=package, path=tmpdirname, git=git_name))
             print_info(_("You should REALLY take time to inspect "
                          "its PKGBUILD."))
             check = question(_("When it's done, shall we continue?") +
