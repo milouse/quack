@@ -128,12 +128,13 @@ class AurHelper:
     def print_list(self, with_devel=False):
         print("\n".join(self.list(True, with_devel)))
 
-    def fetch_results(self, terms, name_only=False):
-        req = "https://aur.archlinux.org/rpc.php?v=5&type=info"
-        params = ["arg[]={}".format(t) for t in terms]
-        if name_only:
-            params.append("&by=name")
-        req = "{}&{}".format(req, "&".join(params))
+    def fetch_pkg_infos(self, terms, req_type="info"):
+        req = "https://aur.archlinux.org/rpc.php?v=5"
+        if req_type == "info":
+            params = ["arg[]={}".format(t) for t in terms]
+            req = "{}&type=info&{}".format(req, "&".join(params))
+        else:
+            req = "{}&type=search&arg={}".format(req, " ".join(terms))
         raw_json = requests.get(req).json()
         # Ensure we get a list
         if "results" not in raw_json:
@@ -141,7 +142,7 @@ class AurHelper:
         return raw_json["results"]
 
     def upgrade(self, with_devel=False):
-        res = self.fetch_results(self.list(False, with_devel))
+        res = self.fetch_pkg_infos(self.list(False, with_devel))
         if res is None or len(res) == 0:
             return False
         upgradable_pkgs = []
@@ -242,14 +243,11 @@ class AurHelper:
                             .format(str=p))
             return self.pacman_install(final_pkgs)
 
-    def search(self, terms_str):
-        req = "https://aur.archlinux.org/rpc.php?v=5&type=search&arg={}" \
-              .format(terms_str)
-        raw_json = requests.get(req).json()
-        if "results" not in raw_json:
+    def search(self, terms):
+        res = self.fetch_pkg_infos(terms, "search")
+        if res is None:
             return False
-
-        for p in raw_json["results"]:
+        for p in res:
             print("{}\n    {}".format(
                 self.color_pkg_with_version(p["Name"], p["Version"]),
                 p["Description"]))
@@ -271,7 +269,7 @@ class AurHelper:
             p = subprocess.run(["pacman", "--color", USE_COLOR,
                                 "-Qi", package])
             sys.exit(p.returncode)
-        res = self.fetch_results([package], True)[0]
+        res = self.fetch_pkg_infos([package])[0]
         if res is None:
             return False
         self.tw = textwrap.TextWrapper(
@@ -417,7 +415,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if args.search:
-        aur.search(" ".join(args.package))
+        aur.search(args.package)
 
     elif args.info:
         aur.info(" ".join(args.package))
