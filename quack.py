@@ -141,6 +141,25 @@ class AurHelper:
             return []
         return raw_json["results"]
 
+    def aur_dependencies(self, all_deps, git_name):
+        aur_deps = []
+        for d in all_deps:
+            if d in self.all_pkgs:
+                continue
+            aur_deps.append(d)
+        if len(aur_deps) == 0:
+            return [], []
+        ai = self.fetch_pkg_infos(aur_deps)
+        if ai is None or len(ai) == 0:
+            return [], []
+        loc_deps = []
+        for p in ai:
+            if p["PackageBase"] != git_name:
+                continue
+            loc_deps.append(p["Name"])
+            aur_deps.remove(p["Name"])
+        return aur_deps, loc_deps
+
     def upgrade(self, with_devel=False):
         res = self.fetch_pkg_infos(self.list(False, with_devel))
         if res is None or len(res) == 0:
@@ -222,6 +241,12 @@ class AurHelper:
             p = subprocess.run(["makepkg", "-sr"])
             if p.returncode != 0:
                 return False
+
+            aur_deps, loc_deps = self.aur_dependencies(deps, git_name)
+            if len(aur_deps) > 0:
+                print("TODO: the following packages must be installed "
+                      "first: {}".format(", ".join(aur_deps)))
+
             built_packages = []
             for f in os.listdir():
                 if f.endswith(".pkg.tar.xz"):
@@ -247,6 +272,17 @@ class AurHelper:
             except ValueError:
                 print_error(_("{str} is not a valid input")
                             .format(str=p))
+            if len(final_pkgs) == 1 and \
+               final_pkgs[0].startswith(package) and \
+               len(loc_deps) > 0:
+                for ld in loc_deps:
+                    for bp in built_packages:
+                        if bp == final_pkgs[0]:
+                            continue
+                        if not bp.startswith(ld):
+                            continue
+                        final_pkgs.append(bp)
+                        break
             return self.pacman_install(final_pkgs)
 
     def search(self, terms):
