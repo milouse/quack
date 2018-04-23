@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-04-18 18:01+0200\n"
-"PO-Revision-Date: 2018-04-23 18:59+0000\n"
+"PO-Revision-Date: 2018-04-24 07:30+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
 "translations/nb_NO/>\n"
@@ -105,7 +105,7 @@ msgstr "Bygg avhenger av"
 
 #: quack.py:297
 msgid "Conflicts With"
-msgstr "Krangler med"
+msgstr "Kolliderer med"
 
 #: quack.py:298
 msgid "Last Maintainer"
