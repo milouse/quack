@@ -399,7 +399,7 @@ if __name__ == "__main__":
 
 """, formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("-v", "--version", action="store_true",
-                        help=_("Display Quack version information"
+                        help=_("Display %(prog)s version information"
                                " and exit."))
     parser.add_argument("--color", help="Specify when to enable "
                         "coloring. Valid options are always, "
