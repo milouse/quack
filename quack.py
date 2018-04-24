@@ -128,6 +128,28 @@ class AurHelper:
     def print_list(self, with_devel=False):
         print("\n".join(self.list(True, with_devel)))
 
+    def list_garbage(self):
+        print_info(_("Pacman post transaction files"))
+        ignore_pathes = [
+            "/dev", "/home", "/lost+found", "/proc", "/root",
+            "/run", "/sys", "/tmp", "/var/db", "/var/log",
+            "/var/spool", "/var/tmp"
+        ]
+        cmd = ["find", "/", "("]
+        for p in ignore_pathes:
+            cmd.extend(["-path", p, "-o"])
+        cmd.pop()
+        if os.getuid() != 0:
+            cmd.insert(0, "sudo")
+        cmd += [")", "-prune", "-o", "-type", "f", "("]
+        for p in ["*.pacsave", "*.pacorig", "*.pacnew"]:
+            cmd.extend(["-name", p, "-o"])
+        cmd.pop()
+        cmd += [")", "-print"]
+        subprocess.run(cmd)
+        print_info(_("Orphaned packages"))
+        p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
+
     def fetch_pkg_infos(self, terms, req_type="info"):
         req = "https://aur.archlinux.org/rpc.php?v=5"
         if req_type == "info":
@@ -422,34 +444,15 @@ if __name__ == "__main__":
             USE_COLOR = ac
     config["color"] = USE_COLOR
 
-    if args.list_garbage:
-        print_info(_("Pacman post transaction files"))
-        ignore_pathes = [
-            "/dev", "/home", "/lost+found", "/proc", "/root",
-            "/run", "/sys", "/tmp", "/var/db", "/var/log",
-            "/var/spool", "/var/tmp"
-        ]
-        cmd = ["find", "/", "("]
-        for p in ignore_pathes:
-            cmd.extend(["-path", p, "-o"])
-        cmd.pop()
-        if os.getuid() != 0:
-            cmd.insert(0, "sudo")
-        cmd += [")", "-prune", "-o", "-type", "f", "("]
-        for p in ["*.pacsave", "*.pacorig", "*.pacnew"]:
-            cmd.extend(["-name", p, "-o"])
-        cmd.pop()
-        cmd += [")", "-print"]
-        subprocess.run(cmd)
-        print_info(_("Orphaned packages"))
-        subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
-        sys.exit()
-
     if os.getuid() == 0 and not args.crazyfool:
         print_error(_("Do not run {quack_cmd} as root!")
                     .format(quack_cmd=sys.argv[0]))
 
     aur = AurHelper(config)
+
+    if args.list_garbage:
+        aur.list_garbage()
+        sys.exit()
 
     package_less_subcommand = args.list or args.upgrade
     if package_less_subcommand is False and len(args.package) == 0:
@@ -473,7 +476,9 @@ if __name__ == "__main__":
 
     elif args.upgrade:
         aur.upgrade(args.devel)
+        aur.list_garbage()
 
     else:
         for p in args.package:
             aur.install(p)
+        aur.list_garbage()
