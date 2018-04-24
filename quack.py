@@ -129,6 +129,8 @@ class AurHelper:
         print("\n".join(self.list(True, with_devel)))
 
     def list_garbage(self):
+        print_info(_("Orphaned packages"))
+        p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
         print_info(_("Pacman post transaction files"))
         ignore_pathes = [
             "/dev", "/home", "/lost+found", "/proc", "/root",
@@ -147,8 +149,6 @@ class AurHelper:
         cmd.pop()
         cmd += [")", "-print"]
         subprocess.run(cmd)
-        print_info(_("Orphaned packages"))
-        p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
 
     def fetch_pkg_infos(self, terms, req_type="info"):
         req = "https://aur.archlinux.org/rpc.php?v=5"
