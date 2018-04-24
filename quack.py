@@ -131,6 +131,22 @@ class AurHelper:
     def list_garbage(self):
         print_info(_("Orphaned packages"))
         p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
+        if p.returncode == 1:
+            print("{} {}"
+                  .format(
+                      hilite("==>", "green"),
+                      hilite("no orphaned packages found", bold=True)))
+        print_info(_("Removed packages kept in cache"))
+        cmd = ["paccache", "-du"]
+        if USE_COLOR == 'never':
+            cmd.insert(1, "--nocolor")
+        subprocess.run(cmd)
+        print_info(_("Old package versions kept in cache"))
+        if USE_COLOR == 'never':
+            cmd[2] = "-d"
+        else:
+            cmd[1] = "-d"
+        subprocess.run(cmd)
         print_info(_("Pacman post transaction files"))
         ignore_pathes = [
             "/dev", "/home", "/lost+found", "/proc", "/root",
