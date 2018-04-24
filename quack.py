@@ -190,8 +190,9 @@ class AurHelper:
             self.install(p)
 
     def pacman_install(self, packages):
-        pacman_cmd = ["sudo", "pacman", "--color", USE_COLOR,
-                      "--needed", "-U"]
+        pacman_cmd = ["pacman", "--color", USE_COLOR, "--needed", "-U"]
+        if os.getuid() != 0:
+            pacman_cmd.insert(0, "sudo")
         p = subprocess.run(pacman_cmd + packages)
         if p.returncode != 0:
             # Strange, pacman failed. May be a sudo timeout. Keep a copy
@@ -202,8 +203,11 @@ class AurHelper:
                          "has been kept in /tmp."))
             return False
         for p in packages:
-            subprocess.run(
-                ["sudo", "cp", p, "/var/cache/pacman/pkg/{}".format(p)])
+            pcmd = ["cp", p, "/var/cache/pacman/pkg/{}".format(p)]
+            if os.getuid() != 0:
+                pcmd.insert(0, "sudo")
+            subprocess.run(pcmd)
+
         return True
 
     def install(self, package):
@@ -384,6 +388,8 @@ if __name__ == "__main__":
                         help="Include devel packages "
                         "(which name has a trailing -svn, -git…) "
                         "for list and upgrade operations")
+    parser.add_argument("--crazyfool", action="store_true",
+                        help=_("Allow %(prog)s to be run as root"))
     parser.add_argument("package", nargs="*", default=[],
                         help="One or more package name to install, "
                         "upgrade, display information about. Only "
@@ -439,7 +445,7 @@ if __name__ == "__main__":
         subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
         sys.exit()
 
-    if os.getuid() == 0:
+    if os.getuid() == 0 and not args.crazyfool:
         print_error(_("Do not run {quack_cmd} as root!")
                     .format(quack_cmd=sys.argv[0]))
 
