@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-04-18 18:01+0200\n"
-"PO-Revision-Date: 2018-04-18 16:17+0000\n"
-"Last-Translator: Étienne Deparis <etienne@depar.is>\n"
+"PO-Revision-Date: 2018-04-24 07:30+0000\n"
+"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
 "translations/nb_NO/>\n"
 "Language: nb_NO\n"
@@ -33,7 +33,7 @@ msgstr "Ønsker du å oppgradere pakkene ovenfor?"
 
 #: quack.py:181
 msgid "A copy of the built packages has been kept in /tmp."
-msgstr ""
+msgstr "En kopi av de bygde pakkene har blitt behold i /tmp."
 
 #: quack.py:197
 #, python-brace-format
@@ -101,12 +101,11 @@ msgstr "Avhenger av"
 
 #: quack.py:296
 msgid "Build Depends On"
-msgstr ""
+msgstr "Bygg avhenger av"
 
 #: quack.py:297
-#, fuzzy
 msgid "Conflicts With"
-msgstr "Krangler med"
+msgstr "Kolliderer med"
 
 #: quack.py:298
 msgid "Last Maintainer"
@@ -151,7 +150,7 @@ msgstr "Ikke kjør {quack_cmd} som root!"
 
 #: quack.py:412
 msgid "no targets specified (use -h for help)\n"
-msgstr ""
+msgstr "ingen mål angitt (bruk -h for hjelp)\n"
 
 #: quack.py:415
 msgid "no operation specified (use -h for help)\n"
