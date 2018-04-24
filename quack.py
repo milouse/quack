@@ -353,7 +353,7 @@ if __name__ == "__main__":
                  [package [package ...]]""", epilog="""
      _         _
   __(.)>    __(.)<  Quack Quack
-~~\___)~~~~~\___)~~~~~~~~~~~~~~~~~~
+~~\\___)~~~~~\\___)~~~~~~~~~~~~~~~~~~
 
 """, formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("-v", "--version", action="store_true",
