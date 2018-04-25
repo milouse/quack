@@ -128,7 +128,7 @@ class AurHelper:
     def print_list(self, with_devel=False):
         print("\n".join(self.list(True, with_devel)))
 
-    def list_garbage(self):
+    def list_garbage(self, only_orphaned=False):
         print_info(_("Orphaned packages"))
         p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
         if p.returncode == 1:
@@ -137,6 +137,8 @@ class AurHelper:
                       hilite("==>", "green"),
                       hilite("no orphaned packages found", bold=True)))
         print_info(_("Removed packages kept in cache"))
+        if only_orphaned:
+            return
         cmd = ["paccache", "-du"]
         if USE_COLOR == 'never':
             cmd.insert(1, "--nocolor")
@@ -219,13 +221,16 @@ class AurHelper:
                   hilite(cur_version, "red"),
                   hilite(p["Version"], "green")))
         if len(upgradable_pkgs) == 0:
-            return True
+            return False
         upcheck = question(_("Do you want to upgrade the "
                              "above packages?") + " [y/N]")
         if upcheck != "y":
-            return True
+            return False
+        rcode = True
         for p in upgradable_pkgs:
-            self.install(p)
+            lr = self.install(p)
+            rcode = rcode and lr
+        return rcode
 
     def pacman_install(self, packages):
         pacman_cmd = ["pacman", "--color", USE_COLOR, "--needed", "-U"]
@@ -491,10 +496,13 @@ if __name__ == "__main__":
         aur.print_list(args.devel)
 
     elif args.upgrade:
-        aur.upgrade(args.devel)
-        aur.list_garbage()
+        if aur.upgrade(args.devel):
+            aur.list_garbage(True)
 
     else:
+        rcode = True
         for p in args.package:
-            aur.install(p)
-        aur.list_garbage()
+            lr = aur.install(p)
+            rcode = rcode and lr
+        if rcode:
+            aur.list_garbage(True)
