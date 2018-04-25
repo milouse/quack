@@ -57,8 +57,8 @@ def print_error(message, quit=True):
         sys.exit(1)
 
 
-def print_info(message):
-    print("{} {}".format(hilite("::", "blue"),
+def print_info(message, symbol="::", color="blue"):
+    print("{} {}".format(hilite(symbol, color, True),
                          hilite(message, bold=True)))
 
 
@@ -132,10 +132,8 @@ class AurHelper:
         print_info(_("Orphaned packages"))
         p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
         if p.returncode == 1:
-            print("{} {}"
-                  .format(
-                      hilite("==>", "green"),
-                      hilite("no orphaned packages found", bold=True)))
+            print_info(_("no orphaned package found"),
+                       symbol="==>", color="green")
         print_info(_("Pacman post transaction files"))
         ignore_pathes = [
             "/dev", "/home", "/lost+found", "/proc", "/root",
@@ -154,6 +152,14 @@ class AurHelper:
         cmd.pop()
         cmd += [")", "-print"]
         subprocess.run(cmd)
+        p = subprocess.run(
+            cmd, check=True, stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE).stdout.decode().strip()
+        if p == "":
+            print_info(_("no transactional file found"),
+                       symbol="==>", color="green")
+        else:
+            print(p)
         if post_transac:
             return
         print_info(_("Removed packages kept in cache"))
