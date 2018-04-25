@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-04-24 18:05+0200\n"
-"PO-Revision-Date: 2018-04-18 16:52+0200\n"
+"PO-Revision-Date: 2018-04-25 10:57+0000\n"
 "Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/quack/"
 "translations/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Weblate 3.0-dev\n"
 
 #: quack.py:54
 msgid "error:"
@@ -33,11 +33,11 @@ msgstr "Paquets orphelins"
 
 #: quack.py:139
 msgid "Removed packages kept in cache"
-msgstr ""
+msgstr "Paquets supprimés conservés en cache"
 
 #: quack.py:144
 msgid "Old package versions kept in cache"
-msgstr ""
+msgstr "Anciennes versions des paquets conservées en cache"
 
 #: quack.py:150
 msgid "Pacman post transaction files"
@@ -62,9 +62,9 @@ msgid "impossible to clone {pkg} from AUR"
 msgstr "impossible de cloner {pkg} depuis AUR"
 
 #: quack.py:273
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Package {pkg} is ready to be built in {path}/{git}"
-msgstr "Le paquet {pkg} est prêt à être construit dans {path}/{pkg}"
+msgstr "Le paquet {pkg} est prêt à être construit dans {path}/{git}"
 
 #: quack.py:275
 msgid "You should REALLY take time to inspect its PKGBUILD."
@@ -148,14 +148,14 @@ msgid "Keywords"
 msgstr "Mots clés"
 
 #: quack.py:402
-#, fuzzy, python-format
+#, python-format
 msgid "Display %(prog)s version information and exit."
-msgstr "Affiche les informations de version de Quack et quitte aussitôt."
+msgstr "Affiche les informations de version de %(prog)s et quitte aussitôt."
 
 #: quack.py:430
 #, python-format
 msgid "Allow %(prog)s to be run as root"
-msgstr ""
+msgstr "Autoriser %(prog)s à être lancé avec les droits root"
 
 #: quack.py:464
 #, python-brace-format

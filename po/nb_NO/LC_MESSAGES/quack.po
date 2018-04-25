@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-04-24 18:05+0200\n"
-"PO-Revision-Date: 2018-04-24 07:30+0000\n"
-"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
+"PO-Revision-Date: 2018-04-25 10:58+0000\n"
+"Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
 "translations/nb_NO/>\n"
 "Language: nb_NO\n"
@@ -62,9 +62,9 @@ msgid "impossible to clone {pkg} from AUR"
 msgstr "Kunne ikke klone {pkg} fra AUR"
 
 #: quack.py:273
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Package {pkg} is ready to be built in {path}/{git}"
-msgstr "Pakken {pkg} er klar til å bli bygd i {path}/{pkg}"
+msgstr "Pakken {pkg} er klar til å bli bygd i {path}/{git}"
 
 #: quack.py:275
 msgid "You should REALLY take time to inspect its PKGBUILD."
@@ -148,9 +148,9 @@ msgid "Keywords"
 msgstr "Nøkkelord"
 
 #: quack.py:402
-#, fuzzy, python-format
+#, python-format
 msgid "Display %(prog)s version information and exit."
-msgstr "Vis Quack-versjonsinformasjon og avslutt."
+msgstr "Vis %(prog)s-versjonsinformasjon og avslutt."
 
 #: quack.py:430
 #, python-format
