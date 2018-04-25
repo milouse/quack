@@ -128,7 +128,7 @@ class AurHelper:
     def print_list(self, with_devel=False):
         print("\n".join(self.list(True, with_devel)))
 
-    def list_garbage(self, only_orphaned=False):
+    def list_garbage(self, post_transac=False):
         print_info(_("Orphaned packages"))
         p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
         if p.returncode == 1:
@@ -136,19 +136,6 @@ class AurHelper:
                   .format(
                       hilite("==>", "green"),
                       hilite("no orphaned packages found", bold=True)))
-        print_info(_("Removed packages kept in cache"))
-        if only_orphaned:
-            return
-        cmd = ["paccache", "-du"]
-        if USE_COLOR == 'never':
-            cmd.insert(1, "--nocolor")
-        subprocess.run(cmd)
-        print_info(_("Old package versions kept in cache"))
-        if USE_COLOR == 'never':
-            cmd[2] = "-d"
-        else:
-            cmd[1] = "-d"
-        subprocess.run(cmd)
         print_info(_("Pacman post transaction files"))
         ignore_pathes = [
             "/dev", "/home", "/lost+found", "/proc", "/root",
@@ -166,6 +153,19 @@ class AurHelper:
             cmd.extend(["-name", p, "-o"])
         cmd.pop()
         cmd += [")", "-print"]
+        subprocess.run(cmd)
+        if post_transac:
+            return
+        print_info(_("Removed packages kept in cache"))
+        cmd = ["paccache", "-du"]
+        if USE_COLOR == 'never':
+            cmd.insert(1, "--nocolor")
+        subprocess.run(cmd)
+        print_info(_("Old package versions kept in cache"))
+        if USE_COLOR == 'never':
+            cmd[2] = "-d"
+        else:
+            cmd[1] = "-d"
         subprocess.run(cmd)
 
     def fetch_pkg_infos(self, terms, req_type="info"):
