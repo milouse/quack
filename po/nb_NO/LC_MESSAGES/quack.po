@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-04-25 20:13+0200\n"
-"PO-Revision-Date: 2018-04-25 10:58+0000\n"
-"Last-Translator: Étienne Deparis <etienne@depar.is>\n"
+"PO-Revision-Date: 2018-04-26 01:40+0000\n"
+"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
 "translations/nb_NO/>\n"
 "Language: nb_NO\n"
@@ -32,26 +32,24 @@ msgid "Orphaned packages"
 msgstr "Avsondrede pakker"
 
 #: quack.py:135
-#, fuzzy
 msgid "no orphaned package found"
-msgstr "Avsondrede pakker"
+msgstr "fant ingen avsondrede pakker"
 
 #: quack.py:137
 msgid "Pacman post transaction files"
 msgstr "Etteroverføringsfiler for Pacman"
 
 #: quack.py:159
-#, fuzzy
 msgid "no transactional file found"
-msgstr "Etteroverføringsfiler for Pacman"
+msgstr "ingen overgangsfil funnet"
 
 #: quack.py:165
 msgid "Removed packages kept in cache"
-msgstr ""
+msgstr "Fjernede pakker beholdt i hurtiglager"
 
 #: quack.py:170
 msgid "Old package versions kept in cache"
-msgstr ""
+msgstr "Gamle pakkeversjoner beholdt i hurtiglager"
 
 #: quack.py:231
 msgid "Do you want to upgrade the above packages?"
@@ -165,7 +163,7 @@ msgstr "Vis %(prog)s-versjonsinformasjon og avslutt."
 #: quack.py:441
 #, python-format
 msgid "Allow %(prog)s to be run as root"
-msgstr ""
+msgstr "Tillat %(prog)s å kjøre som root"
 
 #: quack.py:475
 #, python-brace-format
