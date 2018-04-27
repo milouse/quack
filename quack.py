@@ -64,7 +64,7 @@ def print_info(message, symbol="::", color="blue"):
 
 def question(message):
     return input("{} {} ".format(
-        hilite("::", "blue"),
+        hilite("::", "blue", True),
         hilite(message, bold=True))).lower()
 
 
