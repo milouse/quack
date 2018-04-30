@@ -88,14 +88,14 @@ class AurHelper:
         return re.search("-(?:bzr|cvs|git|hg|svn)$", package)
 
     def clean_pkg_name(self, package):
-        m = re.match("^aur/([a-z0-9-_]+)$", package)
+        m = re.search("^aur/([a-z0-9-_]+)$", package)
         if m is None:
             return package
         return m[1]
 
     def current_version(self, package):
         for line in self.local_pkgs:
-            m = re.match("^{} (.+)$".format(package), line)
+            m = re.search("^{} (.+)$".format(package), line)
             if m is None:
                 continue
             return m[1]
