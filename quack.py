@@ -206,7 +206,7 @@ class AurHelper:
             aur_deps.remove(p["Name"])
         return aur_deps, loc_deps
 
-    def upgrade(self, with_devel=False):
+    def upgrade(self, with_devel=False, dry_run=False):
         res = self.fetch_pkg_infos(self.list(False, with_devel))
         if res is None or len(res) == 0:
             return False
@@ -234,7 +234,7 @@ class AurHelper:
             return False
         rcode = True
         for p in upgradable_pkgs:
-            lr = self.install(p)
+            lr = self.install(p, dry_run)
             rcode = rcode and lr
         return rcode
 
@@ -259,7 +259,7 @@ class AurHelper:
 
         return True
 
-    def install(self, package):
+    def install(self, package, dry_run=False):
         package = self.clean_pkg_name(package)
         no_pkg_err = _("{pkg} is NOT an AUR package").format(pkg=package)
         res = self.fetch_pkg_infos([package])
@@ -291,9 +291,12 @@ class AurHelper:
                 sys.exit()
             elif check != "y":
                 return False
-            p = subprocess.run(["makepkg", "-sr"])
-            if p.returncode != 0:
-                return False
+            if dry_run:
+                print("[dry-run] makepkg -sr")
+            else:
+                p = subprocess.run(["makepkg", "-sr"])
+                if p.returncode != 0:
+                    return False
 
             aur_deps, loc_deps = self.aur_dependencies(deps, git_name)
             if len(aur_deps) > 0:
@@ -305,6 +308,10 @@ class AurHelper:
                 if f.endswith(".pkg.tar.xz"):
                     built_packages.append(f)
             if len(built_packages) == 1:
+                if dry_run:
+                    print("[dry-run] pacman -U {}"
+                          .format(built_packages[0]))
+                    return True
                 return self.pacman_install([built_packages[0]])
             print_info(_("The following packages have been built:"))
             i = 0
@@ -314,6 +321,10 @@ class AurHelper:
             ps = question(_("Which one do you really want to install?") +
                           " [1…{}/A]".format(i))
             if ps == "a":
+                if dry_run:
+                    print("[dry-run] pacman -U {}"
+                          .format(" ".join(built_packages)))
+                    return True
                 return self.pacman_install(built_packages)
             final_pkgs = []
             try:
@@ -336,6 +347,10 @@ class AurHelper:
                             continue
                         final_pkgs.append(bp)
                         break
+            if dry_run:
+                print("[dry-run] pacman -U {}"
+                      .format(" ".join(final_pkgs)))
+                return True
             return self.pacman_install(final_pkgs)
 
     def search(self, terms):
@@ -439,6 +454,10 @@ if __name__ == "__main__":
                         "for list and upgrade operations")
     parser.add_argument("--crazyfool", action="store_true",
                         help=_("Allow %(prog)s to be run as root"))
+    parser.add_argument("-n", "--dry-run", action="store_true",
+                        help=_("Download package info and try to "
+                               "resolve dependencies, but do not build "
+                               "or install anything"))
     parser.add_argument("package", nargs="*", default=[],
                         help="One or more package name to install, "
                         "upgrade, display information about. Only "
@@ -502,13 +521,13 @@ if __name__ == "__main__":
         aur.print_list(args.devel)
 
     elif args.upgrade:
-        if aur.upgrade(args.devel):
+        if aur.upgrade(args.devel, args.dry_run):
             aur.list_garbage(True)
 
     else:
         rcode = True
         for p in args.package:
-            lr = aur.install(p)
+            lr = aur.install(p, args.dry_run)
             rcode = rcode and lr
         if rcode:
             aur.list_garbage(True)
