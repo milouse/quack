@@ -95,7 +95,7 @@ class AurHelper:
 
     def current_version(self, package):
         for line in self.local_pkgs:
-            m = re.search("^{} (.+)$".format(package), line)
+            m = re.search("^{} (.+)$".format(re.escape(package)), line)
             if m is None:
                 continue
             return m[1]
