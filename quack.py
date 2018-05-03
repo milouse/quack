@@ -267,7 +267,10 @@ class AurHelper:
             print_error(no_pkg_err)
         pkg_info = res[0]
         git_name = pkg_info["PackageBase"]
-        deps = pkg_info["Depends"]
+        try:
+            deps = pkg_info["Depends"]
+        except KeyError:
+            deps = []
         with tempfile.TemporaryDirectory() as tmpdirname:
             os.chdir(tmpdirname)
             p = subprocess.run(["git", "clone",
