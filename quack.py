@@ -135,22 +135,16 @@ class AurHelper:
             print_info(_("no orphaned package found"),
                        symbol="==>", color="green")
         print_info(_("Pacman post transaction files"))
-        ignore_pathes = [
-            "/dev", "/home", "/lost+found", "/proc", "/root",
-            "/run", "/sys", "/tmp", "/var/db", "/var/log",
-            "/var/spool", "/var/tmp"
-        ]
-        cmd = ["find", "/", "("]
-        for p in ignore_pathes:
-            cmd.extend(["-path", p, "-o"])
-        cmd.pop()
+        cmd = ["find"]
         if os.getuid() != 0:
             cmd.insert(0, "sudo")
-        cmd += [")", "-prune", "-o", "-type", "f", "("]
+        pac_pathes = ["/boot/", "/etc/", "/usr/"]
+        cmd += pac_pathes + ["-type", "f", "("]
         for p in ["*.pacsave", "*.pacorig", "*.pacnew"]:
             cmd.extend(["-name", p, "-o"])
         cmd.pop()
-        cmd += [")", "-print"]
+        cmd += [")"]
+        print(" ".join(cmd))
         subprocess.run(cmd)
         p = subprocess.run(
             cmd, check=True, stderr=subprocess.DEVNULL,
