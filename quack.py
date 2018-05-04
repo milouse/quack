@@ -150,8 +150,7 @@ class AurHelper:
         cmd.pop()
         cmd += [")"]
         p = subprocess.run(
-            cmd, check=True, stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE).stdout.decode().strip()
+            cmd, stdout=subprocess.PIPE).stdout.decode().strip()
         if p == "":
             print_info(_("no transactional file found"),
                        symbol="==>", color="green")
