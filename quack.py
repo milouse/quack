@@ -57,6 +57,11 @@ def print_error(message, quit=True):
         sys.exit(1)
 
 
+def print_warning(message):
+    print("{} {}".format(hilite(_("warning:"), "yellow", True),
+                         message))
+
+
 def print_info(message, symbol="::", color="blue"):
     print("{} {}".format(hilite(symbol, color, True),
                          hilite(message, bold=True)))
@@ -217,6 +222,9 @@ class AurHelper:
             if (with_devel is False or self.is_devel(p["Name"]) is None) \
                and ver_check[1] == cur_version:
                 # Somehow we have a local version greater than upstream
+                print_warning(
+                    _("Your system run a newer version of {pkg}")
+                    .format(pkg=p["Name"]))
                 continue
             upgradable_pkgs.append(p["Name"])
             print("{} - {} - {}".format(
