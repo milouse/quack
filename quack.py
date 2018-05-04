@@ -239,6 +239,7 @@ class AurHelper:
         for p in upgradable_pkgs:
             lr = self.install(p, dry_run)
             rcode = rcode and lr
+            os.chdir(os.path.expanduser("~"))
         return rcode
 
     def pacman_install(self, packages):
@@ -535,5 +536,6 @@ if __name__ == "__main__":
         for p in args.package:
             lr = aur.install(p, args.dry_run)
             rcode = rcode and lr
+            os.chdir(os.path.expanduser("~"))
         if rcode:
             aur.list_garbage(True)
