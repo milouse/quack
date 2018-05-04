@@ -149,8 +149,6 @@ class AurHelper:
             cmd.extend(["-name", p, "-o"])
         cmd.pop()
         cmd += [")"]
-        print(" ".join(cmd))
-        subprocess.run(cmd)
         p = subprocess.run(
             cmd, check=True, stderr=subprocess.DEVNULL,
             stdout=subprocess.PIPE).stdout.decode().strip()
