@@ -215,6 +215,9 @@ class AurHelper:
             cur_version = self.current_version(p["Name"])
             if cur_version == p["Version"]:
                 continue
+            # Yes I know about `vercmp`, but Array sort seems largely
+            # sufficient to determine if 2 version number are different
+            # or not, and it doesn't require another subprocess.
             ver_check = [cur_version, p["Version"]]
             ver_check.sort()
             if (with_devel is False or self.is_devel(p["Name"]) is None) \
