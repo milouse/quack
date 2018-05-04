@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-05-04 13:26+0200\n"
-"PO-Revision-Date: 2018-05-04 13:29+0200\n"
+"PO-Revision-Date: 2018-05-04 13:44+0200\n"
 "Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/quack/"
 "translations/fr/>\n"
@@ -25,7 +25,7 @@ msgstr "erreur :"
 
 #: quack.py:61
 msgid "warning:"
-msgstr "attention :"
+msgstr "avertissement :"
 
 #: quack.py:112
 msgid "[installed]"
