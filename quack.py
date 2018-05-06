@@ -78,6 +78,7 @@ class AurHelper:
         self.config = config
         self.with_devel = devel
         self.dry_run = dry_run
+        self.temp_dir = None
         self.local_pkgs = subprocess.run(
             ["pacman", "-Q", "--color=never"],
             check=True, stderr=subprocess.DEVNULL,
@@ -185,45 +186,53 @@ class AurHelper:
             return []
         return raw_json["results"]
 
-    def aur_dependencies(self, all_deps, git_name):
-        aur_deps = []
-        for d in all_deps:
+    def extract_dependencies(self, pkg_info):
+        pkg_info["AurDepends"] = []
+        pkg_info["PackageBaseDepends"] = []
+        if "Depends" not in pkg_info:
+            pkg_info["Depends"] = []
+        for d in pkg_info["Depends"]:
             if d in self.all_pkgs:
                 continue
-            aur_deps.append(d)
-        if len(aur_deps) == 0:
-            return [], []
-        ai = self.fetch_pkg_infos(aur_deps)
+            pkg_info["AurDepends"].append(d)
+        if len(pkg_info["AurDepends"]) == 0:
+            return pkg_info
+        ai = self.fetch_pkg_infos(pkg_info["AurDepends"])
         if ai is None or len(ai) == 0:
-            return [], []
-        loc_deps = []
+            return pkg_info
         for p in ai:
-            if p["PackageBase"] != git_name:
+            if p["PackageBase"] != pkg_info["PackageBase"]:
                 continue
-            loc_deps.append(p["Name"])
-            aur_deps.remove(p["Name"])
-        return aur_deps, loc_deps
+            pkg_info["PackageBaseDepends"].append(p["Name"])
+            pkg_info["AurDepends"].remove(p["Name"])
+        return pkg_info
 
-    def upgrade(self, with_devel=False, dry_run=False):
-        res = self.fetch_pkg_infos(self.list(False, with_devel))
+    def should_upgrade(self, package, current_version):
+        if current_version == package["Version"]:
+            return False
+        # Yes I know about `vercmp`, but Array sort seems largely
+        # sufficient to determine if 2 version number are different
+        # or not, and it doesn't require another subprocess.
+        ver_check = [current_version, package["Version"]]
+        ver_check.sort()
+        if ((self.with_devel is False
+           or self.is_devel(package["Name"]) is None)
+           and ver_check[1] == current_version):
+            # Somehow we have a local version greater than upstream
+            print_warning(
+                _("Your system run a newer version of {pkg}")
+                .format(pkg=package["Name"]))
+            return False
+        return True
+
+    def upgrade(self):
+        res = self.fetch_pkg_infos(self.list(False))
         if res is None or len(res) == 0:
             return False
         upgradable_pkgs = []
         for p in res:
             cur_version = self.current_version(p["Name"])
-            if cur_version == p["Version"]:
-                continue
-            # Yes I know about `vercmp`, but Array sort seems largely
-            # sufficient to determine if 2 version number are different
-            # or not, and it doesn't require another subprocess.
-            ver_check = [cur_version, p["Version"]]
-            ver_check.sort()
-            if (with_devel is False or self.is_devel(p["Name"]) is None) \
-               and ver_check[1] == cur_version:
-                # Somehow we have a local version greater than upstream
-                print_warning(
-                    _("Your system run a newer version of {pkg}")
-                    .format(pkg=p["Name"]))
+            if not self.should_upgrade(p, cur_version):
                 continue
             upgradable_pkgs.append(p["Name"])
             print("{} - {} - {}".format(
@@ -240,8 +249,39 @@ class AurHelper:
         for p in upgradable_pkgs:
             lr = self.install(p)
             rcode = rcode and lr
-            os.chdir(os.path.expanduser("~"))
         return rcode
+
+    def switch_to_temp_dir(self, package):
+        no_pkg_err = _("{pkg} is NOT an AUR package").format(pkg=package)
+        res = self.fetch_pkg_infos([package])
+        if res is None or len(res) == 0:
+            print_error(no_pkg_err)
+        pkg_info = res[0]
+        self.temp_dir = tempfile.TemporaryDirectory(prefix="quack_")
+        p = subprocess.run(["git", "clone",
+                            "https://aur.archlinux.org/{}.git"
+                            .format(pkg_info["PackageBase"]),
+                            self.temp_dir.name])
+        if p.returncode != 0:
+            self.close_temp_dir()
+            print_error(_("impossible to clone {pkg} from AUR")
+                        .format(pkg=package))
+        os.chdir(self.temp_dir.name)
+        if not os.path.isfile("PKGBUILD"):
+            self.close_temp_dir()
+            print_error(no_pkg_err)
+        print_info(_("Package {pkg} is ready to be built in {path}")
+                   .format(pkg=package, path=self.temp_dir.name))
+        return pkg_info
+
+    def close_temp_dir(self, success=True, should_exit=False):
+        if self.temp_dir is not None:
+            os.chdir(os.path.expanduser("~"))
+            self.temp_dir.cleanup()
+            self.temp_dir = None
+        if should_exit:
+            sys.exit()
+        return success
 
     def pacman_install(self, packages):
         pacman_cmd = ["pacman", "--color", USE_COLOR, "--needed", "-U"]
@@ -255,111 +295,105 @@ class AurHelper:
                 shutil.copyfile(px, "/tmp/{}".format(px))
             print_info(_("A copy of the built packages "
                          "has been kept in /tmp."))
-            return False
+            return self.close_temp_dir(False)
         for p in packages:
             pcmd = ["cp", p, "/var/cache/pacman/pkg/{}".format(p)]
             if os.getuid() != 0:
                 pcmd.insert(0, "sudo")
             subprocess.run(pcmd)
+        return self.close_temp_dir()
 
-        return True
-
-    def install(self, package, dry_run=False):
+    def build(self, package):
         package = self.clean_pkg_name(package)
-        no_pkg_err = _("{pkg} is NOT an AUR package").format(pkg=package)
-        res = self.fetch_pkg_infos([package])
-        if res is None or len(res) == 0:
-            print_error(no_pkg_err)
-        pkg_info = res[0]
-        git_name = pkg_info["PackageBase"]
-        try:
-            deps = pkg_info["Depends"]
-        except KeyError:
-            deps = []
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            os.chdir(tmpdirname)
-            p = subprocess.run(["git", "clone",
-                                "https://aur.archlinux.org/{}.git"
-                                .format(git_name)])
-            if p.returncode != 0:
-                print_error(_("impossible to clone {pkg} from AUR")
-                            .format(pkg=package))
+        pkg_info = self.switch_to_temp_dir(package)
+        print_info(_("You should REALLY take time to inspect its PKGBUILD."))
+        check = question(_("When it's done, shall we continue?") + " [y/N/q]")
+        if check == "q":
+            return self.close_temp_dir(should_exit=True)
+        elif check != "y":
+            return self.close_temp_dir(False)
+        pkg_info = self.extract_dependencies(pkg_info)
+        if len(pkg_info["AurDepends"]) > 0:
+            unsatisfied = []
+            for d in pkg_info["AurDepends"]:
+                pdata = re.split("[<>=]+", d)
+                if pdata[0] not in self.list():
+                    unsatisfied.append(pdata[0])
+            if len(unsatisfied) > 0:
+                print_warning("the following packages must be "
+                              "installed first: {}"
+                              .format(", ".join(unsatisfied)))
+        if self.dry_run:
+            print("[dry-run] makepkg -sr")
+            buildable_pkgs = subprocess.run(
+                ["makepkg", "--packagelist"], check=True,
+                stdout=subprocess.PIPE).stdout.decode().split("\n")
+            arch = subprocess.run(
+                ["uname", "-m"], check=True,
+                stdout=subprocess.PIPE).stdout.decode()
+            allowed_pkgs = []
+            for p in buildable_pkgs:
+                if p.endswith("-any") or p.endswith("-" + arch):
+                    allowed_pkgs.append(p + ".pkg.tar.xz")
+            pkg_info["BuiltPackages"] = allowed_pkgs
+            return pkg_info
+        p = subprocess.run(["makepkg", "-sr"])
+        if p.returncode != 0:
+            return self.close_temp_dir(False)
+        pkg_info["BuiltPackages"] = []
+        for f in os.listdir():
+            if f.endswith(".pkg.tar.xz"):
+                pkg_info["BuiltPackages"].append(f)
+        return pkg_info
 
-            os.chdir(git_name)
-            if not os.path.isfile("PKGBUILD"):
-                print_error(no_pkg_err)
-
-            print_info(_("Package {pkg} is ready to be built in {path}/{git}")
-                       .format(pkg=package, path=tmpdirname, git=git_name))
-            print_info(_("You should REALLY take time to inspect "
-                         "its PKGBUILD."))
-            check = question(_("When it's done, shall we continue?") +
-                             " [y/N/q]")
-            if check == "q":
-                sys.exit()
-            elif check != "y":
-                return False
-            if dry_run:
-                print("[dry-run] makepkg -sr")
-            else:
-                p = subprocess.run(["makepkg", "-sr"])
-                if p.returncode != 0:
-                    return False
-
-            aur_deps, loc_deps = self.aur_dependencies(deps, git_name)
-            if len(aur_deps) > 0:
-                print("TODO: the following packages must be installed "
-                      "first: {}".format(", ".join(aur_deps)))
-
-            built_packages = []
-            for f in os.listdir():
-                if f.endswith(".pkg.tar.xz"):
-                    built_packages.append(f)
-            if len(built_packages) == 1:
-                if dry_run:
-                    print("[dry-run] pacman -U {}"
-                          .format(built_packages[0]))
-                    return True
-                return self.pacman_install([built_packages[0]])
-            print_info(_("The following packages have been built:"))
-            i = 0
-            for l in built_packages:
-                i += 1
-                print("[{}] {}".format(i, l))
-            ps = question(_("Which one do you really want to install?") +
-                          " [1…{}/A]".format(i))
-            if ps == "a":
-                if dry_run:
-                    print("[dry-run] pacman -U {}"
-                          .format(" ".join(built_packages)))
-                    return True
-                return self.pacman_install(built_packages)
-            final_pkgs = []
-            try:
-                for p in ps.split(" "):
-                    pi = int(p)
-                    if pi > len(built_packages):
-                        raise ValueError
-                    final_pkgs.append(built_packages[pi - 1])
-            except ValueError:
-                print_error(_("{str} is not a valid input")
-                            .format(str=p))
-            if len(final_pkgs) == 1 and \
-               final_pkgs[0].startswith(package) and \
-               len(loc_deps) > 0:
-                for ld in loc_deps:
-                    for bp in built_packages:
-                        if bp == final_pkgs[0]:
-                            continue
-                        if not bp.startswith(ld):
-                            continue
-                        final_pkgs.append(bp)
-                        break
-            if dry_run:
+    def install(self, package):
+        pkg_info = self.build(package)
+        if pkg_info is False:
+            return False
+        built_packages = pkg_info["BuiltPackages"]
+        if len(built_packages) == 0:
+            return self.close_temp_dir(False)
+        if len(built_packages) == 1:
+            if self.dry_run:
+                print("[dry-run] pacman -U {}".format(built_packages[0]))
+                return self.close_temp_dir(True)
+            return self.pacman_install([built_packages[0]])
+        print_info(_("The following packages have been built:"))
+        i = 0
+        for l in built_packages:
+            i += 1
+            print("[{}] {}".format(i, l))
+        ps = question(_("Which one do you really want to install?") +
+                      " [1…{}/A]".format(i))
+        if ps == "a":
+            if self.dry_run:
                 print("[dry-run] pacman -U {}"
-                      .format(" ".join(final_pkgs)))
-                return True
-            return self.pacman_install(final_pkgs)
+                      .format(" ".join(built_packages)))
+                return self.close_temp_dir(True)
+            return self.pacman_install(built_packages)
+        final_pkgs = []
+        try:
+            for p in ps.split(" "):
+                pi = int(p)
+                if pi > len(built_packages):
+                    raise ValueError
+                final_pkgs.append(built_packages[pi - 1])
+        except ValueError:
+            print_error(_("{str} is not a valid input").format(str=p))
+        if (len(final_pkgs) == 1 and final_pkgs[0].startswith(package) and
+           len(pkg_info["PackageBaseDepends"]) > 0):
+            for ld in pkg_info["PackageBaseDepends"]:
+                for bp in built_packages:
+                    if bp == final_pkgs[0]:
+                        continue
+                    if not bp.startswith(ld):
+                        continue
+                    final_pkgs.append(bp)
+                    break
+        if self.dry_run:
+            print("[dry-run] pacman -U {}".format(" ".join(final_pkgs)))
+            return self.close_temp_dir(True)
+        return self.pacman_install(final_pkgs)
 
     def search(self, terms):
         res = self.fetch_pkg_infos(terms, "search")
@@ -545,6 +579,5 @@ if __name__ == "__main__":
         for p in args.package:
             lr = aur.install(p)
             rcode = rcode and lr
-            os.chdir(os.path.expanduser("~"))
         if rcode:
             aur.list_garbage(True)
