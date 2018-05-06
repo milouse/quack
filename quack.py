@@ -74,8 +74,10 @@ def question(message):
 
 
 class AurHelper:
-    def __init__(self, config):
+    def __init__(self, config, devel=False, dry_run=False):
         self.config = config
+        self.with_devel = devel
+        self.dry_run = dry_run
         self.local_pkgs = subprocess.run(
             ["pacman", "-Q", "--color=never"],
             check=True, stderr=subprocess.DEVNULL,
@@ -116,13 +118,13 @@ class AurHelper:
             hilite(package, bold=True),
             version)
 
-    def list(self, with_version=False, with_devel=False):
+    def list(self, with_version=False):
         pkgs = []
         for p in self.local_pkgs:
             d = p.split(" ")
             if d[0] in self.all_pkgs:
                 continue
-            if self.is_devel(d[0]) and not with_devel:
+            if self.is_devel(d[0]) and not self.with_devel:
                 continue
             if with_version:
                 pkgs.append(self.color_pkg_with_version(d[0], d[1]))
@@ -130,8 +132,8 @@ class AurHelper:
                 pkgs.append(d[0])
         return pkgs
 
-    def print_list(self, with_devel=False):
-        print("\n".join(self.list(True, with_devel)))
+    def print_list(self):
+        print("\n".join(self.list(True)))
 
     def list_garbage(self, post_transac=False):
         print_info(_("Orphaned packages"))
@@ -236,7 +238,7 @@ class AurHelper:
             return False
         rcode = True
         for p in upgradable_pkgs:
-            lr = self.install(p, dry_run)
+            lr = self.install(p)
             rcode = rcode and lr
             os.chdir(os.path.expanduser("~"))
         return rcode
@@ -508,7 +510,7 @@ if __name__ == "__main__":
         print_error(_("Do not run {quack_cmd} as root!")
                     .format(quack_cmd=sys.argv[0]))
 
-    aur = AurHelper(config)
+    aur = AurHelper(config, args.devel, args.dry_run)
 
     if args.list_garbage:
         aur.list_garbage()
@@ -532,16 +534,16 @@ if __name__ == "__main__":
         aur.info(" ".join(args.package))
 
     elif args.list:
-        aur.print_list(args.devel)
+        aur.print_list()
 
     elif args.upgrade:
-        if aur.upgrade(args.devel, args.dry_run):
+        if aur.upgrade():
             aur.list_garbage(True)
 
     else:
         rcode = True
         for p in args.package:
-            lr = aur.install(p, args.dry_run)
+            lr = aur.install(p)
             rcode = rcode and lr
             os.chdir(os.path.expanduser("~"))
         if rcode:
