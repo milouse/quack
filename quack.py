@@ -372,6 +372,14 @@ class AurHelper:
         value = "--"
         if title in obj:
             if type(obj[title]) is list:
+                if title in ["Depends", "MakeDepends"]:
+                    new_list = []
+                    for p in obj[title]:
+                        if p in self.all_pkgs:
+                            new_list.append(p)
+                            continue
+                        new_list.append(hilite(p, underline=True))
+                    obj[title] = new_list
                 if len(obj[title]) != 0:
                     value = "  ".join(obj[title])
             else:
