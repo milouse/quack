@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-05-06 20:47+0200\n"
-"PO-Revision-Date: 2018-05-07 14:53+0000\n"
+"PO-Revision-Date: 2018-05-08 15:39+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
 "translations/nb/>\n"
@@ -58,7 +58,7 @@ msgstr "Gamle pakkeversjoner beholdt i hurtiglager"
 #: quack.py:223
 #, python-brace-format
 msgid "Your system run a newer version of {pkg}"
-msgstr "Systemet ditt kjører en nyere versjon av"
+msgstr "Systemet ditt kjører en nyere versjon av {pkg}"
 
 #: quack.py:244
 msgid "Do you want to upgrade the above packages?"
