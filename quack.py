@@ -213,11 +213,14 @@ class AurHelper:
         # Yes I know about `vercmp`, but Array sort seems largely
         # sufficient to determine if 2 version number are different
         # or not, and it doesn't require another subprocess.
-        ver_check = [current_version, package["Version"]]
-        ver_check.sort()
+        # Ok, after test, array sorting failed to sort 1.9.1
+        # and 1.11.1. We need to use vercmp.
+        ver_check = subprocess.run(
+            ["vercmp", current_version, package["Version"]],
+            check=True, stdout=subprocess.PIPE).stdout.decode().strip()
         if ((self.with_devel is False
            or self.is_devel(package["Name"]) is None)
-           and ver_check[1] == current_version):
+           and ver_check == 1):
             # Somehow we have a local version greater than upstream
             print_warning(
                 _("Your system run a newer version of {pkg}")
