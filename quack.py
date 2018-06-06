@@ -428,10 +428,6 @@ class AurHelper:
 
     def info(self, package):
         package = self.clean_pkg_name(package)
-        if self.current_version(package) is not None:
-            p = subprocess.run(["pacman", "--color", USE_COLOR,
-                                "-Qi", package])
-            sys.exit(p.returncode)
         res = self.fetch_pkg_infos([package])[0]
         if res is None:
             return False
