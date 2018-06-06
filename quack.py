@@ -403,9 +403,12 @@ class AurHelper:
         if res is None:
             return False
         for p in res:
-            print("{}\n    {}".format(
+            outdated = ""
+            if "OutOfDate" in p and p["OutOfDate"] is not None:
+                outdated = " " + hilite(_("[outdated]"), "red", True)
+            print("{}{}\n    {}".format(
                 self.color_pkg_with_version(p["Name"], p["Version"]),
-                p["Description"]))
+                outdated, p["Description"]))
 
     def info_line(self, title, obj, i18n_title):
         value = "--"
@@ -421,7 +424,7 @@ class AurHelper:
                     obj[title] = new_list
                 if len(obj[title]) != 0:
                     value = "  ".join(obj[title])
-            else:
+            elif obj[title] is not None:
                 value = str(obj[title])
         attr = hilite("{}: ".format(i18n_title.ljust(25)), bold=True)
         print(self.tw.fill(attr + value))
@@ -441,6 +444,10 @@ class AurHelper:
                 .format(res["Maintainer"])
         res["LastModified"] = time.strftime(
             "%c %Z", time.gmtime(res["LastModified"]))
+        if "OutOfDate" in res and res["OutOfDate"] is not None:
+            ood = time.strftime("%c %Z", time.gmtime(res["OutOfDate"]))
+            res["OutOfDate"] = hilite(
+                _("Since {date}").format(date=ood), "red", True)
         res["AurPage"] = "https://aur.archlinux.org/packages/{}" \
             .format(res["Name"])
         self.info_line("Name",         res, _("Name"))
@@ -454,6 +461,7 @@ class AurHelper:
         self.info_line("Conflicts",    res, _("Conflicts With"))
         self.info_line("Maintainer",   res, _("Last Maintainer"))
         self.info_line("LastModified", res, _("Last Modified"))
+        self.info_line("OutOfDate",    res, _("Out of Date"))
         self.info_line("NumVotes",     res, _("Votes Number"))
         self.info_line("Popularity",   res, _("Popularity"))
         self.info_line("AurPage",      res, _("AUR Page"))

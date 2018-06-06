@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2018-05-06 20:47+0200\n"
+"POT-Creation-Date: 2018-06-06 18:23+0200\n"
 "PO-Revision-Date: 2018-05-08 15:39+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
@@ -55,126 +55,139 @@ msgstr "Fjernede pakker beholdt i hurtiglager"
 msgid "Old package versions kept in cache"
 msgstr "Gamle pakkeversjoner beholdt i hurtiglager"
 
-#: quack.py:223
+#: quack.py:226
 #, python-brace-format
 msgid "Your system run a newer version of {pkg}"
 msgstr "Systemet ditt kjører en nyere versjon av {pkg}"
 
-#: quack.py:244
+#: quack.py:247
 msgid "Do you want to upgrade the above packages?"
 msgstr "Ønsker du å oppgradere pakkene ovenfor?"
 
-#: quack.py:255
+#: quack.py:258
 #, python-brace-format
 msgid "{pkg} is NOT an AUR package"
 msgstr "{pkg} er IKKE en AUR-pakke"
 
-#: quack.py:267
+#: quack.py:270
 #, python-brace-format
 msgid "impossible to clone {pkg} from AUR"
 msgstr "kunne ikke klone {pkg} fra AUR"
 
-#: quack.py:273
+#: quack.py:276
 #, python-brace-format
 msgid "Package {pkg} is ready to be built in {path}"
 msgstr "Pakken {pkg} er klar til å bli bygd i {path}"
 
-#: quack.py:296
+#: quack.py:299
 msgid "A copy of the built packages has been kept in /tmp."
 msgstr "En kopi av de bygde pakkene har blitt behold i /tmp."
 
-#: quack.py:309
+#: quack.py:312
 msgid "You should REALLY take time to inspect its PKGBUILD."
 msgstr "Du burde VIRKELIG ta deg tid til å gjennomse dens PKGBUILD."
 
-#: quack.py:310
+#: quack.py:313
 msgid "When it's done, shall we continue?"
 msgstr "Når det er gjort, skal vi fortsette?"
 
-#: quack.py:361
+#: quack.py:364
 msgid "The following packages have been built:"
 msgstr "Følgende pakker har blitt bygd:"
 
-#: quack.py:366
+#: quack.py:369
 msgid "Which one do you really want to install?"
 msgstr "Hvilken ønsker du å installere?"
 
-#: quack.py:382
+#: quack.py:385
 #, python-brace-format
 msgid "{str} is not a valid input"
 msgstr "{str} er ikke gyldig inndata"
 
-#: quack.py:447
+#: quack.py:408
+msgid "[outdated]"
+msgstr ""
+
+#: quack.py:450
+#, python-brace-format
+msgid "Since {date}"
+msgstr ""
+
+#: quack.py:453
 msgid "Name"
 msgstr "Navn"
 
-#: quack.py:448
+#: quack.py:454
 msgid "Version"
 msgstr "Versjon"
 
-#: quack.py:449
+#: quack.py:455
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: quack.py:450
+#: quack.py:456
 msgid "URL"
 msgstr "Nettadresse"
 
-#: quack.py:451
+#: quack.py:457
 msgid "Licenses"
 msgstr "Lisenser"
 
-#: quack.py:452
+#: quack.py:458
 msgid "Provides"
 msgstr "Tilbyr"
 
-#: quack.py:453
+#: quack.py:459
 msgid "Depends On"
 msgstr "Avhenger av"
 
-#: quack.py:454
+#: quack.py:460
 msgid "Build Depends On"
 msgstr "Bygg avhenger av"
 
-#: quack.py:455
+#: quack.py:461
 msgid "Conflicts With"
 msgstr "Kolliderer med"
 
-#: quack.py:456
+#: quack.py:462
 msgid "Last Maintainer"
 msgstr "Siste vedlikeholder"
 
-#: quack.py:457
+#: quack.py:463
 msgid "Last Modified"
 msgstr "Sist endret"
 
-#: quack.py:458
+#: quack.py:464
+msgid "Out of Date"
+msgstr ""
+
+#: quack.py:465
 msgid "Votes Number"
 msgstr "Stemmenummer"
 
-#: quack.py:459
+#: quack.py:466
 msgid "Popularity"
 msgstr "Popularitet"
 
-#: quack.py:460
+#: quack.py:467
 msgid "AUR Page"
 msgstr "AUR-side"
 
-#: quack.py:461
+#: quack.py:468
 msgid "Keywords"
 msgstr "Nøkkelord"
 
-#: quack.py:478
+#: quack.py:485
 #, python-format
 msgid "Display %(prog)s version information and exit."
 msgstr "Vis %(prog)s-versjonsinformasjon og avslutt."
 
-#: quack.py:506
+#: quack.py:513
 #, python-format
 msgid "Allow %(prog)s to be run as root"
 msgstr "Tillat %(prog)s å kjøre som root"
 
-#: quack.py:508
+#: quack.py:515
 msgid ""
 "Download package info and try to resolve dependencies, but do not build or "
 "install anything"
@@ -182,15 +195,15 @@ msgstr ""
 "Last ned pakkeinfo og prøv å løse avhengigheter, men ikke bygg eller "
 "installer noe"
 
-#: quack.py:544
+#: quack.py:551
 #, python-brace-format
 msgid "Do not run {quack_cmd} as root!"
 msgstr "Ikke kjør {quack_cmd} som root!"
 
-#: quack.py:557
+#: quack.py:564
 msgid "no targets specified (use -h for help)\n"
 msgstr "ingen mål angitt (bruk -h for hjelp)\n"
 
-#: quack.py:560
+#: quack.py:567
 msgid "no operation specified (use -h for help)\n"
 msgstr "ingen operasjon angitt (bruk -h for hjelp)\n"
