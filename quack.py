@@ -260,6 +260,18 @@ class AurHelper:
         if res is None or len(res) == 0:
             print_error(no_pkg_err)
         pkg_info = res[0]
+        pkg_info["FastForward"] = False
+        pkg_info["CARCH"] = subprocess.run(
+            ["uname", "-m"], check=True,
+            stdout=subprocess.PIPE).stdout.decode().strip()
+        pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.xz".format(
+            pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
+        if os.path.isfile(pkg_file):
+            pkg_info["BuiltPackages"] = [pkg_file]
+            pkg_info["FastForward"] = True
+            print_info(_("Package {pkg} is already built as {pkgfile}")
+                       .format(pkg=package, pkgfile=pkg_file))
+            return pkg_info
         self.temp_dir = tempfile.TemporaryDirectory(prefix="quack_")
         p = subprocess.run(["git", "clone",
                             "https://aur.archlinux.org/{}.git"
@@ -286,11 +298,13 @@ class AurHelper:
             sys.exit()
         return success
 
-    def pacman_install(self, packages):
+    def pacman_install(self, packages, backup=True):
         pacman_cmd = ["pacman", "--color", USE_COLOR, "--needed", "-U"]
         if os.getuid() != 0:
             pacman_cmd.insert(0, "sudo")
         p = subprocess.run(pacman_cmd + packages)
+        if backup is False:
+            return self.close_temp_dir()
         if p.returncode != 0:
             # Strange, pacman failed. May be a sudo timeout. Keep a copy
             # of the pkgs
@@ -309,6 +323,8 @@ class AurHelper:
     def build(self, package):
         package = self.clean_pkg_name(package)
         pkg_info = self.switch_to_temp_dir(package)
+        if pkg_info["FastForward"] is True:
+            return pkg_info
         print_info(_("You should REALLY take time to inspect its PKGBUILD."))
         check = question(_("When it's done, shall we continue?") + " [y/N/q]")
         if check == "q":
@@ -331,12 +347,9 @@ class AurHelper:
             buildable_pkgs = subprocess.run(
                 ["makepkg", "--packagelist"], check=True,
                 stdout=subprocess.PIPE).stdout.decode().split("\n")
-            arch = subprocess.run(
-                ["uname", "-m"], check=True,
-                stdout=subprocess.PIPE).stdout.decode()
             allowed_pkgs = []
             for p in buildable_pkgs:
-                if p.endswith("-any") or p.endswith("-" + arch):
+                if p.endswith("-any") or p.endswith("-" + pkg_info["CARCH"]):
                     allowed_pkgs.append(p + ".pkg.tar.xz")
             pkg_info["BuiltPackages"] = allowed_pkgs
             return pkg_info
@@ -360,7 +373,8 @@ class AurHelper:
             if self.dry_run:
                 print("[dry-run] pacman -U {}".format(built_packages[0]))
                 return self.close_temp_dir(True)
-            return self.pacman_install([built_packages[0]])
+            return self.pacman_install([built_packages[0]],
+                                       not pkg_info["FastForward"])
         print_info(_("The following packages have been built:"))
         i = 0
         for l in built_packages:
@@ -373,7 +387,8 @@ class AurHelper:
                 print("[dry-run] pacman -U {}"
                       .format(" ".join(built_packages)))
                 return self.close_temp_dir(True)
-            return self.pacman_install(built_packages)
+            return self.pacman_install(built_packages,
+                                       not pkg_info["FastForward"])
         final_pkgs = []
         try:
             for p in ps.split(" "):
@@ -396,7 +411,7 @@ class AurHelper:
         if self.dry_run:
             print("[dry-run] pacman -U {}".format(" ".join(final_pkgs)))
             return self.close_temp_dir(True)
-        return self.pacman_install(final_pkgs)
+        return self.pacman_install(final_pkgs, not pkg_info["FastForward"])
 
     def search(self, terms):
         res = self.fetch_pkg_infos(terms, "search")
