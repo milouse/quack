@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2018-06-06 18:23+0200\n"
-"PO-Revision-Date: 2018-06-06 18:24+0200\n"
+"POT-Creation-Date: 2018-06-21 13:03+0200\n"
+"PO-Revision-Date: 2018-06-21 13:05+0200\n"
 "Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/quack/"
 "translations/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Poedit 2.0.7\n"
+"X-Generator: Poedit 2.0.8\n"
 
 #: quack.py:54
 msgid "error:"
@@ -69,125 +69,130 @@ msgstr "Voulez-vous mettre à jour les paquets ci-dessus ?"
 msgid "{pkg} is NOT an AUR package"
 msgstr "{pkg} n'est PAS un paquet AUR"
 
-#: quack.py:270
+#: quack.py:272
+#, python-brace-format
+msgid "Package {pkg} is already built as {pkgfile}"
+msgstr "Le paquet {pkg} a déjà été construit dans {pkgfile}"
+
+#: quack.py:282
 #, python-brace-format
 msgid "impossible to clone {pkg} from AUR"
 msgstr "impossible de cloner {pkg} depuis AUR"
 
-#: quack.py:276
+#: quack.py:288
 #, python-brace-format
 msgid "Package {pkg} is ready to be built in {path}"
 msgstr "Le paquet {pkg} est prêt à être construit dans {path}"
 
-#: quack.py:299
+#: quack.py:313
 msgid "A copy of the built packages has been kept in /tmp."
 msgstr "Une copie du paquet construit a été conservée dans /tmp."
 
-#: quack.py:312
+#: quack.py:328
 msgid "You should REALLY take time to inspect its PKGBUILD."
 msgstr "Vous devriez VRAIMENT prendre le temps de vérifier le PKGBUILD."
 
-#: quack.py:313
+#: quack.py:329
 msgid "When it's done, shall we continue?"
 msgstr "Lorsque c'est fait, devons nous continuer ?"
 
-#: quack.py:364
+#: quack.py:378
 msgid "The following packages have been built:"
 msgstr "Les paquets suivant ont été construits :"
 
-#: quack.py:369
+#: quack.py:383
 msgid "Which one do you really want to install?"
 msgstr "Lequel d'entre eux voulez-vous réellement installer ?"
 
-#: quack.py:385
+#: quack.py:400
 #, python-brace-format
 msgid "{str} is not a valid input"
 msgstr "{str} n'est pas une entrée valide"
 
-#: quack.py:408
+#: quack.py:423
 msgid "[outdated]"
 msgstr "[périmé]"
 
-#: quack.py:450
+#: quack.py:465
 #, python-brace-format
 msgid "Since {date}"
 msgstr "Depuis le {date}"
 
-#: quack.py:453
+#: quack.py:468
 msgid "Name"
 msgstr "Nom"
 
-#: quack.py:454
+#: quack.py:469
 msgid "Version"
 msgstr "Version"
 
-#: quack.py:455
+#: quack.py:470
 msgid "Description"
 msgstr "Description"
 
-#: quack.py:456
+#: quack.py:471
 msgid "URL"
 msgstr "URL"
 
-#: quack.py:457
+#: quack.py:472
 msgid "Licenses"
 msgstr "Licences"
 
-#: quack.py:458
+#: quack.py:473
 msgid "Provides"
 msgstr "Fournit"
 
-#: quack.py:459
+#: quack.py:474
 msgid "Depends On"
 msgstr "Dépend de"
 
-#: quack.py:460
+#: quack.py:475
 msgid "Build Depends On"
 msgstr "Construction dépend de"
 
-#: quack.py:461
+#: quack.py:476
 msgid "Conflicts With"
 msgstr "Est en conflit avec"
 
-#: quack.py:462
+#: quack.py:477
 msgid "Last Maintainer"
 msgstr "Dernier paqueteur"
 
-#: quack.py:463
+#: quack.py:478
 msgid "Last Modified"
 msgstr "Dernière modification"
 
-#: quack.py:464
+#: quack.py:479
 msgid "Out of Date"
 msgstr "Périmé"
 
-#: quack.py:465
+#: quack.py:480
 msgid "Votes Number"
 msgstr "Nombre de vote"
 
-#: quack.py:466
+#: quack.py:481
 msgid "Popularity"
 msgstr "Popularité"
 
-#: quack.py:467
+#: quack.py:482
 msgid "AUR Page"
 msgstr "Page AUR"
 
-#: quack.py:468
+#: quack.py:483
 msgid "Keywords"
 msgstr "Mots clés"
 
-#: quack.py:485
+#: quack.py:500
 #, python-format
 msgid "Display %(prog)s version information and exit."
 msgstr "Affiche les informations de version de %(prog)s et quitte aussitôt."
 
-#: quack.py:513
+#: quack.py:528
 #, python-format
 msgid "Allow %(prog)s to be run as root"
 msgstr "Autoriser %(prog)s à être lancé avec les droits root"
 
-#: quack.py:515
+#: quack.py:530
 msgid ""
 "Download package info and try to resolve dependencies, but do not build or "
 "install anything"
@@ -195,15 +200,15 @@ msgstr ""
 "Télécharge les informations du paquet et essaye de résoudre les dépendances, "
 "mais ne construit pas et n'installe rien"
 
-#: quack.py:551
+#: quack.py:566
 #, python-brace-format
 msgid "Do not run {quack_cmd} as root!"
 msgstr "Ne lancez pas {quack_cmd} en tant que root !"
 
-#: quack.py:564
+#: quack.py:579
 msgid "no targets specified (use -h for help)\n"
 msgstr "aucune cible spécifiée (utiliser -h pour l’aide)\n"
 
-#: quack.py:567
+#: quack.py:582
 msgid "no operation specified (use -h for help)\n"
 msgstr "aucune opération spécifiée (utiliser -h pour l’aide)\n"
