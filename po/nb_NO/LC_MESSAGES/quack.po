@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-06-21 13:03+0200\n"
-"PO-Revision-Date: 2018-05-08 15:39+0000\n"
+"PO-Revision-Date: 2018-06-21 18:14+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
 "translations/nb/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.0-dev\n"
+"X-Generator: Weblate 3.1-dev\n"
 
 #: quack.py:54
 msgid "error:"
@@ -72,7 +72,7 @@ msgstr "{pkg} er IKKE en AUR-pakke"
 #: quack.py:272
 #, python-brace-format
 msgid "Package {pkg} is already built as {pkgfile}"
-msgstr ""
+msgstr "Pakken {pkg} er allerede bygd som {pkgfile}"
 
 #: quack.py:282
 #, python-brace-format
@@ -111,12 +111,12 @@ msgstr "{str} er ikke gyldig inndata"
 
 #: quack.py:423
 msgid "[outdated]"
-msgstr ""
+msgstr "[utdatert]"
 
 #: quack.py:465
 #, python-brace-format
 msgid "Since {date}"
-msgstr ""
+msgstr "Siden"
 
 #: quack.py:468
 msgid "Name"
@@ -164,7 +164,7 @@ msgstr "Sist endret"
 
 #: quack.py:479
 msgid "Out of Date"
-msgstr ""
+msgstr "Utdatert"
 
 #: quack.py:480
 msgid "Votes Number"
