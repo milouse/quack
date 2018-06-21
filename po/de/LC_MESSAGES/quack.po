@@ -1,0 +1,209 @@
+# Quack Translation Effort
+# Copyright (C) 2018 Quack volunteers
+# This file is distributed under the same license as the Quack package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Quack 0.2\n"
+"Report-Msgid-Bugs-To: bugs@depar.is\n"
+"POT-Creation-Date: 2018-06-21 13:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: quack.py:54
+msgid "error:"
+msgstr ""
+
+#: quack.py:61
+msgid "warning:"
+msgstr ""
+
+#: quack.py:115
+msgid "[installed]"
+msgstr ""
+
+#: quack.py:140
+msgid "Orphaned packages"
+msgstr ""
+
+#: quack.py:143
+msgid "no orphaned package found"
+msgstr ""
+
+#: quack.py:145
+msgid "Pacman post transaction files"
+msgstr ""
+
+#: quack.py:158
+msgid "no transactional file found"
+msgstr ""
+
+#: quack.py:164
+msgid "Removed packages kept in cache"
+msgstr ""
+
+#: quack.py:169
+msgid "Old package versions kept in cache"
+msgstr ""
+
+#: quack.py:226
+#, python-brace-format
+msgid "Your system run a newer version of {pkg}"
+msgstr ""
+
+#: quack.py:247
+msgid "Do you want to upgrade the above packages?"
+msgstr ""
+
+#: quack.py:258
+#, python-brace-format
+msgid "{pkg} is NOT an AUR package"
+msgstr ""
+
+#: quack.py:272
+#, python-brace-format
+msgid "Package {pkg} is already built as {pkgfile}"
+msgstr ""
+
+#: quack.py:282
+#, python-brace-format
+msgid "impossible to clone {pkg} from AUR"
+msgstr ""
+
+#: quack.py:288
+#, python-brace-format
+msgid "Package {pkg} is ready to be built in {path}"
+msgstr ""
+
+#: quack.py:313
+msgid "A copy of the built packages has been kept in /tmp."
+msgstr ""
+
+#: quack.py:328
+msgid "You should REALLY take time to inspect its PKGBUILD."
+msgstr ""
+
+#: quack.py:329
+msgid "When it's done, shall we continue?"
+msgstr ""
+
+#: quack.py:378
+msgid "The following packages have been built:"
+msgstr ""
+
+#: quack.py:383
+msgid "Which one do you really want to install?"
+msgstr ""
+
+#: quack.py:400
+#, python-brace-format
+msgid "{str} is not a valid input"
+msgstr ""
+
+#: quack.py:423
+msgid "[outdated]"
+msgstr ""
+
+#: quack.py:465
+#, python-brace-format
+msgid "Since {date}"
+msgstr ""
+
+#: quack.py:468
+msgid "Name"
+msgstr ""
+
+#: quack.py:469
+msgid "Version"
+msgstr ""
+
+#: quack.py:470
+msgid "Description"
+msgstr ""
+
+#: quack.py:471
+msgid "URL"
+msgstr ""
+
+#: quack.py:472
+msgid "Licenses"
+msgstr ""
+
+#: quack.py:473
+msgid "Provides"
+msgstr ""
+
+#: quack.py:474
+msgid "Depends On"
+msgstr ""
+
+#: quack.py:475
+msgid "Build Depends On"
+msgstr ""
+
+#: quack.py:476
+msgid "Conflicts With"
+msgstr ""
+
+#: quack.py:477
+msgid "Last Maintainer"
+msgstr ""
+
+#: quack.py:478
+msgid "Last Modified"
+msgstr ""
+
+#: quack.py:479
+msgid "Out of Date"
+msgstr ""
+
+#: quack.py:480
+msgid "Votes Number"
+msgstr ""
+
+#: quack.py:481
+msgid "Popularity"
+msgstr ""
+
+#: quack.py:482
+msgid "AUR Page"
+msgstr ""
+
+#: quack.py:483
+msgid "Keywords"
+msgstr ""
+
+#: quack.py:500
+#, python-format
+msgid "Display %(prog)s version information and exit."
+msgstr ""
+
+#: quack.py:528
+#, python-format
+msgid "Allow %(prog)s to be run as root"
+msgstr ""
+
+#: quack.py:530
+msgid ""
+"Download package info and try to resolve dependencies, but do not build or "
+"install anything"
+msgstr ""
+
+#: quack.py:566
+#, python-brace-format
+msgid "Do not run {quack_cmd} as root!"
+msgstr ""
+
+#: quack.py:579
+msgid "no targets specified (use -h for help)\n"
+msgstr ""
+
+#: quack.py:582
+msgid "no operation specified (use -h for help)\n"
+msgstr ""
