@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Quack 0.1\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2018-06-21 13:03+0200\n"
-"PO-Revision-Date: 2018-06-21 18:14+0000\n"
-"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
+"PO-Revision-Date: 2018-07-10 14:19+0000\n"
+"Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
 "translations/nb/>\n"
 "Language: nb_NO\n"
@@ -116,7 +116,7 @@ msgstr "[utdatert]"
 #: quack.py:465
 #, python-brace-format
 msgid "Since {date}"
-msgstr "Siden"
+msgstr "Siden {date}"
 
 #: quack.py:468
 msgid "Name"
