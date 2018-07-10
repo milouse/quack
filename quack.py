@@ -184,7 +184,7 @@ class AurHelper:
         # Ensure we get a list
         if "results" not in raw_json:
             return []
-        return raw_json["results"]
+        return sorted(raw_json["results"], key=lambda p: p["Name"])
 
     def extract_dependencies(self, pkg_info):
         pkg_info["AurDepends"] = []
