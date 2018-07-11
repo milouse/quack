@@ -62,9 +62,9 @@ def print_warning(message):
                          message))
 
 
-def print_info(message, symbol="::", color="blue"):
+def print_info(message, symbol="::", color="blue", bold=True):
     print("{} {}".format(hilite(symbol, color, True),
-                         hilite(message, bold=True)))
+                         hilite(message, bold=bold)))
 
 
 def question(message):
@@ -286,7 +286,8 @@ class AurHelper:
             self.close_temp_dir()
             print_error(no_pkg_err)
         print_info(_("Package {pkg} is ready to be built in {path}")
-                   .format(pkg=package, path=self.temp_dir.name))
+                   .format(pkg=hilite(package, "yellow", True),
+                           path=self.temp_dir.name), bold=False)
         return pkg_info
 
     def close_temp_dir(self, success=True, should_exit=False):
@@ -325,7 +326,8 @@ class AurHelper:
         pkg_info = self.switch_to_temp_dir(package)
         if pkg_info["FastForward"] is True:
             return pkg_info
-        print_info(_("You should REALLY take time to inspect its PKGBUILD."))
+        print_info(_("You should REALLY take time to inspect its PKGBUILD."),
+                   bold=False)
         check = question(_("When it's done, shall we continue?") + " [y/N/q]")
         if check == "q":
             return self.close_temp_dir(should_exit=True)
