@@ -93,7 +93,7 @@ class AurHelper:
             self.editor = os.getenv("EDITOR")
 
     def is_devel(self, package):
-        return re.search("-(?:bzr|cvs|git|hg|svn)$", package)
+        return re.search("-(?:bzr|cvs|git|hg|svn)$", package) is not None
 
     def clean_pkg_name(self, package):
         m = re.search("^aur/([a-z0-9-_]+)$", package)
@@ -208,6 +208,9 @@ class AurHelper:
         return pkg_info
 
     def should_upgrade(self, package, current_version):
+        # Always offer to upgrade devel packages
+        if self.with_devel and self.is_devel(package["Name"]):
+            return True
         if current_version == package["Version"]:
             return False
         # Yes I know about `vercmp`, but Array sort seems largely
@@ -218,9 +221,7 @@ class AurHelper:
         ver_check = subprocess.run(
             ["vercmp", current_version, package["Version"]],
             check=True, stdout=subprocess.PIPE).stdout.decode().strip()
-        if ((self.with_devel is False
-           or self.is_devel(package["Name"]) is None)
-           and ver_check == 1):
+        if ver_check == 1:
             # Somehow we have a local version greater than upstream
             print_warning(
                 _("Your system run a newer version of {pkg}")
@@ -266,7 +267,7 @@ class AurHelper:
             stdout=subprocess.PIPE).stdout.decode().strip()
         pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.xz".format(
             pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
-        if os.path.isfile(pkg_file):
+        if os.path.isfile(pkg_file) and not self.is_devel(package):
             pkg_info["BuiltPackages"] = [pkg_file]
             pkg_info["FastForward"] = True
             print_info(_("Package {pkg} is already built as {pkgfile}")
