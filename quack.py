@@ -137,12 +137,13 @@ class AurHelper:
         print("\n".join(self.list(True)))
 
     def list_garbage(self, post_transac=False):
-        print_info(_("Orphaned packages"))
+        print_info(_("Orphaned packages"), bold=False)
         p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
         if p.returncode == 1:
             print_info(_("no orphaned package found"),
                        symbol="==>", color="green")
-        print_info(_("Pacman post transaction files"))
+        print()
+        print_info(_("Pacman post transaction files"), bold=False)
         cmd = ["find"]
         if os.getuid() != 0:
             cmd.insert(0, "sudo")
@@ -161,17 +162,24 @@ class AurHelper:
             print(p)
         if post_transac:
             return
-        print_info(_("Removed packages kept in cache"))
+        print()
+        print_info(_("Removed packages kept in cache"), bold=False)
         cmd = ["paccache", "-du"]
         if USE_COLOR == 'never':
             cmd.insert(1, "--nocolor")
-        subprocess.run(cmd)
-        print_info(_("Old package versions kept in cache"))
+        # Remove unnecessary empty line
+        p = subprocess.run(
+            cmd, stdout=subprocess.PIPE).stdout.decode()
+        print(p.strip() + "\n")
+        print_info(_("Old package versions kept in cache"), bold=False)
         if USE_COLOR == 'never':
             cmd[2] = "-d"
         else:
             cmd[1] = "-d"
-        subprocess.run(cmd)
+        # Remove unnecessary empty line here too.
+        p = subprocess.run(
+            cmd, stdout=subprocess.PIPE).stdout.decode()
+        print(p.strip())
 
     def fetch_pkg_infos(self, terms, req_type="info"):
         req = "https://aur.archlinux.org/rpc.php?v=5"
