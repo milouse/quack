@@ -338,9 +338,10 @@ class AurHelper:
         print_info(_("You should REALLY take time to inspect its PKGBUILD."),
                    bold=False)
         check = question(_("When it's done, shall we continue?") + " [y/N/q]")
-        if check == "q":
+        lc = str(check).lower()
+        if lc == "q":
             return self.close_temp_dir(should_exit=True)
-        elif check != "y":
+        elif lc != "y":
             return self.close_temp_dir(False)
         pkg_info = self.extract_dependencies(pkg_info)
         if len(pkg_info["AurDepends"]) > 0:
@@ -393,7 +394,7 @@ class AurHelper:
             print("[{}] {}".format(i, l))
         ps = question(_("Which one do you really want to install?") +
                       " [1…{}/A]".format(i))
-        if ps == "a":
+        if str(ps).lower() == "a":
             if self.dry_run:
                 print("[dry-run] pacman -U {}"
                       .format(" ".join(built_packages)))
