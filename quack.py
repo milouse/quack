@@ -74,10 +74,17 @@ def question(message):
 
 
 class AurHelper:
-    def __init__(self, config, devel=False, dry_run=False):
+    def __init__(self, config, opts={}):
         self.config = config
-        self.with_devel = devel
-        self.dry_run = dry_run
+        self.with_devel = False
+        if "with_devel" in opts:
+            self.with_devel = opts["with_devel"]
+        self.dry_run = False
+        if "dry_run" in opts:
+            self.dry_run = opts["dry_run"]
+        self.force = False
+        if "force" in opts:
+            self.force = opts["force"]
         self.temp_dir = None
         self.local_pkgs = subprocess.run(
             ["pacman", "-Q", "--color=never"],
@@ -275,7 +282,8 @@ class AurHelper:
             stdout=subprocess.PIPE).stdout.decode().strip()
         pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.xz".format(
             pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
-        if os.path.isfile(pkg_file) and not self.is_devel(package):
+        if not (self.force or self.is_devel(package)) and \
+           os.path.isfile(pkg_file):
             pkg_info["BuiltPackages"] = [pkg_file]
             pkg_info["FastForward"] = True
             print_info(_("Package {pkg} is already built as {pkgfile}")
@@ -538,6 +546,8 @@ if __name__ == "__main__":
                         "for list and upgrade operations")
     parser.add_argument("--crazyfool", action="store_true",
                         help=_("Allow %(prog)s to be run as root"))
+    parser.add_argument("--force", action="store_true",
+                        help=_("Force upgrade action"))
     parser.add_argument("-n", "--dry-run", action="store_true",
                         help=_("Download package info and try to "
                                "resolve dependencies, but do not build "
@@ -578,7 +588,9 @@ if __name__ == "__main__":
         print_error(_("Do not run {quack_cmd} as root!")
                     .format(quack_cmd=sys.argv[0]))
 
-    aur = AurHelper(config, args.devel, args.dry_run)
+    aur = AurHelper(config, {"with_devel": args.devel,
+                             "dry_run": args.dry_run,
+                             "force": args.force})
 
     if args.list_garbage:
         aur.list_garbage()
