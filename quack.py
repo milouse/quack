@@ -466,9 +466,10 @@ class AurHelper:
 
     def info(self, package):
         package = self.clean_pkg_name(package)
-        res = self.fetch_pkg_infos([package])[0]
-        if res is None:
-            return False
+        res = self.fetch_pkg_infos([package])
+        if len(res) == 0:
+            print_error(_("{pkg} is NOT an AUR package").format(pkg=package))
+        res = res[0]
         self.tw = textwrap.TextWrapper(
             width=shutil.get_terminal_size((80, 20)).columns,
             subsequent_indent=27 * " ",
