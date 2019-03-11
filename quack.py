@@ -236,7 +236,7 @@ class AurHelper:
         ver_check = subprocess.run(
             ["vercmp", current_version, package["Version"]],
             check=True, stdout=subprocess.PIPE).stdout.decode().strip()
-        if ver_check == 1:
+        if ver_check == "1":
             # Somehow we have a local version greater than upstream
             print_warning(
                 _("Your system run a newer version of {pkg}")
