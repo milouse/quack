@@ -1,72 +1,54 @@
 DEST = /usr
 
-PKGNAME     = quack
-PKGNAME_CAP = Quack
-VERSION     = $(shell sed -n "s/^VERSION = \"\(.*\)\"$$/\1/p" $(PKGNAME).py)
+VERSION     = $(shell sed -n "s/^VERSION = \"\(.*\)\"$$/\1/p" quack.py)
 
-L10N_PATH  = po
 L10N_LANGS = fr nb_NO
-PO_FILES   = $(L10N_LANGS:%=$(L10N_PATH)/%/LC_MESSAGES/$(PKGNAME).po)
-PU_FILES   = $(PO_FILES:%.po=%.pu)
+PO_FILES   = $(L10N_LANGS:%=po/%/LC_MESSAGES/quack.po)
 MO_FILES   = $(PO_FILES:%.po=%.mo)
-DEST_MO    = $(L10N_LANGS:%=$(DEST)/share/locale/%/LC_MESSAGES/$(PKGNAME).dmo)
-CLEAN_MO   = $(DEST_MO:%.dmo=%.cmo)
+DEST_MO    = $(L10N_LANGS:%=$(DEST)/share/locale/%/LC_MESSAGES/quack.mo)
 
 
-.PHONY: build clean install pot uninstall
-.PRECIOUS: $(PO_FILES)
+.PHONY: install lang uninstall uplang
 
-all: build
-
-build: pot $(MO_FILES)
-
-clean:
-	rm -f $(MO_FILES)
-
-install: build $(DEST_MO)
-	git checkout $(L10N_PATH)/$(PKGNAME).pot
+install: $(DEST_MO)
 	install -d -m755 $(DEST)/bin
-	install -d -m755 $(DEST)/share/licenses/$(PKGNAME)
-	install -D -m755 $(PKGNAME).py $(DEST)/bin/$(PKGNAME)
-	install -D -m644 LICENSE $(DEST)/share/licenses/$(PKGNAME)/LICENSE
+	install -d -m755 $(DEST)/share/licenses/quack
+	install -D -m755 quack.py $(DEST)/bin/quack
+	install -D -m644 LICENSE $(DEST)/share/licenses/quack/LICENSE
 
-uninstall: $(CLEAN_MO)
-	rm $(DEST)/bin/$(PKGNAME)
-	rm $(DEST)/share/licenses/$(PKGNAME)/LICENSE
-	rmdir $(DEST)/share/licenses/$(PKGNAME)
+uninstall:
+	rm $(DEST)/bin/quack
+	rm $(DEST)/share/licenses/quack/LICENSE
+	rmdir $(DEST)/share/licenses/quack
 
-pot:
-	mkdir -p $(L10N_PATH)
+po/quack.pot:
+	mkdir -p po
 	xgettext --language=Python --keyword=_ \
-		--copyright-holder="$(PKGNAME_CAP) volunteers" \
-		--package-name=$(PKGNAME_CAP) --package-version=$(VERSION) \
+		--copyright-holder="Quack volunteers" \
+		--package-name=Quack --package-version=$(VERSION) \
 		--msgid-bugs-address=bugs@depar.is --from-code=UTF-8 \
-		--output=$(L10N_PATH)/$(PKGNAME).pot $(PKGNAME).py
-	sed -i -e "s/SOME DESCRIPTIVE TITLE./$(PKGNAME_CAP) Translation Effort/" \
+		--output=po/quack.pot quack.py
+	sed -i -e "s/SOME DESCRIPTIVE TITLE./Quack Translation Effort/" \
 		-e "s|Content-Type: text/plain; charset=CHARSET|Content-Type: text/plain; charset=UTF-8|" \
 		-e "s|Copyright (C) YEAR|Copyright (C) $(shell date +%Y)|" \
-		$(L10N_PATH)/$(PKGNAME).pot
+		po/quack.pot
 
-po: pot $(PU_FILES)
+%.po: po/quack.pot
+	mkdir -p $(@D)
+	msginit -l $(@:po/%/LC_MESSAGES/quack.po=%) \
+		--no-translator -i $< -o $@
 
-%.mo: %.po
+po/%/LC_MESSAGES/quack.mo: po/%/LC_MESSAGES/quack.po
 	msgfmt -o $@ $<
 
-%.dmo:
-	install -d -m755 $(@D)
-	install -D -m644 $(@:$(DEST)/share/locale/%/LC_MESSAGES/$(PKGNAME).dmo=$(L10N_PATH)/%/LC_MESSAGES/$(PKGNAME).mo) \
-		$(@:%.dmo=%.mo)
+$(DEST)/share/locale/%/LC_MESSAGES/quack.mo: po/%/LC_MESSAGES/quack.mo
+	install -D -m644 $< $@
 
-%.cmo:
-	rm -f $(@:%.cmo=%.mo)
+lang: $(PO_FILES)
 
-%.po:
-	mkdir -p $(@D)
-	msginit -l $(@:$(L10N_PATH)/%/LC_MESSAGES/$(PKGNAME).po=%) \
-		-i $(L10N_PATH)/$(PKGNAME).pot -o $@
+%.po~:
+	msgmerge --lang $(@:po/%/LC_MESSAGES/quack.po~=%) \
+		-o $@ $(@:%~=%) po/quack.pot
+	@cp $@ $(@:%~=%) && rm $@
 
-%.pu: %.po
-	cp $< $<.old
-	msgmerge --lang $(<:$(L10N_PATH)/%/LC_MESSAGES/$(PKGNAME).po=%) -o $< \
-		$<.old $(L10N_PATH)/$(PKGNAME).pot
-	rm $<.old
+uplang: $(PO_FILES:%=%~)
