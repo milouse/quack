@@ -10,6 +10,7 @@ import tempfile
 import textwrap
 import subprocess
 from configparser import ConfigParser
+from xdg.BaseDirectory import xdg_cache_home
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 import gettext
@@ -86,6 +87,7 @@ class AurHelper:
         if "force" in opts:
             self.force = opts["force"]
         self.temp_dir = None
+        self.chroot_dir = None
         self.local_pkgs = subprocess.run(
             ["pacman", "-Q", "--color=never"],
             check=True, stderr=subprocess.DEVNULL,
@@ -244,7 +246,7 @@ class AurHelper:
             return False
         return True
 
-    def upgrade(self):
+    def upgrade(self, in_chroot=False):
         res = self.fetch_pkg_infos(self.list(False))
         if res is None or len(res) == 0:
             return False
@@ -266,7 +268,7 @@ class AurHelper:
             return False
         rcode = True
         for p in upgradable_pkgs:
-            lr = self.install(p)
+            lr = self.install(p, in_chroot)
             rcode = rcode and lr
         return rcode
 
@@ -286,14 +288,60 @@ class AurHelper:
             print_error(_("{pkg} is NOT an AUR package")
                         .format(pkg=pkg_info["Name"]))
 
+    def check_package_integrity(self, package):
+        p = subprocess.run(["makepkg", "--verifysource"])
+        if p.returncode == 0:
+            return
+        self.close_temp_dir()
+        print_error(_("Integrity file check fails"))
+
+    def prepare_temp_config_files(self):
+        if not os.path.exists("/tmp/pacman.tmp.conf"):
+            shutil.copyfile("/etc/pacman.conf", "/tmp/pacman.tmp.conf")
+            subprocess.run(["sed", "-i", "s/^IgnorePkg/#IgnorePkg/",
+                            "/tmp/pacman.tmp.conf"])
+        if not os.path.exists("/tmp/makepkg.tmp.conf"):
+            shutil.copyfile("/etc/makepkg.conf", "/tmp/makepkg.tmp.conf")
+
+    def prepare_chroot_dir(self):
+        chroot_home = os.path.join(xdg_cache_home, "quack", "chroot")
+        if not os.path.isdir(chroot_home):
+            os.makedirs(chroot_home, mode=0o700, exist_ok=True)
+        self.chroot_dir = tempfile.TemporaryDirectory(dir=chroot_home)
+        self.prepare_temp_config_files()
+        os.environ["CHROOT"] = self.chroot_dir.name
+        # Create chroot dir
+        p = subprocess.run(["mkarchroot", "-C", "/tmp/pacman.tmp.conf",
+                            "-M", "/tmp/makepkg.tmp.conf",
+                            "{}/root".format(self.chroot_dir.name),
+                            "base-devel"])
+        if p.returncode != 0:
+            self.close_temp_dir()
+            print_error(_("Error while creating the chroot dir in {folder}")
+                        .format(folder=self.chroot_dir.name))
+        # Make sure chroot is up to date
+        subprocess.run(["arch-nspawn", "{}/root".format(self.chroot_dir.name),
+                        "pacman", "-Syu"])
+
     def close_temp_dir(self, success=True, should_exit=False):
         os.chdir(os.path.expanduser("~"))
         if self.temp_dir is not None:
             self.temp_dir.cleanup()
             self.temp_dir = None
-        if should_exit:
+        if self.chroot_dir is not None:
+            # Chroot requires sudo removal. Thus first do this
+            subprocess.run(["sudo", "rm", "-r", self.chroot_dir.name])
+            # Then we recreate the temp dir to avoid a crash when cleaning it
+            os.mkdir(self.chroot_dir.name)
+            self.chroot_dir.cleanup()
+            self.chroot_dir = None
+            if "CHROOT" in os.environ:
+                del os.environ["CHROOT"]
+        if not should_exit:
+            return success
+        if success:
             sys.exit()
-        return success
+        sys.exit(1)
 
     def pacman_install(self, packages, backup=True):
         pacman_cmd = ["pacman", "--color", USE_COLOR, "--needed", "-U"]
@@ -309,7 +357,7 @@ class AurHelper:
                 shutil.copyfile(px, "/tmp/{}".format(px))
             print_info(_("A copy of the built packages "
                          "has been kept in /tmp."))
-            return self.close_temp_dir(False)
+            return self.close_temp_dir(False, True)
         for p in packages:
             pcmd = ["cp", p, "/var/cache/pacman/pkg/{}".format(p)]
             if os.getuid() != 0:
@@ -336,7 +384,7 @@ class AurHelper:
                        .format(pkg=package, pkgfile=pkg_file))
         return pkg_info
 
-    def build(self, package):
+    def build(self, package, in_chroot=False):
         package = self.clean_pkg_name(package)
         pkg_info = self.prepare_pkg_info(package)
         if pkg_info["FastForward"] is True:
@@ -377,7 +425,14 @@ class AurHelper:
                     allowed_pkgs.append(p + ".pkg.tar.xz")
             pkg_info["BuiltPackages"] = allowed_pkgs
             return pkg_info
-        p = subprocess.run(["makepkg", "-sr"])
+        if in_chroot:
+            # makechrootpkg does not check integrity. Do it now.
+            self.check_package_integrity(package)
+            self.prepare_chroot_dir()
+            p = subprocess.run(["makechrootpkg", "-c", "-r",
+                                self.chroot_dir.name])
+        else:
+            p = subprocess.run(["makepkg", "-sr"])
         if p.returncode != 0:
             return self.close_temp_dir(False)
         pkg_info["BuiltPackages"] = []
@@ -386,8 +441,8 @@ class AurHelper:
                 pkg_info["BuiltPackages"].append(f)
         return pkg_info
 
-    def install(self, package):
-        pkg_info = self.build(package)
+    def install(self, package, in_chroot=False):
+        pkg_info = self.build(package, in_chroot)
         if pkg_info is False:
             return False
         built_packages = pkg_info["BuiltPackages"]
@@ -549,6 +604,8 @@ if __name__ == "__main__":
                         help="Include devel packages "
                         "(which name has a trailing -svn, -git…) "
                         "for list and upgrade operations")
+    parser.add_argument("--chroot", action="store_true",
+                        help="Run install and upgrade action in a chroot.")
     parser.add_argument("--crazyfool", action="store_true",
                         help=_("Allow %(prog)s to be run as root"))
     parser.add_argument("--force", action="store_true",
@@ -622,13 +679,13 @@ if __name__ == "__main__":
         aur.print_list()
 
     elif args.upgrade:
-        if aur.upgrade():
+        if aur.upgrade(args.chroot):
             aur.list_garbage(True)
 
     else:
         rcode = True
         for p in args.package:
-            lr = aur.install(p)
+            lr = aur.install(p, args.chroot)
             rcode = rcode and lr
         if rcode:
             aur.list_garbage(True)
