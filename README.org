@@ -1,7 +1,7 @@
 #+title: README
 #+author: Étienne Deparis
 
-[[https://hosted.weblate.org/projects/quack/][https://hosted.weblate.org/widgets/quack/-/translations/svg-badge.svg]]
+[[https://translations.umaneti.net/projects/quack/][https://translations.umaneti.net/widgets/quack/-/translations/svg-badge.svg]]
 
 Quack, the Qualitative and Usable Aur paCKage helper. Also, it sounds
 like a duck. Quack Quack.
@@ -65,7 +65,7 @@ different features an AUR Helper should implement and which we do:
 | Feature          | Support | Comment                                                                                                                                                                                         |
 |------------------+---------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Secure           | YES     |                                                                                                                                                                                                 |
-| Clean build      | ?       | Need to be checked. Maybe already the case as we are just a wrapper around =makepkg=                                                                                                            |
+| Clean build      | PARTIAL | Quack is just a wrapper around =makepkg= or =makechrootpkg=. Chroot build is not the default process.                                                                                           |
 | Reliable parser  | YES     | We use AUR RPC and package base name to determine the repo name, then we just call =makepkg=                                                                                                    |
 | Reliable solver  | NO      | For now, we don't want to follow this path.                                                                                                                                                     |
 | Dependencies     | TBD     | General dependencies are not checked, nor resolved. See bellow in split packages the only case we respect. We will try in a near future to purpose some way of managing simple dependency cases |

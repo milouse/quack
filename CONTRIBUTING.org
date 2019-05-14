@@ -3,7 +3,7 @@
 
 * Translations
 
-Quack is [[https://hosted.weblate.org/projects/quack/][being translated using Weblate]], a web tool designed to ease
+Quack is [[https://translations.umaneti.net/projects/quack/][being translated using Weblate]], a web tool designed to ease
 translating for both developers and translators.
 
 You can also fetch the gettext files directly from the source code tree
