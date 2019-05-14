@@ -128,6 +128,20 @@ class AurHelper:
             hilite(package, bold=True),
             version)
 
+    def sudo_wrapper(self, command):
+        if os.getuid() == 0:
+            return command
+        command.insert(0, "sudo")
+        check_sudo = subprocess.run(["sudo", "-n", "true"],
+                                    stderr=subprocess.DEVNULL)
+        if check_sudo.returncode == 0:
+            return command
+        print_warning(_("You are going to run a `sudo' command and a "
+                        "password will be prompted. Press Enter to "
+                        "continue."))
+        input()
+        return command
+
     def list(self, with_version=False):
         pkgs = []
         for p in self.local_pkgs:
@@ -154,14 +168,12 @@ class AurHelper:
         print()
         print_info(_("Pacman post transaction files"), bold=False)
         cmd = ["find"]
-        if os.getuid() != 0:
-            cmd.insert(0, "sudo")
         pac_pathes = ["/boot/", "/etc/", "/usr/"]
         cmd += pac_pathes + ["-type", "f", "("]
         for p in ["*.pacsave", "*.pacorig", "*.pacnew"]:
             cmd.extend(["-name", p, "-o"])
         cmd.pop()
-        cmd += [")"]
+        cmd = self.sudo_wrapper(cmd + [")"])
         p = subprocess.run(
             cmd, stdout=subprocess.PIPE).stdout.decode().strip()
         if p == "":
@@ -310,6 +322,8 @@ class AurHelper:
         self.chroot_dir = tempfile.TemporaryDirectory(dir=chroot_home)
         self.prepare_temp_config_files()
         os.environ["CHROOT"] = self.chroot_dir.name
+        # Prevent sudo timeout
+        self.sudo_wrapper([])
         # Create chroot dir
         p = subprocess.run(["mkarchroot", "-C", "/tmp/pacman.tmp.conf",
                             "-M", "/tmp/makepkg.tmp.conf",
@@ -330,7 +344,8 @@ class AurHelper:
             self.temp_dir = None
         if self.chroot_dir is not None:
             # Chroot requires sudo removal. Thus first do this
-            subprocess.run(["sudo", "rm", "-r", self.chroot_dir.name])
+            subprocess.run(
+                self.sudo_wrapper(["rm", "-r", self.chroot_dir.name]))
             # Then we recreate the temp dir to avoid a crash when cleaning it
             os.mkdir(self.chroot_dir.name)
             self.chroot_dir.cleanup()
@@ -344,9 +359,8 @@ class AurHelper:
         sys.exit(1)
 
     def pacman_install(self, packages, backup=True):
-        pacman_cmd = ["pacman", "--color", USE_COLOR, "--needed", "-U"]
-        if os.getuid() != 0:
-            pacman_cmd.insert(0, "sudo")
+        pacman_cmd = self.sudo_wrapper(["pacman", "--color", USE_COLOR,
+                                        "--needed", "-U"])
         p = subprocess.run(pacman_cmd + packages)
         if backup is False:
             return self.close_temp_dir()
@@ -359,9 +373,8 @@ class AurHelper:
                          "has been kept in /tmp."))
             return self.close_temp_dir(False, True)
         for p in packages:
-            pcmd = ["cp", p, "/var/cache/pacman/pkg/{}".format(p)]
-            if os.getuid() != 0:
-                pcmd.insert(0, "sudo")
+            pcmd = self.sudo_wrapper(
+                ["cp", p, "/var/cache/pacman/pkg/{}".format(p)])
             subprocess.run(pcmd)
         return self.close_temp_dir()
 
