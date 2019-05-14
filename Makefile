@@ -2,7 +2,7 @@ DEST = /usr
 
 VERSION     = $(shell sed -n "s/^VERSION = \"\(.*\)\"$$/\1/p" quack.py)
 
-L10N_LANGS = fr nb_NO
+L10N_LANGS = fr nb_NO es de it
 PO_FILES   = $(L10N_LANGS:%=po/%/LC_MESSAGES/quack.po)
 MO_FILES   = $(PO_FILES:%.po=%.mo)
 DEST_MO    = $(L10N_LANGS:%=$(DEST)/share/locale/%/LC_MESSAGES/quack.mo)
