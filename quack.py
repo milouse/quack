@@ -270,25 +270,7 @@ class AurHelper:
             rcode = rcode and lr
         return rcode
 
-    def switch_to_temp_dir(self, package):
-        no_pkg_err = _("{pkg} is NOT an AUR package").format(pkg=package)
-        res = self.fetch_pkg_infos([package])
-        if res is None or len(res) == 0:
-            print_error(no_pkg_err)
-        pkg_info = res[0]
-        pkg_info["FastForward"] = False
-        pkg_info["CARCH"] = subprocess.run(
-            ["uname", "-m"], check=True,
-            stdout=subprocess.PIPE).stdout.decode().strip()
-        pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.xz".format(
-            pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
-        if not (self.force or self.is_devel(package)) and \
-           os.path.isfile(pkg_file):
-            pkg_info["BuiltPackages"] = [pkg_file]
-            pkg_info["FastForward"] = True
-            print_info(_("Package {pkg} is already built as {pkgfile}")
-                       .format(pkg=package, pkgfile=pkg_file))
-            return pkg_info
+    def switch_to_temp_dir(self, pkg_info):
         self.temp_dir = tempfile.TemporaryDirectory(prefix="quack_")
         p = subprocess.run(["git", "clone",
                             "https://aur.archlinux.org/{}.git"
@@ -297,19 +279,16 @@ class AurHelper:
         if p.returncode != 0:
             self.close_temp_dir()
             print_error(_("impossible to clone {pkg} from AUR")
-                        .format(pkg=package))
+                        .format(pkg=pkg_info["Name"]))
         os.chdir(self.temp_dir.name)
         if not os.path.isfile("PKGBUILD"):
             self.close_temp_dir()
-            print_error(no_pkg_err)
-        print_info(_("Package {pkg} is ready to be built in {path}")
-                   .format(pkg=hilite(package, "yellow", True),
-                           path=self.temp_dir.name), bold=False)
-        return pkg_info
+            print_error(_("{pkg} is NOT an AUR package")
+                        .format(pkg=pkg_info["Name"]))
 
     def close_temp_dir(self, success=True, should_exit=False):
+        os.chdir(os.path.expanduser("~"))
         if self.temp_dir is not None:
-            os.chdir(os.path.expanduser("~"))
             self.temp_dir.cleanup()
             self.temp_dir = None
         if should_exit:
@@ -338,19 +317,44 @@ class AurHelper:
             subprocess.run(pcmd)
         return self.close_temp_dir()
 
+    def prepare_pkg_info(self, package):
+        res = self.fetch_pkg_infos([package])
+        if res is None or len(res) == 0:
+            print_error(_("{pkg} is NOT an AUR package").format(pkg=package))
+        pkg_info = res[0]
+        pkg_info["FastForward"] = False
+        pkg_info["CARCH"] = subprocess.run(
+            ["uname", "-m"], check=True,
+            stdout=subprocess.PIPE).stdout.decode().strip()
+        pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.xz".format(
+            pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
+        if not (self.force or self.is_devel(package)) and \
+           os.path.isfile(pkg_file):
+            pkg_info["BuiltPackages"] = [pkg_file]
+            pkg_info["FastForward"] = True
+            print_info(_("Package {pkg} is already built as {pkgfile}")
+                       .format(pkg=package, pkgfile=pkg_file))
+        return pkg_info
+
     def build(self, package):
         package = self.clean_pkg_name(package)
-        pkg_info = self.switch_to_temp_dir(package)
+        pkg_info = self.prepare_pkg_info(package)
         if pkg_info["FastForward"] is True:
             return pkg_info
-        print_info(_("You should REALLY take time to inspect its PKGBUILD."),
-                   bold=False)
-        check = question(_("When it's done, shall we continue?") + " [y/N/q]")
-        lc = str(check).lower()
-        if lc == "q":
-            return self.close_temp_dir(should_exit=True)
-        elif lc != "y":
-            return self.close_temp_dir(False)
+        self.switch_to_temp_dir(pkg_info)
+        print_info(_("Package {pkg} is ready to be built in {path}")
+                   .format(pkg=hilite(package, "yellow", True),
+                           path=self.temp_dir.name), bold=False)
+        if not self.dry_run:
+            print_info(_("You should REALLY take time to inspect its "
+                         "PKGBUILD."), bold=False)
+            check = question(_("When it's done, shall we continue?") +
+                             " [y/N/q]")
+            lc = str(check).lower()
+            if lc == "q":
+                return self.close_temp_dir(should_exit=True)
+            elif lc != "y":
+                return self.close_temp_dir(False)
         pkg_info = self.extract_dependencies(pkg_info)
         if len(pkg_info["AurDepends"]) > 0:
             unsatisfied = []
