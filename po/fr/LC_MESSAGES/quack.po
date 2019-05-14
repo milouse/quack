@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Quack 0.1\n"
+"Project-Id-Version: Quack 0.4\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2019-05-14 23:01+0200\n"
+"POT-Creation-Date: 2019-05-14 23:04+0200\n"
 "PO-Revision-Date: 2019-05-14 23:02+0200\n"
 "Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/quack/"
