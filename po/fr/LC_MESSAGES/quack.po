@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quack 0.4\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2019-05-14 23:04+0200\n"
-"PO-Revision-Date: 2019-05-14 23:02+0200\n"
+"POT-Creation-Date: 2019-05-24 09:25+0200\n"
+"PO-Revision-Date: 2019-05-24 09:26+0200\n"
 "Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/quack/"
 "translations/fr/>\n"
@@ -114,6 +114,11 @@ msgstr "Vous devriez VRAIMENT prendre le temps de vérifier le PKGBUILD."
 #: quack.py:412
 msgid "When it's done, shall we continue?"
 msgstr "Lorsque c'est fait, devons nous continuer ?"
+
+#: quack.py:427
+#, python-brace-format
+msgid "the following packages must be installed first: {pkgs}"
+msgstr "Les paquets suivant doivent être préalablement installés : {pkgs}"
 
 #: quack.py:470
 msgid "The following packages have been built:"

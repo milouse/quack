@@ -424,9 +424,9 @@ class AurHelper:
                 if pdata[0] not in self.list():
                     unsatisfied.append(pdata[0])
             if len(unsatisfied) > 0:
-                print_warning("the following packages must be "
-                              "installed first: {}"
-                              .format(", ".join(unsatisfied)))
+                print_warning(_("the following packages must be "
+                              "installed first: {pkgs}")
+                              .format(pkgs=", ".join(unsatisfied)))
         if self.dry_run:
             print("[dry-run] makepkg -sr")
             buildable_pkgs = subprocess.run(
