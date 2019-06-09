@@ -258,7 +258,7 @@ class AurHelper:
             return False
         return True
 
-    def upgrade(self, in_chroot=False):
+    def upgrade(self, jail_type=None):
         res = self.fetch_pkg_infos(self.list(False))
         if res is None or len(res) == 0:
             return False
@@ -280,7 +280,7 @@ class AurHelper:
             return False
         rcode = True
         for p in upgradable_pkgs:
-            lr = self.install(p, in_chroot)
+            lr = self.install(p, jail_type)
             rcode = rcode and lr
         return rcode
 
@@ -314,6 +314,33 @@ class AurHelper:
                             "/tmp/pacman.tmp.conf"])
         if not os.path.exists("/tmp/makepkg.tmp.conf"):
             shutil.copyfile("/etc/makepkg.conf", "/tmp/makepkg.tmp.conf")
+
+    def prepare_docker(self):
+        dockerfile = os.path.join(self.temp_dir.name, "Dockerfile.quack")
+        if os.path.exists(dockerfile):
+            return
+        dockercontent = """FROM archlinux/base
+
+RUN echo 'Server = http://archlinux.polymorf.fr/$repo/os/$arch' > /etc/pacman.d/mirrorlist && \
+    pacman -Syu --noconfirm && \
+    pacman -S --noconfirm base-devel devtools pacman-contrib namcap
+
+RUN groupadd package && \
+    useradd -m -d /home/package -c 'Package Creation User' -s /usr/bin/bash -g package package && \
+    echo 'package ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+USER package
+WORKDIR /home/package/pkg
+VOLUME ["/home/package/pkg"]
+ENTRYPOINT ["makepkg", "-sr", "--noconfirm"]"""
+        with open(dockerfile, "w") as f:
+            f.write(dockercontent)
+        p = subprocess.run(self.sudo_wrapper(
+            ["docker", "build", "-t", "packaging", "-f", "Dockerfile.quack",
+             self.temp_dir.name]))
+        if p.returncode != 0:
+            self.close_temp_dir()
+            print_error(_("Error while creating docker container"))
 
     def prepare_chroot_dir(self):
         chroot_home = os.path.join(xdg_cache_home, "quack", "chroot")
@@ -397,7 +424,7 @@ class AurHelper:
                        .format(pkg=package, pkgfile=pkg_file))
         return pkg_info
 
-    def build(self, package, in_chroot=False):
+    def build(self, package, jail_type=None):
         package = self.clean_pkg_name(package)
         pkg_info = self.prepare_pkg_info(package)
         if pkg_info["FastForward"] is True:
@@ -438,14 +465,24 @@ class AurHelper:
                     allowed_pkgs.append(p + ".pkg.tar.xz")
             pkg_info["BuiltPackages"] = allowed_pkgs
             return pkg_info
-        if in_chroot:
+        if jail_type is None:
+            p = subprocess.run(["makepkg", "-sr"])
+        elif jail_type == 'chroot':
             # makechrootpkg does not check integrity. Do it now.
             self.check_package_integrity(package)
             self.prepare_chroot_dir()
             p = subprocess.run(["makechrootpkg", "-c", "-r",
                                 self.chroot_dir.name])
+        elif jail_type == 'docker':
+            self.prepare_docker()
+            p = subprocess.run(self.sudo_wrapper(
+                ["docker", "run", "-v",
+                 "{}:/home/package/pkg".format(self.temp_dir.name),
+                 "packaging"]))
         else:
-            p = subprocess.run(["makepkg", "-sr"])
+            self.close_temp_dir()
+            print_error(_("Jail type {type} is not known")
+                        .format(jail_type))
         if p.returncode != 0:
             return self.close_temp_dir(False)
         pkg_info["BuiltPackages"] = []
@@ -454,8 +491,8 @@ class AurHelper:
                 pkg_info["BuiltPackages"].append(f)
         return pkg_info
 
-    def install(self, package, in_chroot=False):
-        pkg_info = self.build(package, in_chroot)
+    def install(self, package, jail_type=None):
+        pkg_info = self.build(package, jail_type)
         if pkg_info is False:
             return False
         built_packages = pkg_info["BuiltPackages"]
@@ -618,7 +655,11 @@ if __name__ == "__main__":
                         "(which name has a trailing -svn, -git…) "
                         "for list and upgrade operations")
     parser.add_argument("--chroot", action="store_true",
-                        help="Run install and upgrade action in a chroot.")
+                        help="Run install and upgrade action in a "
+                        "chroot jail.")
+    parser.add_argument("--docker", action="store_true",
+                        help="Run install and upgrade action in a "
+                        "docker jail.")
     parser.add_argument("--crazyfool", action="store_true",
                         help=_("Allow %(prog)s to be run as root"))
     parser.add_argument("--force", action="store_true",
@@ -691,14 +732,19 @@ if __name__ == "__main__":
     elif args.list:
         aur.print_list()
 
-    elif args.upgrade:
-        if aur.upgrade(args.chroot):
-            aur.list_garbage(True)
-
     else:
+        jail = None
+        if args.chroot:
+            jail = 'chroot'
+        elif args.docker:
+            jail = 'docker'
+
         rcode = True
-        for p in args.package:
-            lr = aur.install(p, args.chroot)
-            rcode = rcode and lr
+        if args.upgrade:
+            rcode = aur.upgrade(jail)
+        else:
+            for p in args.package:
+                lr = aur.install(p, jail)
+                rcode = rcode and lr
         if rcode:
             aur.list_garbage(True)
