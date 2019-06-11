@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quack 0.4\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2019-05-24 09:25+0200\n"
+"POT-Creation-Date: 2019-06-11 19:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,7 +73,7 @@ msgstr ""
 msgid "impossible to clone {pkg} from AUR"
 msgstr ""
 
-#: quack.py:300 quack.py:384 quack.py:543
+#: quack.py:300 quack.py:411 quack.py:580
 #, python-brace-format
 msgid "{pkg} is NOT an AUR package"
 msgstr ""
@@ -82,153 +82,162 @@ msgstr ""
 msgid "Integrity file check fails"
 msgstr ""
 
-#: quack.py:334
+#: quack.py:343
+msgid "Error while creating docker container"
+msgstr ""
+
+#: quack.py:361
 #, python-brace-format
 msgid "Error while creating the chroot dir in {folder}"
 msgstr ""
 
-#: quack.py:372
+#: quack.py:399
 msgid "A copy of the built packages has been kept in /tmp."
 msgstr ""
 
-#: quack.py:396
+#: quack.py:423
 #, python-brace-format
 msgid "Package {pkg} is already built as {pkgfile}"
 msgstr ""
 
-#: quack.py:406
+#: quack.py:433
 #, python-brace-format
 msgid "Package {pkg} is ready to be built in {path}"
 msgstr ""
 
-#: quack.py:410
+#: quack.py:437
 msgid "You should REALLY take time to inspect its PKGBUILD."
 msgstr ""
 
-#: quack.py:412
+#: quack.py:439
 msgid "When it's done, shall we continue?"
 msgstr ""
 
-#: quack.py:427
+#: quack.py:454
 #, python-brace-format
 msgid "the following packages must be installed first: {pkgs}"
 msgstr ""
 
-#: quack.py:470
+#: quack.py:484
+#, python-brace-format
+msgid "Jail type {type} is not known"
+msgstr ""
+
+#: quack.py:507
 msgid "The following packages have been built:"
 msgstr ""
 
-#: quack.py:475
+#: quack.py:512
 msgid "Which one do you really want to install?"
 msgstr ""
 
-#: quack.py:492
+#: quack.py:529
 #, python-brace-format
 msgid "{str} is not a valid input"
 msgstr ""
 
-#: quack.py:515
+#: quack.py:552
 msgid "[outdated]"
 msgstr ""
 
-#: quack.py:558
+#: quack.py:595
 #, python-brace-format
 msgid "Since {date}"
 msgstr ""
 
-#: quack.py:561
+#: quack.py:598
 msgid "Name"
 msgstr ""
 
-#: quack.py:562
+#: quack.py:599
 msgid "Version"
 msgstr ""
 
-#: quack.py:563
+#: quack.py:600
 msgid "Description"
 msgstr ""
 
-#: quack.py:564
+#: quack.py:601
 msgid "URL"
 msgstr ""
 
-#: quack.py:565
+#: quack.py:602
 msgid "Licenses"
 msgstr ""
 
-#: quack.py:566
+#: quack.py:603
 msgid "Provides"
 msgstr ""
 
-#: quack.py:567
+#: quack.py:604
 msgid "Depends On"
 msgstr ""
 
-#: quack.py:568
+#: quack.py:605
 msgid "Build Depends On"
 msgstr ""
 
-#: quack.py:569
+#: quack.py:606
 msgid "Conflicts With"
 msgstr ""
 
-#: quack.py:570
+#: quack.py:607
 msgid "Last Maintainer"
 msgstr ""
 
-#: quack.py:571
+#: quack.py:608
 msgid "Last Modified"
 msgstr ""
 
-#: quack.py:572
+#: quack.py:609
 msgid "Out of Date"
 msgstr ""
 
-#: quack.py:573
+#: quack.py:610
 msgid "Votes Number"
 msgstr ""
 
-#: quack.py:574
+#: quack.py:611
 msgid "Popularity"
 msgstr ""
 
-#: quack.py:575
+#: quack.py:612
 msgid "AUR Page"
 msgstr ""
 
-#: quack.py:576
+#: quack.py:613
 msgid "Keywords"
 msgstr ""
 
-#: quack.py:593
+#: quack.py:630
 #, python-format
 msgid "Display %(prog)s version information and exit."
 msgstr ""
 
-#: quack.py:623
+#: quack.py:664
 #, python-format
 msgid "Allow %(prog)s to be run as root"
 msgstr ""
 
-#: quack.py:625
+#: quack.py:666
 msgid "Force upgrade action"
 msgstr ""
 
-#: quack.py:627
+#: quack.py:668
 msgid ""
 "Download package info and try to resolve dependencies, but do not build or "
 "install anything"
 msgstr ""
 
-#: quack.py:663
+#: quack.py:704
 #, python-brace-format
 msgid "Do not run {quack_cmd} as root!"
 msgstr ""
 
-#: quack.py:678
+#: quack.py:719
 msgid "no targets specified (use -h for help)\n"
 msgstr ""
 
-#: quack.py:681
+#: quack.py:722
 msgid "no operation specified (use -h for help)\n"
 msgstr ""
