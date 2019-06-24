@@ -332,7 +332,7 @@ RUN groupadd package && \
 USER package
 WORKDIR /home/package/pkg
 VOLUME ["/home/package/pkg"]
-ENTRYPOINT ["makepkg", "-sr", "--noconfirm"]"""
+ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
         with open(dockerfile, "w") as f:
             f.write(dockercontent)
         p = subprocess.run(self.sudo_wrapper(
