@@ -80,6 +80,7 @@ class AurHelper:
         self.with_devel = opts.get("with_devel", False)
         self.dry_run = opts.get("dry_run", False)
         self.force = opts.get("force", False)
+        self.jail_type = opts.get("jail_type")
         self.editor = os.getenv("EDITOR", "nano")
         self.temp_dir = None
         self.chroot_dir = None
@@ -249,7 +250,7 @@ class AurHelper:
             return False
         return True
 
-    def upgrade(self, jail_type=None):
+    def upgrade(self):
         res = self.fetch_pkg_infos(self.list(False))
         if res is None or len(res) == 0:
             return False
@@ -271,7 +272,7 @@ class AurHelper:
             return False
         rcode = True
         for p in upgradable_pkgs:
-            lr = self.install(p, jail_type)
+            lr = self.install(p)
             rcode = rcode and lr
         return rcode
 
@@ -415,7 +416,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
                        .format(pkg=package, pkgfile=pkg_file))
         return pkg_info
 
-    def build(self, package, jail_type=None):
+    def build(self, package):
         package = self.clean_pkg_name(package)
         pkg_info = self.prepare_pkg_info(package)
         if pkg_info["FastForward"] is True:
@@ -456,15 +457,15 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
                     allowed_pkgs.append(p + ".pkg.tar.xz")
             pkg_info["BuiltPackages"] = allowed_pkgs
             return pkg_info
-        if jail_type is None:
+        if self.jail_type is None:
             p = subprocess.run(["makepkg", "-sr"])
-        elif jail_type == 'chroot':
+        elif self.jail_type == "chroot":
             # makechrootpkg does not check integrity. Do it now.
             self.check_package_integrity(package)
             self.prepare_chroot_dir()
             p = subprocess.run(["makechrootpkg", "-c", "-r",
                                 self.chroot_dir.name])
-        elif jail_type == 'docker':
+        elif self.jail_type == "docker":
             self.prepare_docker()
             p = subprocess.run(self.sudo_wrapper(
                 ["docker", "run", "-v",
@@ -473,7 +474,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
         else:
             self.close_temp_dir()
             print_error(_("Jail type {type} is not known")
-                        .format(jail_type))
+                        .format(self.jail_type))
         if p.returncode != 0:
             return self.close_temp_dir(False)
         pkg_info["BuiltPackages"] = []
@@ -482,8 +483,8 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
                 pkg_info["BuiltPackages"].append(f)
         return pkg_info
 
-    def install(self, package, jail_type=None):
-        pkg_info = self.build(package, jail_type)
+    def install(self, package):
+        pkg_info = self.build(package)
         if pkg_info is False:
             return False
         built_packages = pkg_info["BuiltPackages"]
@@ -695,9 +696,16 @@ if __name__ == "__main__":
         print_error(_("Do not run {quack_cmd} as root!")
                     .format(quack_cmd=sys.argv[0]))
 
-    aur = AurHelper(config, {"with_devel": args.devel,
-                             "dry_run": args.dry_run,
-                             "force": args.force})
+    opts = {"with_devel": args.devel,
+            "dry_run": args.dry_run,
+            "force": args.force}
+
+    if args.chroot:
+        opts["jail_type"] = "chroot"
+    elif args.docker:
+        opts["jail_type"] = "docker"
+
+    aur = AurHelper(config, opts)
 
     if args.list_garbage:
         aur.list_garbage()
@@ -724,18 +732,12 @@ if __name__ == "__main__":
         aur.print_list()
 
     else:
-        jail = None
-        if args.chroot:
-            jail = 'chroot'
-        elif args.docker:
-            jail = 'docker'
-
         rcode = True
         if args.upgrade:
-            rcode = aur.upgrade(jail)
+            rcode = aur.upgrade()
         else:
             for p in args.package:
-                lr = aur.install(p, jail)
+                lr = aur.install(p)
                 rcode = rcode and lr
         if rcode:
             aur.list_garbage(True)
