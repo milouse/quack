@@ -84,6 +84,7 @@ class AurHelper:
         self.editor = os.getenv("EDITOR", "nano")
         self.temp_dir = None
         self.chroot_dir = None
+        self.docker_image_built = False
         self.local_pkgs = subprocess.run(
             ["pacman", "-Q", "--color=never"],
             check=True, stderr=subprocess.DEVNULL,
@@ -308,9 +309,9 @@ class AurHelper:
             shutil.copyfile("/etc/makepkg.conf", "/tmp/makepkg.tmp.conf")
 
     def prepare_docker(self):
-        dockerfile = os.path.join(self.temp_dir.name, "Dockerfile.quack")
-        if os.path.exists(dockerfile):
+        if self.docker_image_built:
             return
+        dockerfile = os.path.join(self.temp_dir.name, "Dockerfile.quack")
         dockercontent = """FROM archlinux/base
 
 RUN echo 'Server = http://archlinux.polymorf.fr/$repo/os/$arch' > /etc/pacman.d/mirrorlist && \
@@ -330,9 +331,27 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
         p = subprocess.run(self.sudo_wrapper(
             ["docker", "build", "-t", "packaging", "-f", "Dockerfile.quack",
              self.temp_dir.name]))
-        if p.returncode != 0:
+        if p.returncode == 0:
+            self.docker_image_built = True
+        else:
             self.close_temp_dir()
             print_error(_("Error while creating docker container"))
+
+    def cleanup_docker_images(self):
+        if self.jail_type != "docker" or self.docker_image_built is False:
+            return
+        # Get image list
+        images = subprocess.run(
+            self.sudo_wrapper(["docker", "images",
+                               "packaging:*", "--quiet"]),
+            check=True, stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
+        # Remove all images
+        subprocess.run(
+            self.sudo_wrapper(["docker", "image", "rm", "-f"] + images))
+        # Remove dangling containers
+        subprocess.run(
+            self.sudo_wrapper(["docker", "container", "prune", "-f"]))
 
     def prepare_chroot_dir(self):
         chroot_home = os.path.join(xdg_cache_home, "quack", "chroot")
@@ -373,6 +392,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
                 del os.environ["CHROOT"]
         if not should_exit:
             return success
+        self.cleanup_docker_images()
         if success:
             sys.exit()
         sys.exit(1)
@@ -739,5 +759,6 @@ if __name__ == "__main__":
             for p in args.package:
                 lr = aur.install(p)
                 rcode = rcode and lr
+        aur.cleanup_docker_images()
         if rcode:
             aur.list_garbage(True)
