@@ -45,9 +45,9 @@ def hilite(string, color=None, bold=False, underline=False):
     if color in color_map:
         attr.append(color_map[color])
     if bold:
-        attr.append('1')
+        attr.append("1")
     if underline:
-        attr.append('4')
+        attr.append("4")
     return "\x1b[{}m{}\x1b[0m".format(";".join(attr), string)
 
 
@@ -77,15 +77,10 @@ def question(message):
 class AurHelper:
     def __init__(self, config, opts={}):
         self.config = config
-        self.with_devel = False
-        if "with_devel" in opts:
-            self.with_devel = opts["with_devel"]
-        self.dry_run = False
-        if "dry_run" in opts:
-            self.dry_run = opts["dry_run"]
-        self.force = False
-        if "force" in opts:
-            self.force = opts["force"]
+        self.with_devel = opts.get("with_devel", False)
+        self.dry_run = opts.get("dry_run", False)
+        self.force = opts.get("force", False)
+        self.editor = os.getenv("EDITOR", "nano")
         self.temp_dir = None
         self.chroot_dir = None
         self.local_pkgs = subprocess.run(
@@ -96,10 +91,6 @@ class AurHelper:
             ["pacman", "--color=never", "-Slq"] + self.config["repos"],
             check=True, stderr=subprocess.DEVNULL,
             stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
-
-        self.editor = "nano"
-        if os.getenv("EDITOR") != "":
-            self.editor = os.getenv("EDITOR")
 
     def is_devel(self, package):
         return re.search("-(?:bzr|cvs|git|hg|svn)$", package) is not None
@@ -186,14 +177,14 @@ class AurHelper:
         print()
         print_info(_("Removed packages kept in cache"), bold=False)
         cmd = ["paccache", "-du"]
-        if USE_COLOR == 'never':
+        if USE_COLOR == "never":
             cmd.insert(1, "--nocolor")
         # Remove unnecessary empty line
         p = subprocess.run(
             cmd, stdout=subprocess.PIPE).stdout.decode()
         print(p.strip() + "\n")
         print_info(_("Old package versions kept in cache"), bold=False)
-        if USE_COLOR == 'never':
+        if USE_COLOR == "never":
             cmd[2] = "-d"
         else:
             cmd[1] = "-d"
