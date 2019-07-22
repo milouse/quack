@@ -332,7 +332,7 @@ RUN groupadd package && \
 USER package
 WORKDIR /home/package/pkg
 VOLUME ["/home/package/pkg"]
-ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
+ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg"""
         with open(dockerfile, "w") as f:
             f.write(dockercontent.format(mirror=bestmirror))
         p = subprocess.run(self.sudo_wrapper(
@@ -473,8 +473,13 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
                 print_warning(_("the following packages must be "
                               "installed first: {pkgs}")
                               .format(pkgs=", ".join(unsatisfied)))
+        # Run check in current environment to handle all possible requirements
+        # (gpg keys...). We check this early because neither docker or chroot
+        # build are able to do it in their striped down environments. It's
+        # interesting too to check that everything will be fine in dry run.
+        self.check_package_integrity(package)
         if self.dry_run:
-            print("[dry-run] makepkg -sr")
+            print("[dry-run] makepkg -sr --skipinteg")
             buildable_pkgs = subprocess.run(
                 ["makepkg", "--packagelist"], check=True,
                 stdout=subprocess.PIPE).stdout.decode().split("\n")
@@ -485,10 +490,9 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm"""
             pkg_info["BuiltPackages"] = allowed_pkgs
             return pkg_info
         if self.jail_type is None:
-            p = subprocess.run(["makepkg", "-sr"])
+            # Thus avoid integrity check as it has already be done.
+            p = subprocess.run(["makepkg", "-sr", "--skipinteg"])
         elif self.jail_type == "chroot":
-            # makechrootpkg does not check integrity. Do it now.
-            self.check_package_integrity(package)
             self.prepare_chroot_dir()
             p = subprocess.run(["makechrootpkg", "-c", "-r",
                                 self.chroot_dir.name])
