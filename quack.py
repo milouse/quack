@@ -220,7 +220,7 @@ class AurHelper:
         if len(pkg_info["AurDepends"]) == 0:
             return pkg_info
         ai = self.fetch_pkg_infos(pkg_info["AurDepends"])
-        if ai is None or len(ai) == 0:
+        if len(ai) == 0:
             return pkg_info
         for p in ai:
             if p["PackageBase"] != pkg_info["PackageBase"]:
@@ -253,7 +253,7 @@ class AurHelper:
 
     def upgrade(self):
         res = self.fetch_pkg_infos(self.list(False))
-        if res is None or len(res) == 0:
+        if len(res) == 0:
             return False
         upgradable_pkgs = []
         for p in res:
@@ -426,7 +426,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
 
     def prepare_pkg_info(self, package):
         res = self.fetch_pkg_infos([package])
-        if res is None or len(res) == 0:
+        if len(res) == 0:
             print_error(_("{pkg} is NOT an AUR package").format(pkg=package))
         pkg_info = res[0]
         pkg_info["FastForward"] = False
@@ -567,7 +567,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
 
     def search(self, terms):
         res = self.fetch_pkg_infos(terms, "search")
-        if res is None:
+        if len(res) == 0:
             return False
         for p in res:
             outdated = ""
