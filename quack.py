@@ -135,7 +135,7 @@ class AurHelper:
         input()
         return command
 
-    def list(self, with_version=False):
+    def list_installed(self, with_version=False):
         pkgs = []
         for p in self.local_pkgs:
             d = p.split(" ")
@@ -150,7 +150,7 @@ class AurHelper:
         return pkgs
 
     def print_list(self):
-        print("\n".join(self.list(True)))
+        print("\n".join(self.list_installed(True)))
 
     def list_garbage(self, post_transac=False):
         print_info(_("Orphaned packages"), bold=False)
@@ -252,7 +252,7 @@ class AurHelper:
         return True
 
     def upgrade(self):
-        res = self.fetch_pkg_infos(self.list(False))
+        res = self.fetch_pkg_infos(self.list_installed(False))
         if len(res) == 0:
             return False
         upgradable_pkgs = []
@@ -467,7 +467,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
             unsatisfied = []
             for d in pkg_info["AurDepends"]:
                 pdata = re.split("[<>=]+", d)
-                if pdata[0] not in self.list():
+                if pdata[0] not in self.list_installed():
                     unsatisfied.append(pdata[0])
             if len(unsatisfied) > 0:
                 print_warning(_("the following packages must be "
