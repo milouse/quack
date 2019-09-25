@@ -81,6 +81,7 @@ class AurHelper:
         self.dry_run = opts.get("dry_run", False)
         self.force = opts.get("force", False)
         self.jail_type = opts.get("jail_type")
+        self.is_child = opts.get("is_child", False)
         self.editor = os.getenv("EDITOR", "nano")
         self.temp_dir = None
         self.chroot_dir = None
@@ -208,25 +209,89 @@ class AurHelper:
             return []
         return sorted(raw_json["results"], key=lambda p: p["Name"])
 
+    def handle_aur_dependencies(self, pkg_info):
+        must_install = []
+        for d in (pkg_info["AurDepends"] + pkg_info["AurMakeDepends"]):
+            ai = pkg_info.get("AurDependsData", {}).get(d)
+            if ai is None:
+                print_warning(_("{pkg} is not an AUR package, maybe a "
+                                "group or a virtual package.").format(pkg=d))
+                continue
+            pkgball = os.path.basename(ai["TargetCachePath"])
+            destball = os.path.join(self.temp_dir.name, pkgball)
+            if ai["FastForward"] is False:
+                print_warning(_("The following package must be installed "
+                                "first: {pkg}").format(pkg=ai["Name"]))
+                aur = AurHelper(self.config, {
+                    "jail_type": self.jail_type,
+                    "dry_run": self.dry_run,
+                    "is_child": True
+                })
+                if aur.build(d) is None:
+                    aur.close_temp_dir()
+                    self.close_temp_dir(should_exit=True)
+                shutil.copyfile(
+                    os.path.join(aur.temp_dir.name, pkgball),
+                    destball
+                )
+                aur.close_temp_dir()
+            else:
+                shutil.copyfile(ai["TargetCachePath"], destball)
+            if self.jail_type is None or d in pkg_info["AurDepends"]:
+                must_install.append((d, destball))
+
+        # Go back to the parent dir
+        os.chdir(self.temp_dir.name)
+
+        for pkgdata in must_install:
+            if self.dry_run:
+                print("[dry-run] pacman -U {} --noconfirm".format(pkgdata[1]))
+                print("[dry-run] pacman -D --asdeps {}".format(pkgdata[0]))
+            else:
+                p = subprocess.run(
+                    # FIXME: not the right path
+                    self.sudo_wrapper(
+                        ["pacman", "-U", pkgdata[1], "--noconfirm"]
+                    )
+                )
+                if p.returncode != 0:
+                    self.close_temp_dir()
+                    print_error(_("An error occured while installing "
+                                  "the dependency {pkg}.")
+                                .format(pkg=pkgdata[0]))
+                p = subprocess.run(
+                    self.sudo_wrapper(["pacman", "-D", "--asdeps", pkgdata[0]])
+                )
+                if p.returncode != 0:
+                    print_warning(_("An error occured while marking the "
+                                    "package {pkg} as non-explicitely "
+                                    "installed.").format(pkg=pkgdata[0]))
+
     def extract_dependencies(self, pkg_info):
         pkg_info["AurDepends"] = []
+        pkg_info["AurMakeDepends"] = []
         pkg_info["PackageBaseDepends"] = []
-        if "Depends" not in pkg_info:
-            pkg_info["Depends"] = []
-        for d in pkg_info["Depends"]:
-            if d in self.all_pkgs:
-                continue
-            pkg_info["AurDepends"].append(d)
-        if len(pkg_info["AurDepends"]) == 0:
-            return pkg_info
-        ai = self.fetch_pkg_infos(pkg_info["AurDepends"])
-        if len(ai) == 0:
-            return pkg_info
-        for p in ai:
-            if p["PackageBase"] != pkg_info["PackageBase"]:
-                continue
-            pkg_info["PackageBaseDepends"].append(p["Name"])
-            pkg_info["AurDepends"].remove(p["Name"])
+        pkg_info["AurDependsData"] = {}
+        for kind in ["Depends", "MakeDepends"]:
+            aurkind = "Aur" + kind
+            for d in pkg_info.get(kind, []):
+                pname = re.split("[<>=]+", d)[0]
+                # self.all_pkgs contains only official packages
+                if pname in self.all_pkgs:
+                    continue
+                ai = self.prepare_pkg_info(pname)
+                if ai is None:
+                    # It may happen for some virtual packages or group, which
+                    # will normally be resolved by pacman itself
+                    continue
+                if ai["PackageBase"] == pkg_info["PackageBase"]:
+                    # The dependency will be build in the same main package
+                    # build process. Thus no need to treat it specially.
+                    pkg_info["PackageBaseDepends"].append(ai["Name"])
+                    continue
+                pkg_info[aurkind].append(ai["Name"])
+                pkg_info["AurDependsData"][ai["Name"]] = ai
+        self.handle_aur_dependencies(pkg_info)
         return pkg_info
 
     def should_upgrade(self, package, current_version):
@@ -308,10 +373,9 @@ class AurHelper:
         if not os.path.exists("/tmp/makepkg.tmp.conf"):
             shutil.copyfile("/etc/makepkg.conf", "/tmp/makepkg.tmp.conf")
 
-    def prepare_docker(self):
+    def prepare_docker(self, pkg_info):
         if self.docker_image_built:
             return
-        dockerfile = os.path.join(self.temp_dir.name, "Dockerfile.quack")
         bestmirror = "Server = https://mirror.netcologne.de/archlinux/$repo/os/$arch"  # noqa
         # It's weird the result of the following request is not stable
         # r = requests.get("https://www.archlinux.org/mirrorlist/?country=all&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on")  # noqa
@@ -332,8 +396,9 @@ RUN groupadd package && \
 USER package
 WORKDIR /home/package/pkg
 VOLUME ["/home/package/pkg"]
-ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg"""
-        with open(dockerfile, "w") as f:
+ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
+"""
+        with open("Dockerfile.quack", "w") as f:
             f.write(dockercontent.format(mirror=bestmirror))
         p = subprocess.run(self.sudo_wrapper(
             ["docker", "build", "-t", "packaging", "-f", "Dockerfile.quack",
@@ -343,6 +408,20 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
         else:
             self.close_temp_dir()
             print_error(_("Error while creating docker container"))
+        roadmap = ["#!/usr/bin/env sh", "set -e",
+                   "sudo pacman -Syu --noconfirm",
+                   "exec makepkg -sr --noconfirm --skipinteg"]
+        for d in (pkg_info["AurDepends"] + pkg_info["AurMakeDepends"]):
+            ai = pkg_info.get("AurDependsData", {}).get(d)
+            if ai is None:
+                # It may happen for some virtual packages or group, which will
+                # normally be resolved by pacman itself
+                continue
+            pkgball = os.path.basename(ai["TargetCachePath"])
+            paccmd = "sudo pacman -U {} --noconfirm".format(pkgball)
+            roadmap.insert(4, paccmd)
+        with open(os.path.join(self.temp_dir.name, "roadmap.sh"), "w") as f:
+            f.write("\n".join(roadmap) + "\n")
 
     def cleanup_docker_images(self):
         if self.jail_type != "docker" or self.docker_image_built is False:
@@ -397,7 +476,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
             self.chroot_dir = None
             if "CHROOT" in os.environ:
                 del os.environ["CHROOT"]
-        if not should_exit:
+        if not should_exit or self.is_child:
             return success
         self.cleanup_docker_images()
         if success:
@@ -427,7 +506,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
     def prepare_pkg_info(self, package):
         res = self.fetch_pkg_infos([package])
         if len(res) == 0:
-            print_error(_("{pkg} is NOT an AUR package").format(pkg=package))
+            return None
         pkg_info = res[0]
         pkg_info["FastForward"] = False
         pkg_info["CARCH"] = subprocess.run(
@@ -435,6 +514,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
             stdout=subprocess.PIPE).stdout.decode().strip()
         pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.xz".format(
             pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
+        pkg_info["TargetCachePath"] = pkg_file
         if not (self.force or self.is_devel(package)) and \
            os.path.isfile(pkg_file):
             pkg_info["BuiltPackages"] = [pkg_file]
@@ -446,6 +526,8 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
     def build(self, package):
         package = self.clean_pkg_name(package)
         pkg_info = self.prepare_pkg_info(package)
+        if pkg_info is None:
+            print_error(_("{pkg} is NOT an AUR package").format(pkg=package))
         if pkg_info["FastForward"] is True:
             return pkg_info
         self.switch_to_temp_dir(pkg_info)
@@ -458,21 +540,13 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
             check = question(_("When it's done, shall we continue?") +
                              " [y/N/q]")
             lc = str(check).lower()
+            if self.is_child and lc != "y":
+                return None
             if lc == "q":
                 return self.close_temp_dir(should_exit=True)
             elif lc != "y":
                 return self.close_temp_dir(False)
         pkg_info = self.extract_dependencies(pkg_info)
-        if len(pkg_info["AurDepends"]) > 0:
-            unsatisfied = []
-            for d in pkg_info["AurDepends"]:
-                pdata = re.split("[<>=]+", d)
-                if pdata[0] not in self.list_installed():
-                    unsatisfied.append(pdata[0])
-            if len(unsatisfied) > 0:
-                print_warning(_("the following packages must be "
-                              "installed first: {pkgs}")
-                              .format(pkgs=", ".join(unsatisfied)))
         # Run check in current environment to handle all possible requirements
         # (gpg keys...). We check this early because neither docker or chroot
         # build are able to do it in their striped down environments. It's
@@ -497,7 +571,7 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
             p = subprocess.run(["makechrootpkg", "-c", "-r",
                                 self.chroot_dir.name])
         elif self.jail_type == "docker":
-            self.prepare_docker()
+            self.prepare_docker(pkg_info)
             p = subprocess.run(self.sudo_wrapper(
                 ["docker", "run", "-v",
                  "{}:/home/package/pkg".format(self.temp_dir.name),
@@ -507,7 +581,9 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
             print_error(_("Jail type {type} is not known")
                         .format(self.jail_type))
         if p.returncode != 0:
-            return self.close_temp_dir(False)
+            self.close_temp_dir(False)
+            print_error(_("Unexpected build error for {pkg}")
+                        .format(pkg=package))
         pkg_info["BuiltPackages"] = []
         for f in os.listdir():
             if f.endswith(".pkg.tar.xz"):
@@ -598,10 +674,9 @@ ENTRYPOINT sudo pacman -Syu --noconfirm && makepkg -sr --noconfirm --skipinteg""
 
     def info(self, package):
         package = self.clean_pkg_name(package)
-        res = self.fetch_pkg_infos([package])
-        if len(res) == 0:
+        res = self.prepare_pkg_info(package)
+        if res is None:
             print_error(_("{pkg} is NOT an AUR package").format(pkg=package))
-        res = res[0]
         self.tw = textwrap.TextWrapper(
             width=shutil.get_terminal_size((80, 20)).columns,
             subsequent_indent=27 * " ",
