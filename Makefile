@@ -1,6 +1,6 @@
 DEST = /usr
 
-VERSION     = $(shell sed -n "s/^VERSION = \"\(.*\)\"$$/\1/p" quack.py)
+VERSION = $(shell sed -n "s/^VERSION = \"\(.*\)\"$$/\1/p" quack.py)
 
 L10N_LANGS = fr nb_NO es de it
 PO_FILES   = $(L10N_LANGS:%=po/%/LC_MESSAGES/quack.po)
@@ -49,6 +49,9 @@ lang: $(PO_FILES)
 %.po~:
 	msgmerge --lang $(@:po/%/LC_MESSAGES/quack.po~=%) \
 		-o $@ $(@:%~=%) po/quack.pot
-	@cp $@ $(@:%~=%) && rm $@
+	sed -i -e "s|Copyright (C) [0-9]*|Copyright (C) $(shell date +%Y)|" \
+		-e "s|Id-Version: Quack [0-9.]*|Id-Version: Quack $(VERSION)|" \
+		$@
+	cp $@ $(@:%~=%) && rm $@
 
 uplang: $(PO_FILES:%=%~)
