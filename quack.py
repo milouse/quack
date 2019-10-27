@@ -464,7 +464,12 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
     def close_temp_dir(self, success=True, should_exit=False):
         os.chdir(os.path.expanduser("~"))
         if self.temp_dir is not None:
-            self.temp_dir.cleanup()
+            try:
+                self.temp_dir.cleanup()
+            except PermissionError:
+                print_error(_("A permission error occured while deleting "
+                              "the quack temp dir {folder}")
+                            .format(foder=self.temp_dir.name))
             self.temp_dir = None
         if self.chroot_dir is not None:
             # Chroot requires sudo removal. Thus first do this
