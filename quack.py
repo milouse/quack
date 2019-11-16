@@ -373,7 +373,7 @@ class AurHelper:
         if not os.path.exists("/tmp/makepkg.tmp.conf"):
             shutil.copyfile("/etc/makepkg.conf", "/tmp/makepkg.tmp.conf")
 
-    def prepare_docker(self, pkg_info):
+    def build_docker_image(self):
         if self.docker_image_built:
             return
         bestmirror = "Server = https://mirror.netcologne.de/archlinux/$repo/os/$arch"  # noqa
@@ -405,9 +405,11 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
              self.temp_dir.name]))
         if p.returncode == 0:
             self.docker_image_built = True
-        else:
-            self.close_temp_dir()
-            print_error(_("Error while creating docker container"))
+            return
+        self.close_temp_dir()
+        print_error(_("Error while creating docker container"))
+
+    def build_docker_roadmap(self, pkg_info):
         roadmap = ["#!/usr/bin/env sh", "set -e",
                    "sudo pacman -Syu --noconfirm",
                    "exec makepkg -sr --noconfirm --skipinteg"]
@@ -576,7 +578,8 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             p = subprocess.run(["makechrootpkg", "-c", "-r",
                                 self.chroot_dir.name])
         elif self.jail_type == "docker":
-            self.prepare_docker(pkg_info)
+            self.build_docker_image()
+            self.build_docker_roadmap(pkg_info)
             p = subprocess.run(self.sudo_wrapper(
                 ["docker", "run", "-v",
                  "{}:/home/package/pkg".format(self.temp_dir.name),
