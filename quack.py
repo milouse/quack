@@ -491,8 +491,9 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         sys.exit(1)
 
     def pacman_install(self, packages, backup=True):
-        pacman_cmd = self.sudo_wrapper(["pacman", "--color", USE_COLOR,
-                                        "--needed", "-U"])
+        pacman_cmd = self.sudo_wrapper(["pacman", "--color", USE_COLOR, "-U"])
+        if not self.force:
+            pacman_cmd.insert(-1, "--needed")
         p = subprocess.run(pacman_cmd + packages)
         if backup is False:
             return self.close_temp_dir()
