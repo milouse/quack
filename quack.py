@@ -126,7 +126,15 @@ class AurHelper:
         if os.getuid() == 0:
             return command
         command.insert(0, "sudo")
-        check_sudo = subprocess.run(["sudo", "-n", "true"],
+        # Command may contains only "sudo" in case we are just checking sudo
+        # timeout.
+        if len(command) > 1 and command[1] in ["docker", "pacman"]:
+            # Some people authorize docker or pacman in their sudoers
+            check_sudo_cmd = ["sudo", "-n", command[1], "--version"]
+        else:
+            check_sudo_cmd = ["sudo", "-n", "true"]
+        check_sudo = subprocess.run(check_sudo_cmd,
+                                    stdout=subprocess.DEVNULL,
                                     stderr=subprocess.DEVNULL)
         if check_sudo.returncode == 0:
             return command
