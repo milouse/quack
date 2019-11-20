@@ -80,7 +80,7 @@ class AurHelper:
         self.with_devel = opts.get("with_devel", False)
         self.dry_run = opts.get("dry_run", False)
         self.force = opts.get("force", False)
-        self.jail_type = opts.get("jail_type")
+        self.jail_type = opts.get("jail_type", "docker")
         self.is_child = opts.get("is_child", False)
         self.editor = os.getenv("EDITOR", "nano")
         self.temp_dir = None
@@ -733,9 +733,10 @@ if __name__ == "__main__":
     quack_desc = "Quack, the Qualitative and Usable Aur paCKage helper"
     parser = ArgumentParser(description=quack_desc,
                             usage="""%(prog)s -h
-       %(prog)s [--color WHEN] -C
-       %(prog)s [--color WHEN] -A [-l | -u | -s | -i] [--devel]
-                 [package [package ...]]""", epilog="""
+       %(prog)s -A [--devel] package [package ...]
+       %(prog)s -A (-l, -u) [--devel]
+       %(prog)s -A (-s, -i) package [package ...]
+       %(prog)s -C""", epilog="""
      _         _
   __(.)>    __(.)<  Quack Quack
 ~~\\___)~~~~~\\___)~~~~~~~~~~~~~~~~~~
@@ -744,49 +745,60 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--version", action="store_true",
                         help=_("Display %(prog)s version information"
                                " and exit."))
-    parser.add_argument("--color", help="Specify when to enable "
-                        "coloring. Valid options are always, "
-                        "never, or auto.", metavar="WHEN")
-    cmd_group = parser.add_argument_group("Operations")
-    cmd_group.add_argument("-C", "--list-garbage", action="store_true",
-                           help="Find and list .pacsave, "
-                           ".pacorig, .pacnew files")
-    cmd_group.add_argument("-A", "--aur", action="store_true",
-                           help="AUR related operations "
-                           "(default to install package)")
-    sub_group = parser.add_argument_group("AUR options")
-    sub_group.add_argument("-l", "--list", action="store_true",
-                           help="List locally installed AUR packages "
-                           "and exit.")
-    sub_group.add_argument("-u", "--upgrade", action="store_true",
-                           help="Upgrade locally installed AUR packages.")
-    sub_group.add_argument("-s", "--search", action="store_true",
-                           help="Search AUR packages by name and exit.")
+    parser.add_argument(
+        "--color", metavar="WHEN", choices=["always", "never", "auto"],
+        help=_("Specify when to enable coloring.")
+    )
+    cmd_group = parser.add_argument_group(_("Commands"))
+    cmd_group.add_argument("-A", "--aur", action="store_true", default=True,
+                           help=_("AUR related actions. (default)"))
+    cmd_group.add_argument(
+        "-C", "--list-garbage", action="store_true", default=False,
+        help=_("Find and list .pacsave, .pacorig or .pacnew files"))
+
+    sub_group = parser.add_argument_group(
+        _("AUR actions"),
+        _("Install action is implicit, when no other action is passed to "
+          "the -A, --aur command.")
+    )
     sub_group.add_argument("-i", "--info", action="store_true",
-                           help="Display information on an AUR package "
-                           "and exit.")
-    parser.add_argument("--devel", action="store_true",
-                        help="Include devel packages "
-                        "(which name has a trailing -svn, -git…) "
-                        "for list and upgrade operations")
-    parser.add_argument("--chroot", action="store_true",
-                        help="Run install and upgrade action in a "
-                        "chroot jail.")
-    parser.add_argument("--docker", action="store_true",
-                        help="Run install and upgrade action in a "
-                        "docker jail.")
+                           help=_("Display information on an AUR package "
+                                  "and exit."))
+    sub_group.add_argument("-l", "--list", action="store_true",
+                           help=_("List locally installed AUR packages "
+                                  "and exit."))
+    sub_group.add_argument("-s", "--search", action="store_true",
+                           help=_("Search AUR packages by name and exit."))
+    sub_group.add_argument("-u", "--upgrade", action="store_true",
+                           help=_("Upgrade installed AUR packages."))
+    sub_group = parser.add_argument_group(
+        _("Install and Upgrade options"))
+    sub_group.add_argument("--force", action="store_true",
+                           help=_("Force install or upgrade action"))
+    sub_group.add_argument("-n", "--dry-run", action="store_true",
+                           help=_("Download package info and try to "
+                                  "resolve dependencies, but do not build "
+                                  "or install anything"))
+    sub_group.add_argument(
+        "-j", "--jail", default="docker", choices=["docker", "chroot", "none"],
+        help=_("Run install and upgrade action in a docker (by default) or a "
+               "chroot jail. Use --jail=none or --no-jail to prevent the use "
+               "of a jail."))
+    sub_group.add_argument("-J", "--no-jail", action="store_true",
+                           help=_("Prevent install and upgrade action to "
+                                  "be run in a jail."))
+    sub_group = parser.add_argument_group(
+        _("List, Install and Upgrade options"))
+    sub_group.add_argument("--devel", action="store_true",
+                           help=_("Include devel packages "
+                                  "(which name has a trailing -svn, -git…)."))
+    sub_group = parser.add_argument_group(
+        _("Install, Info and Search options"))
+    sub_group.add_argument("package", nargs="*", default=[],
+                           help=_("One or more package name to install, "
+                                  "look for, or display information about."))
     parser.add_argument("--crazyfool", action="store_true",
                         help=_("Allow %(prog)s to be run as root"))
-    parser.add_argument("--force", action="store_true",
-                        help=_("Force upgrade action"))
-    parser.add_argument("-n", "--dry-run", action="store_true",
-                        help=_("Download package info and try to "
-                               "resolve dependencies, but do not build "
-                               "or install anything"))
-    parser.add_argument("package", nargs="*", default=[],
-                        help="One or more package name to install, "
-                        "upgrade, display information about. Only "
-                        "usefull for the -A operation.")
     args = parser.parse_args()
 
     if args.version:
@@ -823,11 +835,6 @@ if __name__ == "__main__":
             "dry_run": args.dry_run,
             "force": args.force}
 
-    if args.chroot:
-        opts["jail_type"] = "chroot"
-    elif args.docker:
-        opts["jail_type"] = "docker"
-
     aur = AurHelper(config, opts)
 
     if args.list_garbage:
@@ -836,12 +843,7 @@ if __name__ == "__main__":
 
     package_less_subcommand = args.list or args.upgrade
     if package_less_subcommand is False and len(args.package) == 0:
-        if args.info or args.search:
-            print_error(
-                _("no targets specified (use -h for help)\n"), False)
-        else:
-            print_error(
-                _("no operation specified (use -h for help)\n"), False)
+        print_error(_("no package specified (use -h for help)\n"), False)
         parser.print_usage()
         sys.exit(1)
 
@@ -855,6 +857,11 @@ if __name__ == "__main__":
         aur.print_list()
 
     else:
+        if args.no_jail:
+            aur.jail_type = None
+        else:
+            aur.jail_type = args.jail
+
         rcode = True
         if args.upgrade:
             rcode = aur.upgrade()
