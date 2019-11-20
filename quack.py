@@ -324,6 +324,12 @@ class AurHelper:
             return False
         return True
 
+    def post_install(self, success):
+        self.cleanup_docker_images()
+        if success:
+            self.list_garbage(True)
+        return success
+
     def upgrade(self):
         res = self.fetch_pkg_infos(self.list_installed(False))
         if len(res) == 0:
@@ -348,7 +354,7 @@ class AurHelper:
         for p in upgradable_pkgs:
             lr = self.install(p)
             rcode = rcode and lr
-        return rcode
+        return self.post_install(rcode)
 
     def switch_to_temp_dir(self, pkg_info):
         self.temp_dir = tempfile.TemporaryDirectory(prefix="quack_")
@@ -658,6 +664,13 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             return self.close_temp_dir(True)
         return self.pacman_install(final_pkgs, not pkg_info["FastForward"])
 
+    def install_list(self, packages):
+        rcode = True
+        for p in packages:
+            lr = self.install(p)
+            rcode = rcode and lr
+        return self.post_install(rcode)
+
     def search(self, terms):
         res = self.fetch_pkg_infos(terms, "search")
         if len(res) == 0:
@@ -862,13 +875,7 @@ if __name__ == "__main__":
         else:
             aur.jail_type = args.jail
 
-        rcode = True
         if args.upgrade:
-            rcode = aur.upgrade()
-        else:
-            for p in args.package:
-                lr = aur.install(p)
-                rcode = rcode and lr
-        aur.cleanup_docker_images()
-        if rcode:
-            aur.list_garbage(True)
+            sys.exit(int(not aur.upgrade()))
+
+        sys.exit(int(not aur.install_list(args.package)))
