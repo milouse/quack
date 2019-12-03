@@ -427,6 +427,14 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         roadmap = ["#!/usr/bin/env sh", "set -e",
                    "sudo pacman -Syu --noconfirm",
                    "exec makepkg -sr --noconfirm --skipinteg"]
+        # Allow one to provides is own operations before building the
+        # package. It may by usefull to install other invisible dependencies.
+        myfile = os.path.join(self.temp_dir.name, "my.roadmap.sh")
+        if os.path.exists(myfile):
+            with open(myfile, "r") as f:
+                for line in f.readlines():
+                    if not line.startswith("#"):
+                        roadmap.insert(-1, line.strip())
         for d in (pkg_info["AurDepends"] + pkg_info["AurMakeDepends"]):
             ai = pkg_info.get("AurDependsData", {}).get(d)
             if ai is None:
