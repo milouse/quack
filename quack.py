@@ -435,7 +435,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                 continue
             pkgball = os.path.basename(ai["TargetCachePath"])
             paccmd = "sudo pacman -U {} --noconfirm".format(pkgball)
-            roadmap.insert(4, paccmd)
+            roadmap.insert(-1, paccmd)
         with open(os.path.join(self.temp_dir.name, "roadmap.sh"), "w") as f:
             f.write("\n".join(roadmap) + "\n")
 
