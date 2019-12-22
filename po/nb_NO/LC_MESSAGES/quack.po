@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quack 0.5\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2019-11-22 17:32+0100\n"
-"PO-Revision-Date: 2019-03-12 23:04+0000\n"
-"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
+"POT-Creation-Date: 2019-12-22 17:53+0100\n"
+"PO-Revision-Date: 2019-12-22 18:00+0100\n"
+"Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
 "translations/nb_NO/>\n"
 "Language: nb_NO\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.5.1\n"
+"X-Generator: Poedit 2.2.4\n"
 
 #: quack.py:55
 msgid "error:"
@@ -27,276 +27,320 @@ msgstr "feil:"
 msgid "warning:"
 msgstr "advarsel:"
 
-#: quack.py:118
+#: quack.py:122
 msgid "[installed]"
 msgstr "[installert]"
 
-#: quack.py:141
+#: quack.py:145
 msgid ""
 "You are going to run a `sudo' command and a password will be prompted. Press "
 "Enter to continue."
 msgstr ""
 
-#: quack.py:165
+#: quack.py:175
 msgid "Orphaned packages"
 msgstr "Avsondrede pakker"
 
-#: quack.py:168
-msgid "no orphaned package found"
-msgstr "fant ingen avsondrede pakker"
+#: quack.py:178
+msgid "0 orphaned package found"
+msgstr ""
 
-#: quack.py:171
+#: quack.py:181
 msgid "Pacman post transaction files"
 msgstr "Etteroverføringsfiler for Pacman"
 
-#: quack.py:182
-msgid "no transactional file found"
-msgstr "ingen overgangsfil funnet"
+#: quack.py:192
+msgid "0 transactional file found"
+msgstr ""
 
-#: quack.py:189
+#: quack.py:205
 msgid "Removed packages kept in cache"
 msgstr "Fjernede pakker beholdt i hurtiglager"
 
-#: quack.py:197
+#: quack.py:213
 msgid "Old package versions kept in cache"
 msgstr "Gamle pakkeversjoner beholdt i hurtiglager"
 
-#: quack.py:225
+#: quack.py:233
+msgid "Docker images"
+msgstr ""
+
+#: quack.py:235
+#, python-brace-format
+msgid "{n} docker images found"
+msgstr ""
+
+#: quack.py:238
+#, python-brace-format
+msgid "{n} docker image found"
+msgstr ""
+
+#: quack.py:249
+msgid "Docker containers"
+msgstr ""
+
+#: quack.py:251
+#, python-brace-format
+msgid "{n} docker containers found"
+msgstr ""
+
+#: quack.py:254
+#, python-brace-format
+msgid "{n} docker container found"
+msgstr ""
+
+#: quack.py:259
+msgid "Removing packages kept in cache…"
+msgstr ""
+
+#: quack.py:262
+msgid ""
+"paccache is not installed on your system. It's provided in the pacman-"
+"contrib package."
+msgstr ""
+
+#: quack.py:272
+msgid "Removing leftover docker images and containers…"
+msgstr ""
+
+#: quack.py:309
 #, python-brace-format
 msgid "{pkg} is not an AUR package, maybe a group or a virtual package."
 msgstr ""
 
-#: quack.py:231
-#, fuzzy, python-brace-format
-msgid "The following package must be installed first: {pkg}"
-msgstr "Følgende pakker har blitt bygd:"
+#: quack.py:315
+#, python-brace-format
+msgid "The following package must be installed first: {pkg}."
+msgstr ""
 
-#: quack.py:267
+#: quack.py:351
 #, python-brace-format
 msgid "An error occured while installing the dependency {pkg}."
 msgstr ""
 
-#: quack.py:274
+#: quack.py:358
 #, python-brace-format
 msgid ""
 "An error occured while marking the package {pkg} as non-explicitely "
 "installed."
 msgstr ""
 
-#: quack.py:322
+#: quack.py:406
 #, python-brace-format
-msgid "Your system run a newer version of {pkg}"
-msgstr "Systemet ditt kjører en nyere versjon av {pkg}"
+msgid "Your system run a newer version of {pkg}."
+msgstr "Systemet ditt kjører en nyere versjon av {pkg}."
 
-#: quack.py:349
+#: quack.py:432
 msgid "Do you want to upgrade the above packages?"
 msgstr "Ønsker du å oppgradere pakkene ovenfor?"
 
-#: quack.py:367
+#: quack.py:450
 #, python-brace-format
-msgid "impossible to clone {pkg} from AUR"
-msgstr "kunne ikke klone {pkg} fra AUR"
+msgid "Impossible to clone {pkg} from AUR."
+msgstr "Kunne ikke klone {pkg} fra AUR."
 
-#: quack.py:372 quack.py:552 quack.py:709
+#: quack.py:455 quack.py:630 quack.py:787
 #, python-brace-format
-msgid "{pkg} is NOT an AUR package"
-msgstr "{pkg} er IKKE en AUR-pakke"
+msgid "{pkg} is NOT an AUR package."
+msgstr "{pkg} er IKKE en AUR-pakke."
 
-#: quack.py:380
-msgid "Integrity file check fails"
+#: quack.py:463
+msgid "Integrity file check fails."
 msgstr ""
 
-#: quack.py:424
-msgid "Error while creating docker container"
+#: quack.py:511
+msgid "Error while creating docker container."
 msgstr ""
 
-#: quack.py:474
+#: quack.py:553
 #, python-brace-format
-msgid "Error while creating the chroot dir in {folder}"
+msgid "Error while creating the chroot dir in {folder}."
 msgstr ""
 
-#: quack.py:486
+#: quack.py:565
 #, python-brace-format
-msgid "A permission error occured while deleting the quack temp dir {folder}"
+msgid "A permission error occured while deleting the quack temp dir {folder}."
 msgstr ""
 
-#: quack.py:519
+#: quack.py:597
 msgid "A copy of the built packages has been kept in /tmp."
 msgstr "En kopi av de bygde pakkene har blitt behold i /tmp."
 
-#: quack.py:544
+#: quack.py:622
 #, python-brace-format
-msgid "Package {pkg} is already built as {pkgfile}"
-msgstr "Pakken {pkg} er allerede bygd som {pkgfile}"
+msgid "Package {pkg} is already built as {pkgfile}."
+msgstr "Pakken {pkg} er allerede bygd som {pkgfile}."
 
-#: quack.py:556
+#: quack.py:634
 #, python-brace-format
-msgid "Package {pkg} is ready to be built in {path}"
-msgstr "Pakken {pkg} er klar til å bli bygd i {path}"
+msgid "Package {pkg} is ready to be built in {path}."
+msgstr "Pakken {pkg} er klar til å bli bygd i {path}."
 
-#: quack.py:560
+#: quack.py:638
 msgid "You should REALLY take time to inspect its PKGBUILD."
 msgstr "Du burde VIRKELIG ta deg tid til å gjennomse dens PKGBUILD."
 
-#: quack.py:562
+#: quack.py:640
 msgid "When it's done, shall we continue?"
 msgstr "Når det er gjort, skal vi fortsette?"
 
-#: quack.py:604
+#: quack.py:682
 #, python-brace-format
-msgid "Jail type {type} is not known"
+msgid "Jail type {type} is not known."
 msgstr ""
 
-#: quack.py:608
+#: quack.py:686
 #, python-brace-format
-msgid "Unexpected build error for {pkg}"
+msgid "Unexpected build error for {pkg}."
 msgstr ""
 
-#: quack.py:629
+#: quack.py:707
 msgid "The following packages have been built:"
 msgstr "Følgende pakker har blitt bygd:"
 
-#: quack.py:634
+#: quack.py:712
 msgid "Which one do you really want to install?"
 msgstr "Hvilken ønsker du å installere?"
 
-#: quack.py:651
+#: quack.py:729
 #, python-brace-format
-msgid "{str} is not a valid input"
-msgstr "{str} er ikke gyldig inndata"
+msgid "{str} is not a valid input."
+msgstr "{str} er ikke gyldig inndata."
 
-#: quack.py:681
+#: quack.py:759
 msgid "[outdated]"
 msgstr "[utdatert]"
 
-#: quack.py:723
+#: quack.py:801
 #, python-brace-format
 msgid "Since {date}"
 msgstr "Siden {date}"
 
-#: quack.py:726
+#: quack.py:804
 msgid "Name"
 msgstr "Navn"
 
-#: quack.py:727
+#: quack.py:805
 msgid "Version"
 msgstr "Versjon"
 
-#: quack.py:728
+#: quack.py:806
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: quack.py:729
+#: quack.py:807
 msgid "URL"
 msgstr "Nettadresse"
 
-#: quack.py:730
+#: quack.py:808
 msgid "Licenses"
 msgstr "Lisenser"
 
-#: quack.py:731
+#: quack.py:809
 msgid "Provides"
 msgstr "Tilbyr"
 
-#: quack.py:732
+#: quack.py:810
 msgid "Depends On"
 msgstr "Avhenger av"
 
-#: quack.py:733
+#: quack.py:811
 msgid "Build Depends On"
 msgstr "Bygg avhenger av"
 
-#: quack.py:734
+#: quack.py:812
 msgid "Conflicts With"
 msgstr "Kolliderer med"
 
-#: quack.py:735
+#: quack.py:813
 msgid "Last Maintainer"
 msgstr "Siste vedlikeholder"
 
-#: quack.py:736
+#: quack.py:814
 msgid "Last Modified"
 msgstr "Sist endret"
 
-#: quack.py:737
+#: quack.py:815
 msgid "Out of Date"
 msgstr "Utdatert"
 
-#: quack.py:738
+#: quack.py:816
 msgid "Votes Number"
 msgstr "Stemmenummer"
 
-#: quack.py:739
+#: quack.py:817
 msgid "Popularity"
 msgstr "Popularitet"
 
-#: quack.py:740
+#: quack.py:818
 msgid "AUR Page"
 msgstr "AUR-side"
 
-#: quack.py:741
+#: quack.py:819
 msgid "Keywords"
 msgstr "Nøkkelord"
 
-#: quack.py:759
+#: quack.py:837
 #, python-format
-msgid "Display %(prog)s version information and exit."
-msgstr "Vis %(prog)s-versjonsinformasjon og avslutt."
+msgid "Display %(prog)s version information and exit"
+msgstr "Vis %(prog)s-versjonsinformasjon og avslutt"
 
-#: quack.py:763
-msgid "Specify when to enable coloring."
+#: quack.py:841
+msgid "Specify when to enable coloring"
 msgstr ""
 
-#: quack.py:765
+#: quack.py:844
+#, python-format
+msgid "Allow %(prog)s to be run as root"
+msgstr "Tillat %(prog)s å kjøre som root"
+
+#: quack.py:846
 msgid "Commands"
 msgstr ""
 
-#: quack.py:767
-msgid "AUR related actions. (default)"
+#: quack.py:849
+msgid "AUR related actions (default)"
 msgstr ""
 
-#: quack.py:770
+#: quack.py:853
 msgid "Find and list .pacsave, .pacorig or .pacnew files"
 msgstr ""
 
-#: quack.py:773
+#: quack.py:857
 msgid "AUR actions"
 msgstr ""
 
-#: quack.py:774
+#: quack.py:858
 msgid ""
 "Install action is implicit, when no other action is passed to the -A, --aur "
-"command."
+"command"
 msgstr ""
 
-#: quack.py:778
-#, fuzzy
-msgid "Display information on an AUR package and exit."
-msgstr "Vis %(prog)s-versjonsinformasjon og avslutt."
-
-#: quack.py:781
-msgid "List locally installed AUR packages and exit."
+#: quack.py:862
+msgid "Display information on an AUR package and exit"
 msgstr ""
 
-#: quack.py:784
-msgid "Search AUR packages by name and exit."
+#: quack.py:865
+msgid "List locally installed AUR packages and exit"
 msgstr ""
 
-#: quack.py:786
-#, fuzzy
-msgid "Upgrade installed AUR packages."
-msgstr "{pkg} er IKKE en AUR-pakke"
+#: quack.py:868
+msgid "Search AUR packages by name and exit"
+msgstr ""
 
-#: quack.py:788
+#: quack.py:870
+msgid "Upgrade installed AUR packages"
+msgstr ""
+
+#: quack.py:872
 msgid "Install and Upgrade options"
 msgstr ""
 
-#: quack.py:790
-#, fuzzy
+#: quack.py:874
 msgid "Force install or upgrade action"
-msgstr "Tving gjennom oppgradering"
+msgstr ""
 
-#: quack.py:792
+#: quack.py:876
 msgid ""
 "Download package info and try to resolve dependencies, but do not build or "
 "install anything"
@@ -304,47 +348,46 @@ msgstr ""
 "Last ned pakkeinfo og prøv å løse avhengigheter, men ikke bygg eller "
 "installer noe"
 
-#: quack.py:797
+#: quack.py:881
 msgid ""
 "Run install and upgrade action in a docker (by default) or a chroot jail. "
-"Use --jail=none or --no-jail to prevent the use of a jail."
+"Use --jail=none or --no-jail to prevent the use of a jail"
 msgstr ""
 
-#: quack.py:801
-msgid "Prevent install and upgrade action to be run in a jail."
+#: quack.py:885
+msgid "Prevent install and upgrade action to be run in a jail"
 msgstr ""
 
-#: quack.py:804
+#: quack.py:888
 msgid "List, Install and Upgrade options"
 msgstr ""
 
-#: quack.py:806
-msgid "Include devel packages (which name has a trailing -svn, -git…)."
+#: quack.py:890
+msgid "Include devel packages (which name has a trailing -svn, -git…)"
 msgstr ""
 
-#: quack.py:809
+#: quack.py:893
 msgid "Install, Info and Search options"
 msgstr ""
 
-#: quack.py:811
+#: quack.py:895
 msgid ""
-"One or more package name to install, look for, or display information about."
+"One or more package name to install, look for, or display information about"
 msgstr ""
 
-#: quack.py:814
-#, python-format
-msgid "Allow %(prog)s to be run as root"
-msgstr "Tillat %(prog)s å kjøre som root"
+#: quack.py:898
+msgid "Cleanup actions"
+msgstr ""
 
-#: quack.py:844
+#: quack.py:901
+msgid "Actually cleanup things instead of just listing them"
+msgstr ""
+
+#: quack.py:933
 #, python-brace-format
 msgid "Do not run {quack_cmd} as root!"
 msgstr "Ikke kjør {quack_cmd} som root!"
 
-#: quack.py:859
-#, fuzzy
-msgid "no package specified (use -h for help)\n"
-msgstr "ingen mål angitt (bruk -h for hjelp)\n"
-
-#~ msgid "no operation specified (use -h for help)\n"
-#~ msgstr "ingen operasjon angitt (bruk -h for hjelp)\n"
+#: quack.py:951
+msgid "No package specified (use -h for help)"
+msgstr "Ingen mål angitt (bruk -h for hjelp)"

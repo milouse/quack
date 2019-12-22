@@ -83,7 +83,7 @@ class AurHelper:
         self.jail_type = opts.get("jail_type", "docker")
         if self.jail_type == "docker" \
            and not self.check_command_presence("docker"):
-            print_warning("docker is not installed on your system")
+            print_warning("Docker is not installed on your system.")
             self.jail_type = None
         self.is_child = opts.get("is_child", False)
         self.editor = os.getenv("EDITOR", "nano")
@@ -175,7 +175,7 @@ class AurHelper:
         print_info(_("Orphaned packages"), bold=False)
         p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
         if p.returncode == 1:
-            print_info(_("no orphaned package found"),
+            print_info(_("0 orphaned package found"),
                        symbol="==>", color="green")
         print()
         print_info(_("Pacman post transaction files"), bold=False)
@@ -189,7 +189,7 @@ class AurHelper:
         p = subprocess.run(
             cmd, stdout=subprocess.PIPE).stdout.decode().strip()
         if p == "":
-            print_info(_("no transactional file found"),
+            print_info(_("0 transactional file found"),
                        symbol="==>", color="green")
         else:
             print(p)
@@ -256,7 +256,7 @@ class AurHelper:
 
     def cleanup_garbage(self):
         if self.check_command_presence("paccache"):
-            print_info(_("Removing packages kept in cache"), bold=False)
+            print_info(_("Removing packages kept in cache…"), bold=False)
             subprocess.run(["paccache", "-r"])
         else:
             print_warning(_("paccache is not installed on your system. "
@@ -269,7 +269,7 @@ class AurHelper:
             return
         print()
         print_info(
-            _("Removing leftover docker images and containers"),
+            _("Removing leftover docker images and containers…"),
             bold=False
         )
         # Get image list
@@ -313,7 +313,7 @@ class AurHelper:
             destball = os.path.join(self.temp_dir.name, pkgball)
             if ai["FastForward"] is False:
                 print_warning(_("The following package must be installed "
-                                "first: {pkg}").format(pkg=ai["Name"]))
+                                "first: {pkg}.").format(pkg=ai["Name"]))
                 aur = AurHelper(self.config, {
                     "jail_type": self.jail_type,
                     "dry_run": self.dry_run,
@@ -403,7 +403,7 @@ class AurHelper:
         if ver_check == "1":
             # Somehow we have a local version greater than upstream
             print_warning(
-                _("Your system run a newer version of {pkg}")
+                _("Your system run a newer version of {pkg}.")
                 .format(pkg=package["Name"]))
             return False
         return True
@@ -447,12 +447,12 @@ class AurHelper:
                             self.temp_dir.name])
         if p.returncode != 0:
             self.close_temp_dir()
-            print_error(_("impossible to clone {pkg} from AUR")
+            print_error(_("Impossible to clone {pkg} from AUR.")
                         .format(pkg=pkg_info["Name"]))
         os.chdir(self.temp_dir.name)
         if not os.path.isfile("PKGBUILD"):
             self.close_temp_dir()
-            print_error(_("{pkg} is NOT an AUR package")
+            print_error(_("{pkg} is NOT an AUR package.")
                         .format(pkg=pkg_info["Name"]))
 
     def check_package_integrity(self, package):
@@ -460,7 +460,7 @@ class AurHelper:
         if p.returncode == 0:
             return
         self.close_temp_dir()
-        print_error(_("Integrity file check fails"))
+        print_error(_("Integrity file check fails."))
 
     def prepare_temp_config_files(self):
         if not os.path.exists("/tmp/pacman.tmp.conf"):
@@ -508,7 +508,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.docker_image_built = True
             return
         self.close_temp_dir()
-        print_error(_("Error while creating docker container"))
+        print_error(_("Error while creating docker container."))
 
     def build_docker_roadmap(self, pkg_info):
         roadmap = ["#!/usr/bin/env sh", "set -e",
@@ -550,7 +550,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                             "base-devel"])
         if p.returncode != 0:
             self.close_temp_dir()
-            print_error(_("Error while creating the chroot dir in {folder}")
+            print_error(_("Error while creating the chroot dir in {folder}.")
                         .format(folder=self.chroot_dir.name))
         # Make sure chroot is up to date
         subprocess.run(["arch-nspawn", "{}/root".format(self.chroot_dir.name),
@@ -563,7 +563,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                 self.temp_dir.cleanup()
             except PermissionError:
                 print_error(_("A permission error occured while deleting "
-                              "the quack temp dir {folder}")
+                              "the quack temp dir {folder}.")
                             .format(foder=self.temp_dir.name))
             self.temp_dir = None
         if self.chroot_dir is not None:
@@ -619,7 +619,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
            os.path.isfile(pkg_file):
             pkg_info["BuiltPackages"] = [pkg_file]
             pkg_info["FastForward"] = True
-            print_info(_("Package {pkg} is already built as {pkgfile}")
+            print_info(_("Package {pkg} is already built as {pkgfile}.")
                        .format(pkg=package, pkgfile=pkg_file))
         return pkg_info
 
@@ -627,11 +627,11 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         package = self.clean_pkg_name(package)
         pkg_info = self.prepare_pkg_info(package)
         if pkg_info is None:
-            print_error(_("{pkg} is NOT an AUR package").format(pkg=package))
+            print_error(_("{pkg} is NOT an AUR package.").format(pkg=package))
         if pkg_info["FastForward"] is True:
             return pkg_info
         self.switch_to_temp_dir(pkg_info)
-        print_info(_("Package {pkg} is ready to be built in {path}")
+        print_info(_("Package {pkg} is ready to be built in {path}.")
                    .format(pkg=hilite(package, "yellow", True),
                            path=self.temp_dir.name), bold=False)
         if not self.dry_run:
@@ -679,11 +679,11 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                  "packaging"]))
         else:
             self.close_temp_dir()
-            print_error(_("Jail type {type} is not known")
+            print_error(_("Jail type {type} is not known.")
                         .format(self.jail_type))
         if p.returncode != 0:
             self.close_temp_dir(False)
-            print_error(_("Unexpected build error for {pkg}")
+            print_error(_("Unexpected build error for {pkg}.")
                         .format(pkg=package))
         pkg_info["BuiltPackages"] = []
         for f in os.listdir():
@@ -726,7 +726,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                     raise ValueError
                 final_pkgs.append(built_packages[pi - 1])
         except ValueError:
-            print_error(_("{str} is not a valid input").format(str=p))
+            print_error(_("{str} is not a valid input.").format(str=p))
         if (len(final_pkgs) == 1 and final_pkgs[0].startswith(package) and
            len(pkg_info["PackageBaseDepends"]) > 0):
             for ld in pkg_info["PackageBaseDepends"]:
@@ -784,7 +784,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         package = self.clean_pkg_name(package)
         res = self.prepare_pkg_info(package)
         if res is None:
-            print_error(_("{pkg} is NOT an AUR package").format(pkg=package))
+            print_error(_("{pkg} is NOT an AUR package.").format(pkg=package))
         self.tw = textwrap.TextWrapper(
             width=shutil.get_terminal_size((80, 20)).columns,
             subsequent_indent=27 * " ",
@@ -835,15 +835,18 @@ if __name__ == "__main__":
 """, formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("-v", "--version", action="store_true",
                         help=_("Display %(prog)s version information"
-                               " and exit."))
+                               " and exit"))
     parser.add_argument(
         "--color", metavar="WHEN", choices=["always", "never", "auto"],
-        help=_("Specify when to enable coloring.")
+        help=_("Specify when to enable coloring")
     )
+    parser.add_argument("--crazyfool", action="store_true",
+                        help=_("Allow %(prog)s to be run as root"))
+
     cmd_group = parser.add_argument_group(_("Commands"))
     cmd_group.add_argument(
         "-A", "--aur", action="store_true", default=True,
-        help=_("AUR related actions. (default)")
+        help=_("AUR related actions (default)")
     )
     cmd_group.add_argument(
         "-C", "--list-garbage", action="store_true", default=False,
@@ -853,18 +856,18 @@ if __name__ == "__main__":
     sub_group = parser.add_argument_group(
         _("AUR actions"),
         _("Install action is implicit, when no other action is passed to "
-          "the -A, --aur command.")
+          "the -A, --aur command")
     )
     sub_group.add_argument("-i", "--info", action="store_true",
                            help=_("Display information on an AUR package "
-                                  "and exit."))
+                                  "and exit"))
     sub_group.add_argument("-l", "--list", action="store_true",
                            help=_("List locally installed AUR packages "
-                                  "and exit."))
+                                  "and exit"))
     sub_group.add_argument("-s", "--search", action="store_true",
-                           help=_("Search AUR packages by name and exit."))
+                           help=_("Search AUR packages by name and exit"))
     sub_group.add_argument("-u", "--upgrade", action="store_true",
-                           help=_("Upgrade installed AUR packages."))
+                           help=_("Upgrade installed AUR packages"))
     sub_group = parser.add_argument_group(
         _("Install and Upgrade options"))
     sub_group.add_argument("--force", action="store_true",
@@ -877,27 +880,25 @@ if __name__ == "__main__":
         "-j", "--jail", default="docker", choices=["docker", "chroot", "none"],
         help=_("Run install and upgrade action in a docker (by default) or a "
                "chroot jail. Use --jail=none or --no-jail to prevent the use "
-               "of a jail."))
+               "of a jail"))
     sub_group.add_argument("-J", "--no-jail", action="store_true",
                            help=_("Prevent install and upgrade action to "
-                                  "be run in a jail."))
+                                  "be run in a jail"))
     sub_group = parser.add_argument_group(
         _("List, Install and Upgrade options"))
     sub_group.add_argument("--devel", action="store_true",
                            help=_("Include devel packages "
-                                  "(which name has a trailing -svn, -git…)."))
+                                  "(which name has a trailing -svn, -git…)"))
     sub_group = parser.add_argument_group(
         _("Install, Info and Search options"))
     sub_group.add_argument("package", nargs="*", default=[],
                            help=_("One or more package name to install, "
-                                  "look for, or display information about."))
-    parser.add_argument("--crazyfool", action="store_true",
-                        help=_("Allow %(prog)s to be run as root"))
+                                  "look for, or display information about"))
 
     sub_group = parser.add_argument_group(_("Cleanup actions"))
     sub_group.add_argument(
         "-c", "--clean", action="store_true",
-        help=_("Actually cleanup things instead of just listing them.")
+        help=_("Actually cleanup things instead of just listing them")
     )
 
     args = parser.parse_args()
@@ -947,7 +948,8 @@ if __name__ == "__main__":
 
     package_less_subcommand = args.list or args.upgrade
     if package_less_subcommand is False and len(args.package) == 0:
-        print_error(_("no package specified (use -h for help)\n"), False)
+        print_error(_("No package specified (use -h for help)"), False)
+        print()
         parser.print_usage()
         sys.exit(1)
 
