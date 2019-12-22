@@ -81,6 +81,10 @@ class AurHelper:
         self.dry_run = opts.get("dry_run", False)
         self.force = opts.get("force", False)
         self.jail_type = opts.get("jail_type", "docker")
+        if self.jail_type == "docker" \
+           and not self.check_command_presence("docker"):
+            print_warning("docker is not installed on your system")
+            self.jail_type = None
         self.is_child = opts.get("is_child", False)
         self.editor = os.getenv("EDITOR", "nano")
         self.temp_dir = None
@@ -144,6 +148,12 @@ class AurHelper:
         input()
         return command
 
+    def check_command_presence(self, command):
+        sentinel = subprocess.run(["which", command],
+                                  stdout=subprocess.DEVNULL,
+                                  stderr=subprocess.DEVNULL)
+        return sentinel.returncode == 0
+
     def list_installed(self, with_version=False):
         pkgs = []
         for p in self.local_pkgs:
@@ -184,6 +194,11 @@ class AurHelper:
         else:
             print(p)
         if post_transac:
+            return
+        self.list_cached_packages()
+
+    def list_cached_packages(self):
+        if not self.check_command_presence("paccache"):
             return
         print()
         print_info(_("Removed packages kept in cache"), bold=False)
