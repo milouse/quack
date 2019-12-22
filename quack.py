@@ -196,6 +196,7 @@ class AurHelper:
         if post_transac:
             return
         self.list_cached_packages()
+        self.list_docker_garbage()
 
     def list_cached_packages(self):
         if not self.check_command_presence("paccache"):
@@ -218,6 +219,74 @@ class AurHelper:
         p = subprocess.run(
             cmd, stdout=subprocess.PIPE).stdout.decode()
         print(p.strip())
+
+    def list_docker_garbage(self):
+        if not self.check_command_presence("docker"):
+            return
+        print()
+        # Count images
+        images = subprocess.run(
+            self.sudo_wrapper(["docker", "images", "packaging:*", "--quiet"]),
+            check=True, stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
+        number = len([i for i in images if i != ""])
+        print_info(_("Docker images"), bold=False)
+        if number > 1:
+            print_info(_("{n} docker images found").format(n=number),
+                       symbol="==>", color="green")
+        else:
+            print_info(_("{n} docker image found").format(n=number),
+                       symbol="==>", color="green")
+        print()
+        # Count containers
+        containers = subprocess.run(
+            self.sudo_wrapper(["docker", "container", "ls", "--filter",
+                               "label=vendor=quack.packaging", "-a",
+                               "--quiet"]),
+            check=True, stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
+        number = len([c for c in containers if c != ""])
+        print_info(_("Docker containers"), bold=False)
+        if number > 1:
+            print_info(_("{n} docker containers found").format(n=number),
+                       symbol="==>", color="green")
+        else:
+            print_info(_("{n} docker container found").format(n=number),
+                       symbol="==>", color="green")
+
+    def cleanup_garbage(self):
+        if self.check_command_presence("paccache"):
+            print_info(_("Removing packages kept in cache"), bold=False)
+            subprocess.run(["paccache", "-r"])
+        else:
+            print_warning(_("paccache is not installed on your system. "
+                            "It's provided in the pacman-contrib package."))
+
+        self.cleanup_docker_images()
+
+    def cleanup_docker_images(self):
+        if not self.check_command_presence("docker"):
+            return
+        print()
+        print_info(
+            _("Removing leftover docker images and containers"),
+            bold=False
+        )
+        # Get image list
+        raw_images = subprocess.run(
+            self.sudo_wrapper(["docker", "images",
+                               "packaging:*", "--quiet"]),
+            check=True, stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
+        images = [i for i in raw_images if i != ""]
+        if len(images) > 0:
+            # Remove all images
+            subprocess.run(
+                self.sudo_wrapper(["docker", "image", "rm", "-f"] + images))
+        # Remove dangling containers
+        subprocess.run(
+            self.sudo_wrapper(["docker", "container", "prune", "-f",
+                               "--filter", "label=vendor=quack.packaging"]))
 
     def fetch_pkg_infos(self, terms, req_type="info"):
         req = "https://aur.archlinux.org/rpc.php?v=5"
@@ -340,7 +409,6 @@ class AurHelper:
         return True
 
     def post_install(self, success):
-        self.cleanup_docker_images()
         if success:
             self.list_garbage(True)
         return success
@@ -414,6 +482,8 @@ class AurHelper:
         #         break
         dockercontent = """FROM archlinux/base
 
+LABEL vendor="quack.packaging" version="{version}"
+
 RUN echo '{mirror}' > /etc/pacman.d/mirrorlist && \
     pacman -Syu --noconfirm && \
     pacman -S --noconfirm base-devel devtools pacman-contrib namcap
@@ -428,7 +498,9 @@ VOLUME ["/home/package/pkg"]
 ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
 """
         with open("Dockerfile.quack", "w") as f:
-            f.write(dockercontent.format(mirror=bestmirror))
+            f.write(
+                dockercontent.format(mirror=bestmirror, version=VERSION)
+            )
         p = subprocess.run(self.sudo_wrapper(
             ["docker", "build", "-t", "packaging", "-f", "Dockerfile.quack",
              self.temp_dir.name]))
@@ -461,22 +533,6 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             roadmap.insert(-1, paccmd)
         with open(os.path.join(self.temp_dir.name, "roadmap.sh"), "w") as f:
             f.write("\n".join(roadmap) + "\n")
-
-    def cleanup_docker_images(self):
-        if self.jail_type != "docker" or self.docker_image_built is False:
-            return
-        # Get image list
-        images = subprocess.run(
-            self.sudo_wrapper(["docker", "images",
-                               "packaging:*", "--quiet"]),
-            check=True, stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
-        # Remove all images
-        subprocess.run(
-            self.sudo_wrapper(["docker", "image", "rm", "-f"] + images))
-        # Remove dangling containers
-        subprocess.run(
-            self.sudo_wrapper(["docker", "container", "prune", "-f"]))
 
     def prepare_chroot_dir(self):
         chroot_home = os.path.join(xdg_cache_home, "quack", "chroot")
@@ -522,7 +578,6 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                 del os.environ["CHROOT"]
         if not should_exit or self.is_child:
             return success
-        self.cleanup_docker_images()
         if success:
             sys.exit()
         sys.exit(1)
@@ -772,7 +827,7 @@ if __name__ == "__main__":
        %(prog)s -A [--devel] package [package ...]
        %(prog)s -A (-l, -u) [--devel]
        %(prog)s -A (-s, -i) package [package ...]
-       %(prog)s -C""", epilog="""
+       %(prog)s -C [-c]""", epilog="""
      _         _
   __(.)>    __(.)<  Quack Quack
 ~~\\___)~~~~~\\___)~~~~~~~~~~~~~~~~~~
@@ -786,11 +841,14 @@ if __name__ == "__main__":
         help=_("Specify when to enable coloring.")
     )
     cmd_group = parser.add_argument_group(_("Commands"))
-    cmd_group.add_argument("-A", "--aur", action="store_true", default=True,
-                           help=_("AUR related actions. (default)"))
+    cmd_group.add_argument(
+        "-A", "--aur", action="store_true", default=True,
+        help=_("AUR related actions. (default)")
+    )
     cmd_group.add_argument(
         "-C", "--list-garbage", action="store_true", default=False,
-        help=_("Find and list .pacsave, .pacorig or .pacnew files"))
+        help=_("Find and list .pacsave, .pacorig or .pacnew files")
+    )
 
     sub_group = parser.add_argument_group(
         _("AUR actions"),
@@ -835,6 +893,13 @@ if __name__ == "__main__":
                                   "look for, or display information about."))
     parser.add_argument("--crazyfool", action="store_true",
                         help=_("Allow %(prog)s to be run as root"))
+
+    sub_group = parser.add_argument_group(_("Cleanup actions"))
+    sub_group.add_argument(
+        "-c", "--clean", action="store_true",
+        help=_("Actually cleanup things instead of just listing them.")
+    )
+
     args = parser.parse_args()
 
     if args.version:
@@ -874,7 +939,10 @@ if __name__ == "__main__":
     aur = AurHelper(config, opts)
 
     if args.list_garbage:
-        aur.list_garbage()
+        if args.clean:
+            aur.cleanup_garbage()
+        else:
+            aur.list_garbage()
         sys.exit()
 
     package_less_subcommand = args.list or args.upgrade
