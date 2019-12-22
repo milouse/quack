@@ -441,7 +441,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
     def build_docker_roadmap(self, pkg_info):
         roadmap = ["#!/usr/bin/env sh", "set -e",
                    "sudo pacman -Syu --noconfirm",
-                   "exec makepkg -sr --noconfirm --skipinteg"]
+                   "exec makepkg -s --noconfirm --skipinteg"]
         # Allow one to provides is own operations before building the
         # package. It may by usefull to install other invisible dependencies.
         myfile = os.path.join(self.temp_dir.name, "my.roadmap.sh")
