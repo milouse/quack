@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+import glob
 import time
 import shutil
 import requests
@@ -26,7 +27,7 @@ gettext.textdomain("quack")
 _ = gettext.gettext
 
 
-VERSION = "0.5"
+VERSION = "0.6"
 USE_COLOR = "never"
 
 
@@ -171,7 +172,31 @@ class AurHelper:
     def print_list(self):
         print("\n".join(self.list_installed(True)))
 
-    def list_garbage(self, post_transac=False):
+    def list_transac_files(self):
+        bkp_reg = re.compile(r"^%BACKUP%$", re.M)
+        result = []
+        for filepath in glob.glob("/var/lib/pacman/local/*/files"):
+            with open(filepath, "r") as f:
+                content = f.read()
+                match = bkp_reg.search(content)
+                if match is None:
+                    continue
+                f.seek(match.start())
+                tail = f.read()
+            for line in tail.split("\n"):
+                ldata = [l.strip() for l in line.split("\t")]
+                if ldata[0] in ["", "%BACKUP%"]:
+                    continue
+                basefile = "/" + ldata[0]
+                if not os.path.exists(basefile):
+                    continue
+                for suffix in [".pacsave", ".pacorig", ".pacnew"]:
+                    transacfile = basefile + suffix
+                    if os.path.exists(transacfile):
+                        result.append(transacfile)
+        return result
+
+    def list_garbage(self, post_transac=False, deep_search=False):
         print_info(_("Orphaned packages"), bold=False)
         p = subprocess.run(["pacman", "--color", USE_COLOR, "-Qdt"])
         if p.returncode == 1:
@@ -179,15 +204,18 @@ class AurHelper:
                        symbol="==>", color="green")
         print()
         print_info(_("Pacman post transaction files"), bold=False)
-        cmd = ["find"]
-        pac_pathes = ["/boot/", "/etc/", "/usr/"]
-        cmd += pac_pathes + ["-type", "f", "("]
-        for p in ["*.pacsave", "*.pacorig", "*.pacnew"]:
-            cmd.extend(["-name", p, "-o"])
-        cmd.pop()
-        cmd = self.sudo_wrapper(cmd + [")"])
-        p = subprocess.run(
-            cmd, stdout=subprocess.PIPE).stdout.decode().strip()
+        if deep_search:
+            cmd = ["find"]
+            pac_pathes = ["/boot/", "/etc/", "/usr/"]
+            cmd += pac_pathes + ["-type", "f", "("]
+            for p in ["*.pacsave", "*.pacorig", "*.pacnew"]:
+                cmd.extend(["-name", p, "-o"])
+            cmd.pop()  # Remove the last "-o"
+            cmd = self.sudo_wrapper(cmd + [")"])
+            p = subprocess.run(
+                cmd, stdout=subprocess.PIPE).stdout.decode().strip()
+        else:
+            p = "\n".join(self.list_transac_files())
         if p == "":
             print_info(_("0 transactional file found"),
                        symbol="==>", color="green")
@@ -900,6 +928,11 @@ if __name__ == "__main__":
         "-c", "--clean", action="store_true",
         help=_("Actually cleanup things instead of just listing them")
     )
+    sub_group.add_argument(
+        "-d", "--deep", action="store_true",
+        help=_("Make a deep search of transactional files instead of a "
+               "quick search (use find instead of pacman db).")
+    )
 
     args = parser.parse_args()
 
@@ -943,7 +976,7 @@ if __name__ == "__main__":
         if args.clean:
             aur.cleanup_garbage()
         else:
-            aur.list_garbage()
+            aur.list_garbage(deep_search=args.deep)
         sys.exit()
 
     package_less_subcommand = args.list or args.upgrade
