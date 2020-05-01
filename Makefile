@@ -23,7 +23,8 @@ uninstall:
 
 po/quack.pot:
 	mkdir -p po
-	xgettext --language=Python --keyword=_ \
+	xgettext --language=Python \
+		--keyword=_ --keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 \
 		--copyright-holder="Quack volunteers" \
 		--package-name=Quack --package-version=$(VERSION) \
 		--msgid-bugs-address=bugs@depar.is --from-code=UTF-8 \
