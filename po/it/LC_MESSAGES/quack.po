@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Quack 0.6\n"
+"Project-Id-Version: Quack 0.7\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2020-03-21 18:20+0100\n"
+"POT-Creation-Date: 2020-05-01 13:59+0200\n"
 "PO-Revision-Date: 2019-10-23 20:15+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
