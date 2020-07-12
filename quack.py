@@ -184,7 +184,7 @@ class AurHelper:
                 f.seek(match.start())
                 tail = f.read()
             for line in tail.split("\n"):
-                ldata = [l.strip() for l in line.split("\t")]
+                ldata = [part.strip() for part in line.split("\t")]
                 if ldata[0] in ["", "%BACKUP%"]:
                     continue
                 basefile = "/" + ldata[0]
@@ -778,12 +778,12 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             return self.pacman_install([built_packages[0]],
                                        not pkg_info["FastForward"])
         print_info(_("The following packages have been built:"))
-        i = 0
-        for l in built_packages:
-            i += 1
-            print("[{}] {}".format(i, l))
+        pkg_idx = 0
+        for line in built_packages:
+            pkg_idx += 1
+            print("[{}] {}".format(pkg_idx, line))
         ps = question(_("Which one do you really want to install?") +
-                      " [1…{}/A]".format(i))
+                      " [1…{}/A]".format(pkg_idx))
         if str(ps).lower() == "a":
             if self.dry_run:
                 print("[dry-run] pacman -U {}"
