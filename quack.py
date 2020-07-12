@@ -746,7 +746,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.build_docker_image()
             self.build_docker_roadmap(pkg_info)
             p = subprocess.run(self.sudo_wrapper(
-                ["docker", "run", "--mount",
+                ["docker", "run", "--rm", "--mount",
                  "type=bind,source={},destination={}".format(
                      self.temp_dir.name, "/home/package/pkg"
                  ), "packaging"]))
