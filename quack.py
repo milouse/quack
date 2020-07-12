@@ -567,7 +567,6 @@ RUN groupadd package && \
 
 USER package
 WORKDIR /home/package/pkg
-VOLUME ["/home/package/pkg"]
 ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
 """
         with open("Dockerfile.quack", "w") as f:
