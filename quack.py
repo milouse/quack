@@ -684,7 +684,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         pkg_info["CARCH"] = subprocess.run(
             ["uname", "-m"], check=True,
             stdout=subprocess.PIPE).stdout.decode().strip()
-        pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.xz".format(
+        pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.zst".format(
             pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
         pkg_info["TargetCachePath"] = pkg_file
         if not (self.force or self.is_devel(package)) and \
@@ -732,7 +732,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             allowed_pkgs = []
             for p in buildable_pkgs:
                 if p.endswith("-any") or p.endswith("-" + pkg_info["CARCH"]):
-                    allowed_pkgs.append(p + ".pkg.tar.xz")
+                    allowed_pkgs.append(p + ".pkg.tar.zst")
             pkg_info["BuiltPackages"] = allowed_pkgs
             return pkg_info
         if self.jail_type is None:
@@ -760,7 +760,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                         .format(pkg=package))
         pkg_info["BuiltPackages"] = []
         for f in os.listdir():
-            if f.endswith(".pkg.tar.xz"):
+            if f.endswith(".pkg.tar.zst"):
                 pkg_info["BuiltPackages"].append(f)
         return pkg_info
 
