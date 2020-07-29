@@ -27,7 +27,7 @@ gettext.textdomain("quack")
 _ = gettext.gettext
 
 
-VERSION = "0.6"
+VERSION = "0.7"
 USE_COLOR = "never"
 
 
@@ -184,7 +184,7 @@ class AurHelper:
                 f.seek(match.start())
                 tail = f.read()
             for line in tail.split("\n"):
-                ldata = [l.strip() for l in line.split("\t")]
+                ldata = [part.strip() for part in line.split("\t")]
                 if ldata[0] in ["", "%BACKUP%"]:
                     continue
                 basefile = "/" + ldata[0]
@@ -224,7 +224,10 @@ class AurHelper:
         if post_transac:
             return
         self.list_cached_packages()
-        self.list_docker_garbage()
+        if not self.check_command_presence("docker"):
+            return
+        self.list_docker_garbage("container")
+        self.list_docker_garbage("image")
 
     def list_cached_packages(self):
         if not self.check_command_presence("paccache"):
@@ -248,39 +251,58 @@ class AurHelper:
             cmd, stdout=subprocess.PIPE).stdout.decode()
         print(p.strip())
 
-    def list_docker_garbage(self):
-        if not self.check_command_presence("docker"):
-            return
-        print()
-        # Count images
+    def get_docker_images_list(self):
         images = subprocess.run(
-            self.sudo_wrapper(["docker", "images", "packaging:*", "--quiet"]),
+            self.sudo_wrapper(
+                ["docker", "image", "ls", "packaging", "--quiet"]
+            ),
             check=True, stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
-        number = len([i for i in images if i != ""])
-        print_info(_("Docker images"), bold=False)
-        if number > 1:
-            print_info(_("{n} docker images found").format(n=number),
-                       symbol="==>", color="green")
-        else:
-            print_info(_("{n} docker image found").format(n=number),
-                       symbol="==>", color="green")
-        print()
-        # Count containers
+            stdout=subprocess.PIPE
+        ).stdout.decode().strip()
+        if images == "":
+            return []
+        return images.split("\n")
+
+    def get_docker_containers_list(self):
         containers = subprocess.run(
-            self.sudo_wrapper(["docker", "container", "ls", "--filter",
-                               "label=vendor=quack.packaging", "-a",
-                               "--quiet"]),
+            self.sudo_wrapper(
+                ["docker", "container", "ls", "--all",
+                 "--filter", "ancestor=packaging",
+                 "--filter", "status=exited", "--quiet"]
+            ),
             check=True, stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
-        number = len([c for c in containers if c != ""])
-        print_info(_("Docker containers"), bold=False)
-        if number > 1:
-            print_info(_("{n} docker containers found").format(n=number),
-                       symbol="==>", color="green")
+            stdout=subprocess.PIPE
+        ).stdout.decode().strip()
+        if containers == "":
+            return []
+        return containers.split("\n")
+
+    def list_docker_garbage(self, docker_type):
+        plural_type = docker_type + "s"
+        if docker_type == "image":
+            context = "female"
         else:
-            print_info(_("{n} docker container found").format(n=number),
-                       symbol="==>", color="green")
+            context = "male"
+        # Count images
+        number = len(
+            getattr(self, "get_docker_{}_list".format(plural_type))()
+        )
+        print()
+        print_info(_("Docker {item}").format(item=plural_type), bold=False)
+        if context == "female":
+            message = gettext.npgettext(
+                "female", "{n} docker {item} found",
+                "{n} docker {items} found", number
+            )
+        else:
+            message = gettext.npgettext(
+                "male", "{n} docker {item} found",
+                "{n} docker {items} found", number
+            )
+        print_info(
+            message.format(n=number, item=docker_type, items=plural_type),
+            symbol="==>", color="green"
+        )
 
     def cleanup_garbage(self):
         if self.check_command_presence("paccache"):
@@ -290,31 +312,56 @@ class AurHelper:
             print_warning(_("paccache is not installed on your system. "
                             "It's provided in the pacman-contrib package."))
 
-        self.cleanup_docker_images()
-
-    def cleanup_docker_images(self):
         if not self.check_command_presence("docker"):
             return
+        # Remove first containers to avoid error when deleting images and avoid
+        # to use force flag.
+        self.cleanup_docker_garbage("container")
+        # Now remove safely related images
+        self.cleanup_docker_garbage("image")
+
+    def cleanup_docker_garbage(self, docker_type):
+        plural_type = docker_type + "s"
+        if docker_type == "image":
+            context = "female"
+        else:
+            context = "male"
         print()
         print_info(
-            _("Removing leftover docker images and containers…"),
+            _("Removing leftover docker {item}").format(item=plural_type),
             bold=False
         )
-        # Get image list
-        raw_images = subprocess.run(
-            self.sudo_wrapper(["docker", "images",
-                               "packaging:*", "--quiet"]),
-            check=True, stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
-        images = [i for i in raw_images if i != ""]
-        if len(images) > 0:
-            # Remove all images
-            subprocess.run(
-                self.sudo_wrapper(["docker", "image", "rm", "-f"] + images))
-        # Remove dangling containers
+        objects = getattr(self, "get_docker_{}_list".format(plural_type))()
+        if len(objects) == 0:
+            if context == "female":
+                message = gettext.pgettext(
+                    "female", "no candidate {item}s found for removing"
+                )
+            else:
+                message = gettext.pgettext(
+                    "male", "no candidate {item}s found for removing"
+                )
+            print_info(message.format(item=docker_type),
+                       symbol="==>", color="green")
+            return
         subprocess.run(
-            self.sudo_wrapper(["docker", "container", "prune", "-f",
-                               "--filter", "label=vendor=quack.packaging"]))
+            self.sudo_wrapper(["docker", docker_type, "rm"] + objects)
+        )
+        number = len(objects)
+        if context == "female":
+            message = gettext.npgettext(
+                "female", "finished: {n} {item} removed",
+                "finished: {n} {items} removed", number
+            )
+        else:
+            message = gettext.npgettext(
+                "male", "finished: {n} {item} removed",
+                "finished: {n} {items} removed", number
+            ).format(n=number, item=docker_type, items=plural_type)
+        print_info(
+            message.format(n=number, item=docker_type, items=plural_type),
+            symbol="==>", color="green"
+        )
 
     def fetch_pkg_infos(self, terms, req_type="info"):
         req = "https://aur.archlinux.org/rpc.php?v=5"
@@ -510,8 +557,6 @@ class AurHelper:
         #         break
         dockercontent = """FROM archlinux/base
 
-LABEL vendor="quack.packaging" version="{version}"
-
 RUN echo '{mirror}' > /etc/pacman.d/mirrorlist && \
     pacman -Syu --noconfirm && \
     pacman -S --noconfirm base-devel devtools pacman-contrib namcap
@@ -522,7 +567,6 @@ RUN groupadd package && \
 
 USER package
 WORKDIR /home/package/pkg
-VOLUME ["/home/package/pkg"]
 ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
 """
         with open("Dockerfile.quack", "w") as f:
@@ -640,7 +684,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         pkg_info["CARCH"] = subprocess.run(
             ["uname", "-m"], check=True,
             stdout=subprocess.PIPE).stdout.decode().strip()
-        pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.xz".format(
+        pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.zst".format(
             pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
         pkg_info["TargetCachePath"] = pkg_file
         if not (self.force or self.is_devel(package)) and \
@@ -688,7 +732,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             allowed_pkgs = []
             for p in buildable_pkgs:
                 if p.endswith("-any") or p.endswith("-" + pkg_info["CARCH"]):
-                    allowed_pkgs.append(p + ".pkg.tar.xz")
+                    allowed_pkgs.append(p + ".pkg.tar.zst")
             pkg_info["BuiltPackages"] = allowed_pkgs
             return pkg_info
         if self.jail_type is None:
@@ -702,9 +746,10 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.build_docker_image()
             self.build_docker_roadmap(pkg_info)
             p = subprocess.run(self.sudo_wrapper(
-                ["docker", "run", "-v",
-                 "{}:/home/package/pkg".format(self.temp_dir.name),
-                 "packaging"]))
+                ["docker", "run", "--rm", "--mount",
+                 "type=bind,source={},destination={}".format(
+                     self.temp_dir.name, "/home/package/pkg"
+                 ), "packaging"]))
         else:
             self.close_temp_dir()
             print_error(_("Jail type {type} is not known.")
@@ -715,7 +760,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                         .format(pkg=package))
         pkg_info["BuiltPackages"] = []
         for f in os.listdir():
-            if f.endswith(".pkg.tar.xz"):
+            if f.endswith(".pkg.tar.zst"):
                 pkg_info["BuiltPackages"].append(f)
         return pkg_info
 
@@ -733,12 +778,12 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             return self.pacman_install([built_packages[0]],
                                        not pkg_info["FastForward"])
         print_info(_("The following packages have been built:"))
-        i = 0
-        for l in built_packages:
-            i += 1
-            print("[{}] {}".format(i, l))
+        pkg_idx = 0
+        for line in built_packages:
+            pkg_idx += 1
+            print("[{}] {}".format(pkg_idx, line))
         ps = question(_("Which one do you really want to install?") +
-                      " [1…{}/A]".format(i))
+                      " [1…{}/A]".format(pkg_idx))
         if str(ps).lower() == "a":
             if self.dry_run:
                 print("[dry-run] pacman -U {}"
