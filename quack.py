@@ -594,6 +594,12 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                     paccmd = line.strip()
                     if not paccmd.startswith("#"):
                         roadmap.insert(-1, paccmd)
+        # If some pkg.tar.zst are already there in the temp folder, it's
+        # certainly because we need them to be installed as dependency
+        for line in glob.glob("*.pkg.tar.zst"):
+            paccmd = "sudo pacman -U {} --noconfirm".format(line)
+            if paccmd not in roadmap:
+                roadmap.insert(-1, paccmd)
         for d in (pkg_info["AurDepends"] + pkg_info["AurMakeDepends"]):
             ai = pkg_info.get("AurDependsData", {}).get(d)
             if ai is None:
