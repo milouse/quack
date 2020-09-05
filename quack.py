@@ -757,10 +757,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.close_temp_dir(False)
             print_error(_("Unexpected build error for {pkg}.")
                         .format(pkg=package))
-        pkg_info["BuiltPackages"] = []
-        for f in os.listdir():
-            if f.endswith(".pkg.tar.zst"):
-                pkg_info["BuiltPackages"].append(f)
+        pkg_info["BuiltPackages"] = glob.glob("*.pkg.tar.zst")
         return pkg_info
 
     def install(self, package):
