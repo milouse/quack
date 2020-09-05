@@ -416,7 +416,6 @@ class AurHelper:
                 print("[dry-run] pacman -D --asdeps {}".format(pkgdata[0]))
             else:
                 p = subprocess.run(
-                    # FIXME: not the right path
                     self.sudo_wrapper(
                         ["pacman", "-U", pkgdata[1], "--noconfirm"]
                     )
