@@ -591,8 +591,9 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         if os.path.exists(myfile):
             with open(myfile, "r") as f:
                 for line in f.readlines():
-                    if not line.startswith("#"):
-                        roadmap.insert(-1, line.strip())
+                    paccmd = line.strip()
+                    if not paccmd.startswith("#"):
+                        roadmap.insert(-1, paccmd)
         for d in (pkg_info["AurDepends"] + pkg_info["AurMakeDepends"]):
             ai = pkg_info.get("AurDependsData", {}).get(d)
             if ai is None:
@@ -601,7 +602,8 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                 continue
             pkgball = os.path.basename(ai["TargetCachePath"])
             paccmd = "sudo pacman -U {} --noconfirm".format(pkgball)
-            roadmap.insert(-1, paccmd)
+            if paccmd not in roadmap:
+                roadmap.insert(-1, paccmd)
         with open(os.path.join(self.temp_dir.name, "roadmap.sh"), "w") as f:
             f.write("\n".join(roadmap) + "\n")
 
