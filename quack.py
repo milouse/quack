@@ -554,7 +554,7 @@ class AurHelper:
         #     if line.startswith("#Server"):
         #         bestmirror = line[1:]
         #         break
-        dockercontent = """FROM archlinux/base
+        dockercontent = """FROM archlinux/archlinux
 
 RUN echo '{mirror}' > /etc/pacman.d/mirrorlist && \
     pacman -Syu --noconfirm && \
