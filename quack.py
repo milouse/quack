@@ -751,6 +751,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         self.check_package_integrity(package)
         if self.dry_run:
             return self.build_dry_run(pkg_info)
+        dependencies_packages = set(glob.glob("*.pkg.tar.zst"))
         if self.jail_type is None:
             # Thus avoid integrity check as it has already be done.
             p = subprocess.run(["makepkg", "-sr", "--skipinteg"])
@@ -774,7 +775,8 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.close_temp_dir(False)
             print_error(_("Unexpected build error for {pkg}.")
                         .format(pkg=package))
-        pkg_info["BuiltPackages"] = glob.glob("*.pkg.tar.zst")
+        all_pkgs = set(glob.glob("*.pkg.tar.zst"))
+        pkg_info["BuiltPackages"] = list(all_pkgs - dependencies_packages)
         return pkg_info
 
     def install(self, package):
