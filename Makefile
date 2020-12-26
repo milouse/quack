@@ -17,9 +17,9 @@ install: $(DEST_MO)
 	install -D -m644 LICENSE $(DEST)/share/licenses/quack/LICENSE
 
 uninstall:
-	rm $(DEST)/bin/quack
-	rm $(DEST)/share/licenses/quack/LICENSE
-	rmdir $(DEST)/share/licenses/quack
+	rm -f $(DEST)/bin/quack
+	rm -rf $(DEST)/share/licenses/quack
+	rm -f $(DEST_MO)
 
 po/quack.pot:
 	mkdir -p po
