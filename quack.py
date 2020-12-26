@@ -27,7 +27,7 @@ gettext.textdomain("quack")
 _ = gettext.gettext
 
 
-VERSION = "0.7"
+VERSION = "0.8"
 USE_COLOR = "never"
 
 
@@ -378,8 +378,8 @@ class AurHelper:
 
     def handle_aur_dependencies(self, pkg_info):
         must_install = []
-        for d in (pkg_info["AurDepends"] + pkg_info["AurMakeDepends"]):
-            ai = pkg_info.get("AurDependsData", {}).get(d)
+        for d in pkg_info["ExtDepends"]:
+            ai = pkg_info.get("ExtDependsData", {}).get(d)
             if ai is None:
                 print_warning(_("{pkg} is not an AUR package, maybe a "
                                 "group or a virtual package.").format(pkg=d))
@@ -404,24 +404,21 @@ class AurHelper:
                 aur.close_temp_dir()
             else:
                 shutil.copyfile(ai["TargetCachePath"], destball)
-            if self.jail_type is None or d in pkg_info["AurDepends"]:
+            if self.jail_type is None or d in pkg_info["ExtDepends"]:
                 must_install.append((d, destball))
 
         # Go back to the parent dir
         os.chdir(self.temp_dir.name)
 
         for pkgdata in must_install:
+            pkgball = os.path.basename(pkgdata[1])
             if self.dry_run:
-                print("[dry-run] pacman -U {} --noconfirm".format(pkgdata[1]))
+                print("[dry-run] pacman -U {} --needed --noconfirm"
+                      .format(pkgball))
                 print("[dry-run] pacman -D --asdeps {}".format(pkgdata[0]))
             else:
-                p = subprocess.run(
-                    # FIXME: not the right path
-                    self.sudo_wrapper(
-                        ["pacman", "-U", pkgdata[1], "--noconfirm"]
-                    )
-                )
-                if p.returncode != 0:
+                success = self.pacman_install([pkgball])
+                if not success:
                     self.close_temp_dir()
                     print_error(_("An error occured while installing "
                                   "the dependency {pkg}.")
@@ -435,12 +432,10 @@ class AurHelper:
                                     "installed.").format(pkg=pkgdata[0]))
 
     def extract_dependencies(self, pkg_info):
-        pkg_info["AurDepends"] = []
-        pkg_info["AurMakeDepends"] = []
+        pkg_info["ExtDepends"] = []
+        pkg_info["ExtDependsData"] = {}
         pkg_info["PackageBaseDepends"] = []
-        pkg_info["AurDependsData"] = {}
-        for kind in ["Depends", "MakeDepends"]:
-            aurkind = "Aur" + kind
+        for kind in ["MakeDepends", "Depends"]:
             for d in pkg_info.get(kind, []):
                 pname = re.split("[<>=]+", d)[0]
                 # self.all_pkgs contains only official packages
@@ -451,13 +446,28 @@ class AurHelper:
                     # It may happen for some virtual packages or group, which
                     # will normally be resolved by pacman itself
                     continue
+                if ai["Name"] in pkg_info["ExtDepends"]:
+                    # It has already be processed, for exemple as a dependency
+                    # of one of its previous dependencies. Do not process it
+                    # twice.
+                    continue
                 if ai["PackageBase"] == pkg_info["PackageBase"]:
                     # The dependency will be build in the same main package
                     # build process. Thus no need to treat it specially.
                     pkg_info["PackageBaseDepends"].append(ai["Name"])
                     continue
-                pkg_info[aurkind].append(ai["Name"])
-                pkg_info["AurDependsData"][ai["Name"]] = ai
+                pkg_info["ExtDepends"].append(ai["Name"])
+                pkg_info["ExtDependsData"][ai["Name"]] = ai
+                # Now we must look deeper for dependencies, among the newly
+                # created external dependencies array. Official packages will
+                # never depends on an external package, thus we don't have to
+                # look further for official packages.
+                ai = self.extract_dependencies(ai)
+                for subp in ai["ExtDepends"]:
+                    pkg_info["ExtDepends"].insert(0, subp)
+                    pdata = ai["ExtDependsData"][subp]
+                    pdata["FastForward"] = True
+                    pkg_info["ExtDependsData"][subp] = pdata
         self.handle_aur_dependencies(pkg_info)
         return pkg_info
 
@@ -555,7 +565,7 @@ class AurHelper:
         #     if line.startswith("#Server"):
         #         bestmirror = line[1:]
         #         break
-        dockercontent = """FROM archlinux/base
+        dockercontent = """FROM archlinux/archlinux
 
 RUN echo '{mirror}' > /etc/pacman.d/mirrorlist && \
     pacman -Syu --noconfirm && \
@@ -584,27 +594,32 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
 
     def build_docker_roadmap(self, pkg_info):
         roadmap = ["#!/usr/bin/env sh", "set -e",
-                   "sudo pacman -Syu --noconfirm",
-                   "exec makepkg -s --noconfirm --skipinteg"]
+                   "sudo pacman -Syu --noconfirm"]
         # Allow one to provides is own operations before building the
         # package. It may by usefull to install other invisible dependencies.
         myfile = os.path.join(self.temp_dir.name, "my.roadmap.sh")
         if os.path.exists(myfile):
             with open(myfile, "r") as f:
                 for line in f.readlines():
-                    if not line.startswith("#"):
-                        roadmap.insert(-1, line.strip())
-        for d in (pkg_info["AurDepends"] + pkg_info["AurMakeDepends"]):
-            ai = pkg_info.get("AurDependsData", {}).get(d)
+                    paccmd = line.strip()
+                    if not paccmd.startswith("#"):
+                        roadmap.append(paccmd)
+        for d in pkg_info["ExtDepends"]:
+            ai = pkg_info.get("ExtDependsData", {}).get(d)
             if ai is None:
                 # It may happen for some virtual packages or group, which will
                 # normally be resolved by pacman itself
                 continue
             pkgball = os.path.basename(ai["TargetCachePath"])
             paccmd = "sudo pacman -U {} --noconfirm".format(pkgball)
-            roadmap.insert(-1, paccmd)
+            if paccmd not in roadmap:
+                roadmap.append(paccmd)
+        roadmap.append("exec makepkg -s --noconfirm --skipinteg")
+        roadmap_content = "\n".join(roadmap)
+        if self.dry_run:
+            print(roadmap_content)
         with open(os.path.join(self.temp_dir.name, "roadmap.sh"), "w") as f:
-            f.write("\n".join(roadmap) + "\n")
+            f.write(roadmap_content + "\n")
 
     def prepare_chroot_dir(self):
         chroot_home = os.path.join(xdg_cache_home, "quack", "chroot")
@@ -655,25 +670,16 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         sys.exit(1)
 
     def pacman_install(self, packages, backup=True):
+        if backup:
+            for p in packages:
+                pcmd = self.sudo_wrapper(
+                    ["cp", p, "/var/cache/pacman/pkg/{}".format(p)])
+                subprocess.run(pcmd)
         pacman_cmd = self.sudo_wrapper(["pacman", "--color", USE_COLOR, "-U"])
         if not self.force:
             pacman_cmd.insert(-1, "--needed")
         p = subprocess.run(pacman_cmd + packages)
-        if backup is False:
-            return self.close_temp_dir()
-        if p.returncode != 0:
-            # Strange, pacman failed. May be a sudo timeout. Keep a copy
-            # of the pkgs
-            for px in packages:
-                shutil.copyfile(px, "/tmp/{}".format(px))
-            print_info(_("A copy of the built packages "
-                         "has been kept in /tmp."))
-            return self.close_temp_dir(False, True)
-        for p in packages:
-            pcmd = self.sudo_wrapper(
-                ["cp", p, "/var/cache/pacman/pkg/{}".format(p)])
-            subprocess.run(pcmd)
-        return self.close_temp_dir()
+        return p.returncode == 0
 
     def prepare_pkg_info(self, package):
         res = self.fetch_pkg_infos([package])
@@ -693,6 +699,25 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             pkg_info["FastForward"] = True
             print_info(_("Package {pkg} is already built as {pkgfile}.")
                        .format(pkg=package, pkgfile=pkg_file))
+        return pkg_info
+
+    def build_dry_run(self, pkg_info):
+        buildable_pkgs = subprocess.run(
+            ["makepkg", "--packagelist"], check=True,
+            stdout=subprocess.PIPE).stdout.decode().split("\n")
+        allowed_pkgs = []
+        for p in buildable_pkgs:
+            if p.endswith("-any") or p.endswith("-" + pkg_info["CARCH"]):
+                allowed_pkgs.append(p + ".pkg.tar.zst")
+        pkg_info["BuiltPackages"] = allowed_pkgs
+        if self.jail_type == "docker":
+            print("[dry-run] build docker image")
+            print("[dry-run] roadmap.sh content >>>>")
+            self.build_docker_roadmap(pkg_info)
+            print("<<<<")
+            print("[dry-run] docker run")
+        else:
+            print("[dry-run] makepkg -sr --skipinteg")
         return pkg_info
 
     def build(self, package):
@@ -725,16 +750,8 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         # interesting too to check that everything will be fine in dry run.
         self.check_package_integrity(package)
         if self.dry_run:
-            print("[dry-run] makepkg -sr --skipinteg")
-            buildable_pkgs = subprocess.run(
-                ["makepkg", "--packagelist"], check=True,
-                stdout=subprocess.PIPE).stdout.decode().split("\n")
-            allowed_pkgs = []
-            for p in buildable_pkgs:
-                if p.endswith("-any") or p.endswith("-" + pkg_info["CARCH"]):
-                    allowed_pkgs.append(p + ".pkg.tar.zst")
-            pkg_info["BuiltPackages"] = allowed_pkgs
-            return pkg_info
+            return self.build_dry_run(pkg_info)
+        dependencies_packages = set(glob.glob("*.pkg.tar.zst"))
         if self.jail_type is None:
             # Thus avoid integrity check as it has already be done.
             p = subprocess.run(["makepkg", "-sr", "--skipinteg"])
@@ -758,10 +775,8 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.close_temp_dir(False)
             print_error(_("Unexpected build error for {pkg}.")
                         .format(pkg=package))
-        pkg_info["BuiltPackages"] = []
-        for f in os.listdir():
-            if f.endswith(".pkg.tar.zst"):
-                pkg_info["BuiltPackages"].append(f)
+        all_pkgs = set(glob.glob("*.pkg.tar.zst"))
+        pkg_info["BuiltPackages"] = list(all_pkgs - dependencies_packages)
         return pkg_info
 
     def install(self, package):
@@ -775,8 +790,11 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             if self.dry_run:
                 print("[dry-run] pacman -U {}".format(built_packages[0]))
                 return self.close_temp_dir(True)
-            return self.pacman_install([built_packages[0]],
-                                       not pkg_info["FastForward"])
+            return self.close_temp_dir(
+                self.pacman_install(
+                    [built_packages[0]], not pkg_info["FastForward"]
+                )
+            )
         print_info(_("The following packages have been built:"))
         pkg_idx = 0
         for line in built_packages:
@@ -789,8 +807,11 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                 print("[dry-run] pacman -U {}"
                       .format(" ".join(built_packages)))
                 return self.close_temp_dir(True)
-            return self.pacman_install(built_packages,
-                                       not pkg_info["FastForward"])
+            return self.close_temp_dir(
+                self.pacman_install(
+                    built_packages, not pkg_info["FastForward"]
+                )
+            )
         final_pkgs = []
         try:
             for p in ps.split(" "):
@@ -813,7 +834,9 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         if self.dry_run:
             print("[dry-run] pacman -U {}".format(" ".join(final_pkgs)))
             return self.close_temp_dir(True)
-        return self.pacman_install(final_pkgs, not pkg_info["FastForward"])
+        return self.close_temp_dir(
+            self.pacman_install(final_pkgs, not pkg_info["FastForward"])
+        )
 
     def install_list(self, packages):
         rcode = True

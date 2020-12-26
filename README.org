@@ -1,8 +1,6 @@
 #+title: README
 #+author: Étienne Deparis
 
-[[https://translations.umaneti.net/projects/quack/][https://translations.umaneti.net/widgets/quack/-/translations/svg-badge.svg]]
-
 Quack, the Qualitative and Usable Aur paCKage helper. Also, it sounds
 like a duck. Quack Quack.
 
@@ -19,13 +17,13 @@ role and stay in command.
 
 * Installation
 
-Requirements are listed in the =requirements.txt= file.
+Requirements are listed in the ~requirements.txt~ file.
 
-Then, just run =make install=
+Then, just run ~make install~
 
 * Usage
 
-See =quack -h=
+See ~quack -h~
 
 ** Features
 
@@ -40,38 +38,38 @@ different features an AUR Helper should implement and which we do:
                  successful build process.
 - Reliable parser :: ability to handle complex packages by using the
      provided metadata (RPC/.SRCINFO) instead of PKGBUILD parsing, such
-     as =aws-cli-git=.
+     as ~aws-cli-git~.
 - Reliable solver :: ability to correctly solve and build complex
-     dependency chains, such as =ros-lunar-desktop=.
+     dependency chains, such as ~ros-lunar-desktop~.
 - Split packages :: ability to correctly build and install:
   + Multiple packages from the same package base, without rebuilding or
-    reinstalling multiple times, such as =clion=;
+    reinstalling multiple times, such as ~clion~;
   + Split packages which depend on a package from the same package base,
-    such as =libc++= and =libc++abi=;
-  + Split packages independently, such as =python-pyalsaaudio= and
-    =python2-pyalsaaudio=.
-- Git clone :: uses =git-clone(1)= by default to retrieve build files from
+    such as ~libc++~ and ~libc++abi~;
+  + Split packages independently, such as ~python-pyalsaaudio~ and
+    ~python2-pyalsaaudio~.
+- Git clone :: uses ~git-clone(1)~ by default to retrieve build files from
                the AUR.
 - Native pacman :: when used as replacement for pacman(8) commands such
-                   as =pacman -Syu=, the following are obeyed by
+                   as ~pacman -Syu~, the following are obeyed by
                    default:
-  + do not separate commands, for example =pacman -Syu= is not split to
-    =pacman -Sy= and =pacman -S packages=;
+  + do not separate commands, for example ~pacman -Syu~ is not split to
+    ~pacman -Sy~ and ~pacman -S packages~;
   + use pacman directly instead of manual database manipulation or usage
-    of =libalpm(3)=.
+    of ~libalpm(3)~.
 - Shell completion :: tab completion is available for the listed shells.
 #+end_quote
 
-| Feature          | Support | Comment                                                                                                                                                                                         |
-|------------------+---------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Secure           | YES     |                                                                                                                                                                                                 |
-| Clean build      | PARTIAL | Quack is just a wrapper around =makepkg= or =makechrootpkg=. Chroot build is not the default process.                                                                                           |
-| Reliable parser  | YES     | We use AUR RPC and package base name to determine the repo name, then we just call =makepkg=                                                                                                    |
-| Reliable solver  | NO      | For now, we don't want to follow this path.                                                                                                                                                     |
-| Dependencies     | TBD     | General dependencies are not checked, nor resolved. See bellow in split packages the only case we respect. We will try in a near future to purpose some way of managing simple dependency cases |
-| Split packages   | PARTIAL | As we use =makepkg= all builds are currently done. However we offer a way to only install the package of your choice, respecting dependencies from the same package base if they exists.        |
-| Native pacman    | YES     | Only =pacman -U=, =pacman -Slq=, =pacman -Q=, =pacman -Qi= and =pacman -Qdt= are used. Quack cannot be used as pacman replacement and there is no plan to support such a feature.               |
-| Shell completion | TBD     |                                                                                                                                                                                                 |
+| Feature          | Support | Comment                                                                                                                                                                                  |
+|------------------+---------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Secure           | YES     |                                                                                                                                                                                          |
+| Clean build      | YES     | By default Quack run in a docker container. It is also able to run inside a chroot with ~makechrootpkg~.                                                                                 |
+| Reliable parser  | YES     | We use AUR RPC and package base name to determine the repo name, then we just call ~makepkg~                                                                                             |
+| Reliable solver  | PARTIAL | See below
+| Dependencies     | PARTIAL | Most cases are supported. Complex ones depends on pacman itself, thus complex AUR cases are not supported.                                                                               |
+| Split packages   | PARTIAL | As we use ~makepkg~ all builds are currently done. However we offer a way to only install the package of your choice, respecting dependencies from the same package base if they exists. |
+| Native pacman    | YES     | Quack cannot be used as pacman replacement and there is no plan to support such a feature. Also, it directly calls ~pacman~ for package related operations.                              |
+| Shell completion | NO      |                                                                                                                                                                                          |
 
 * Contributing
 
