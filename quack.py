@@ -27,7 +27,7 @@ gettext.textdomain("quack")
 _ = gettext.gettext
 
 
-VERSION = "0.8"
+VERSION = "0.9"
 USE_COLOR = "never"
 
 
@@ -364,7 +364,7 @@ class AurHelper:
         )
 
     def fetch_pkg_infos(self, terms, req_type="info"):
-        req = "https://aur.archlinux.org/rpc.php?v=5"
+        req = "https://aur.archlinux.org/rpc?v=5"
         if req_type == "info":
             params = ["arg[]={}".format(t) for t in terms]
             req = "{}&type=info&{}".format(req, "&".join(params))
