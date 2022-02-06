@@ -1,11 +1,11 @@
 # Quack Translation Effort
-# Copyright (C) 2020 Quack volunteers
+# Copyright (C) 2022 Quack volunteers
 # This file is distributed under the same license as the Quack package.
 # Automatically generated, 2019.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Quack 0.8\n"
+"Project-Id-Version: Quack 0.9\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
 "POT-Creation-Date: 2020-12-26 11:02+0100\n"
 "PO-Revision-Date: 2019-10-23 20:15+0200\n"
