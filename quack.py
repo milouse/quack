@@ -558,16 +558,9 @@ class AurHelper:
     def build_docker_image(self):
         if self.docker_image_built:
             return
-        bestmirror = "Server = https://mirror.netcologne.de/archlinux/$repo/os/$arch"  # noqa
-        # It's weird the result of the following request is not stable
-        # r = requests.get("https://www.archlinux.org/mirrorlist/?country=all&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on")  # noqa
-        # for line in r.text.split("\n"):
-        #     if line.startswith("#Server"):
-        #         bestmirror = line[1:]
-        #         break
         dockercontent = """FROM archlinux/archlinux
 
-RUN echo '{mirror}' > /etc/pacman.d/mirrorlist && \
+RUN echo 'Server = https://mirrors.gandi.net/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist && \
     pacman -Syu --noconfirm && \
     pacman -S --noconfirm base-devel devtools pacman-contrib namcap
 
@@ -580,9 +573,7 @@ WORKDIR /home/package/pkg
 ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
 """
         with open("Dockerfile.quack", "w") as f:
-            f.write(
-                dockercontent.format(mirror=bestmirror, version=VERSION)
-            )
+            f.write(dockercontent)
         p = subprocess.run(self.sudo_wrapper(
             ["docker", "build", "-t", "packaging", "-f", "Dockerfile.quack",
              self.temp_dir.name]))
