@@ -1,5 +1,5 @@
 # Quack Translation Effort
-# Copyright (C) 2022 Quack volunteers
+# Copyright (C) 2018-2022 Quack volunteers
 # This file is distributed under the same license as the Quack package.
 # Automatically generated, 2019.
 #
