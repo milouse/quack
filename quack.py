@@ -645,7 +645,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                 self.temp_dir.cleanup()
             except PermissionError:
                 print_error(_("A permission error occured while deleting "
-                              "the quack temp dir {folder}.")
+                              "the quack temp dir {folder}")
                             .format(foder=self.temp_dir.name))
             self.temp_dir = None
         if self.chroot_dir is not None:
@@ -725,12 +725,12 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             return pkg_info
         self.switch_to_temp_dir(pkg_info)
         assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
-        print_info(_("Package {pkg} is ready to be built in {path}.")
+        print_info(_("Package {pkg} is ready to be built in {path}")
                    .format(pkg=hilite(package, "yellow", True),
                            path=self.temp_dir.name), bold=False)
         if not self.dry_run:
             print_info(_("You should REALLY take time to inspect its "
-                         "PKGBUILD."), bold=False)
+                         "PKGBUILD"), bold=False)
             check = question(_("When it's done, shall we continue?") +
                              " [y/N/q]")
             lc = str(check).lower()

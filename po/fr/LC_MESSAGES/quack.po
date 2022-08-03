@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Quack 0.10\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2020-12-26 11:02+0100\n"
-"PO-Revision-Date: 2020-05-01 16:26+0200\n"
+"POT-Creation-Date: 2022-08-03 12:05+0200\n"
+"PO-Revision-Date: 2022-08-03 12:05+0200\n"
 "Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/quack/"
 "translations/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 3.1\n"
 
 #: quack.py:56
 msgid "error:"
@@ -129,23 +129,23 @@ msgid_plural "finished: {n} {items} removed"
 msgstr[0] "terminé : {n} {item} supprimé"
 msgstr[1] "terminé : {n} {items} supprimés"
 
-#: quack.py:384
+#: quack.py:385
 #, python-brace-format
 msgid "{pkg} is not an AUR package, maybe a group or a virtual package."
 msgstr ""
 "{pkg} n'est pas un paquet AUR, peut-être un groupe ou un paquet virtuel."
 
-#: quack.py:390
+#: quack.py:391
 #, python-brace-format
 msgid "The following package must be installed first: {pkg}."
 msgstr "Le paquet suivant doit être préalablement installé : {pkg}."
 
-#: quack.py:423
+#: quack.py:425
 #, python-brace-format
 msgid "An error occured while installing the dependency {pkg}."
 msgstr "Une erreur est survenue lors de l'installation de la dépendance {pkg}."
 
-#: quack.py:430
+#: quack.py:432
 #, python-brace-format
 msgid ""
 "An error occured while marking the package {pkg} as non-explicitely "
@@ -154,192 +154,196 @@ msgstr ""
 "Une erreur est survenue lors de l'inscription du paquet {pkg} comme "
 "dépendance."
 
-#: quack.py:491
+#: quack.py:493
 #, python-brace-format
 msgid "Your system run a newer version of {pkg}."
 msgstr "Votre système utilise une version plus récente de {pkg}."
 
-#: quack.py:517
+#: quack.py:519
 msgid "Do you want to upgrade the above packages?"
 msgstr "Voulez-vous mettre à jour les paquets ci-dessus ?"
 
-#: quack.py:535
+#: quack.py:537
 #, python-brace-format
 msgid "Impossible to clone {pkg} from AUR."
 msgstr "Impossible de cloner {pkg} depuis AUR."
 
-#: quack.py:540 quack.py:727 quack.py:883
+#: quack.py:542 quack.py:722 quack.py:886
 #, python-brace-format
 msgid "{pkg} is NOT an AUR package."
 msgstr "{pkg} n'est PAS un paquet AUR."
 
-#: quack.py:548
+#: quack.py:550
 msgid "Integrity file check fails."
 msgstr "La vérification de l'intégrité des fichiers a échoué."
 
-#: quack.py:593
+#: quack.py:587
 msgid "Error while creating docker container."
 msgstr "Une erreur est survenue lors de la création du container docker."
 
-#: quack.py:640
+#: quack.py:635
 #, python-brace-format
 msgid "Error while creating the chroot dir in {folder}."
 msgstr ""
 "Une erreur est survenue lors de la création du dossier de chroot dans "
 "{folder}."
 
-#: quack.py:652
+#: quack.py:647
 #, python-brace-format
-msgid "A permission error occured while deleting the quack temp dir {folder}."
+msgid "A permission error occured while deleting the quack temp dir {folder}"
 msgstr ""
 "Une erreur de droit est survenue lors de la suppression du dossier "
-"temporaire de quack {folder}."
+"temporaire de quack {folder}"
 
-#: quack.py:700
+#: quack.py:695
 #, python-brace-format
 msgid "Package {pkg} is already built as {pkgfile}."
 msgstr "Le paquet {pkg} a déjà été construit dans {pkgfile}."
 
-#: quack.py:731
+#: quack.py:728
 #, python-brace-format
-msgid "Package {pkg} is ready to be built in {path}."
-msgstr "Le paquet {pkg} est prêt à être construit dans {path}."
+msgid "Package {pkg} is ready to be built in {path}"
+msgstr "Le paquet {pkg} est prêt à être construit dans {path}"
 
-#: quack.py:735
-msgid "You should REALLY take time to inspect its PKGBUILD."
-msgstr "Vous devriez VRAIMENT prendre le temps de vérifier le PKGBUILD."
+#: quack.py:732
+msgid "You should REALLY take time to inspect its PKGBUILD"
+msgstr "Vous devriez VRAIMENT prendre le temps de vérifier le PKGBUILD"
 
-#: quack.py:737
+#: quack.py:734
 msgid "When it's done, shall we continue?"
 msgstr "Lorsque c'est fait, devons nous continuer ?"
 
-#: quack.py:772
+#: quack.py:774
 #, python-brace-format
 msgid "Jail type {type} is not known."
 msgstr "Le type d'isolation {type} n'est pas connu."
 
-#: quack.py:776
+#: quack.py:778
 #, python-brace-format
 msgid "Unexpected build error for {pkg}."
 msgstr "Une erreur est survenue durant la construction de {pkg}."
 
-#: quack.py:798
+#: quack.py:800
 msgid "The following packages have been built:"
 msgstr "Les paquets suivant ont été construits :"
 
-#: quack.py:803
+#: quack.py:805
 msgid "Which one do you really want to install?"
 msgstr "Lequel d'entre eux voulez-vous réellement installer ?"
 
-#: quack.py:823
+#: quack.py:818
+msgid "<nothing>"
+msgstr "<rien>"
+
+#: quack.py:826
 #, python-brace-format
 msgid "{str} is not a valid input."
 msgstr "{str} n'est pas une entrée valide."
 
-#: quack.py:855
+#: quack.py:858
 msgid "[outdated]"
 msgstr "[périmé]"
 
-#: quack.py:897
+#: quack.py:901
 #, python-brace-format
 msgid "Since {date}"
 msgstr "Depuis le {date}"
 
-#: quack.py:900
+#: quack.py:904
 msgid "Name"
 msgstr "Nom"
 
-#: quack.py:901
+#: quack.py:905
 msgid "Version"
 msgstr "Version"
 
-#: quack.py:902
+#: quack.py:906
 msgid "Description"
 msgstr "Description"
 
-#: quack.py:903
+#: quack.py:907
 msgid "URL"
 msgstr "URL"
 
-#: quack.py:904
+#: quack.py:908
 msgid "Licenses"
 msgstr "Licences"
 
-#: quack.py:905
+#: quack.py:909
 msgid "Provides"
 msgstr "Fournit"
 
-#: quack.py:906
+#: quack.py:910
 msgid "Depends On"
 msgstr "Dépend de"
 
-#: quack.py:907
+#: quack.py:911
 msgid "Build Depends On"
 msgstr "Construction dépend de"
 
-#: quack.py:908
+#: quack.py:912
 msgid "Conflicts With"
 msgstr "Est en conflit avec"
 
-#: quack.py:909
+#: quack.py:913
 msgid "Last Maintainer"
 msgstr "Dernier paqueteur"
 
-#: quack.py:910
+#: quack.py:914
 msgid "Last Modified"
 msgstr "Dernière modification"
 
-#: quack.py:911
+#: quack.py:915
 msgid "Out of Date"
 msgstr "Périmé"
 
-#: quack.py:912
+#: quack.py:916
 msgid "Votes Number"
 msgstr "Nombre de vote"
 
-#: quack.py:913
+#: quack.py:917
 msgid "Popularity"
 msgstr "Popularité"
 
-#: quack.py:914
+#: quack.py:918
 msgid "AUR Page"
 msgstr "Page AUR"
 
-#: quack.py:915
+#: quack.py:919
 msgid "Keywords"
 msgstr "Mots clés"
 
-#: quack.py:933
+#: quack.py:937
 #, python-format
 msgid "Display %(prog)s version information and exit"
 msgstr "Affiche les informations de version de %(prog)s et quitte aussitôt"
 
-#: quack.py:937
+#: quack.py:941
 msgid "Specify when to enable coloring"
 msgstr "Détermine la manière d'utiliser la coloration"
 
-#: quack.py:940
+#: quack.py:944
 #, python-format
 msgid "Allow %(prog)s to be run as root"
 msgstr "Autoriser %(prog)s à être lancé avec les droits root"
 
-#: quack.py:942
+#: quack.py:946
 msgid "Commands"
 msgstr "Commandes"
 
-#: quack.py:945
+#: quack.py:949
 msgid "AUR related actions (default)"
 msgstr "Actions liées à AUR (par défaut)"
 
-#: quack.py:949
+#: quack.py:953
 msgid "Find and list .pacsave, .pacorig or .pacnew files"
 msgstr "Trouver et lister les fichiers .pacsave, .pacorig et .pacnew"
 
-#: quack.py:953
+#: quack.py:957
 msgid "AUR actions"
 msgstr "Actions AUR"
 
-#: quack.py:954
+#: quack.py:958
 msgid ""
 "Install action is implicit, when no other action is passed to the -A, --aur "
 "command"
@@ -347,31 +351,31 @@ msgstr ""
 "L'action d'installation est implicite lorsque aucune autre action n'est "
 "passé à la commande -A, --aur"
 
-#: quack.py:958
+#: quack.py:962
 msgid "Display information on an AUR package and exit"
 msgstr "Affiche les informations d'un paquet AUR et quitte aussitôt"
 
-#: quack.py:961
+#: quack.py:965
 msgid "List locally installed AUR packages and exit"
 msgstr "Liste les paquets AUR déjà installés et quitte aussitôt"
 
-#: quack.py:964
+#: quack.py:968
 msgid "Search AUR packages by name and exit"
 msgstr "Recherche des paquets AUR par leur nom et quitte aussitôt"
 
-#: quack.py:966
+#: quack.py:970
 msgid "Upgrade installed AUR packages"
 msgstr "Mettre à jour les paquets AUR déjà installés"
 
-#: quack.py:968
+#: quack.py:972
 msgid "Install and Upgrade options"
 msgstr "Options d'Installation ou de Mise à jour"
 
-#: quack.py:970
+#: quack.py:974
 msgid "Force install or upgrade action"
 msgstr "Forcer l'installation ou la mise à jour"
 
-#: quack.py:972
+#: quack.py:976
 msgid ""
 "Download package info and try to resolve dependencies, but do not build or "
 "install anything"
@@ -379,7 +383,7 @@ msgstr ""
 "Télécharge les informations du paquet et essaye de résoudre les dépendances, "
 "mais ne construit pas et n'installe rien"
 
-#: quack.py:977
+#: quack.py:981
 msgid ""
 "Run install and upgrade action in a docker (by default) or a chroot jail. "
 "Use --jail=none or --no-jail to prevent the use of a jail"
@@ -388,41 +392,41 @@ msgstr ""
 "isolé docker (par défaut) ou chroot. Vous pouvez utiliser --jail=none ou --"
 "no-jail pour empêcher l'isolation"
 
-#: quack.py:981
+#: quack.py:985
 msgid "Prevent install and upgrade action to be run in a jail"
 msgstr ""
 "Empêche l'installation ou la mise à jour au sein d'un environnement isolé"
 
-#: quack.py:984
+#: quack.py:988
 msgid "List, Install and Upgrade options"
 msgstr "Options de liste, d'Installation ou de Mise à jour"
 
-#: quack.py:986
+#: quack.py:990
 msgid "Include devel packages (which name has a trailing -svn, -git…)"
 msgstr ""
 "Inclure les paquets de versions en développement (dont les noms terminent "
 "par -svn, -git…)"
 
-#: quack.py:989
+#: quack.py:993
 msgid "Install, Info and Search options"
 msgstr "Options d'Installation, d'Information ou de Recherche"
 
-#: quack.py:991
+#: quack.py:995
 msgid ""
 "One or more package name to install, look for, or display information about"
 msgstr ""
 "Un ou plusieurs noms de paquet à installer, rechercher ou afficher plus "
 "d'information à propos"
 
-#: quack.py:994
+#: quack.py:998
 msgid "Cleanup actions"
 msgstr "Actions de nettoyage"
 
-#: quack.py:997
+#: quack.py:1001
 msgid "Actually cleanup things instead of just listing them"
 msgstr "Supprime réellement les éléments au lieu de simplement les lister"
 
-#: quack.py:1001
+#: quack.py:1005
 msgid ""
 "Make a deep search of transactional files instead of a quick search (use "
 "find instead of pacman db)."
@@ -430,12 +434,12 @@ msgstr ""
 "Effectue une recherche approfondie de fichiers transactionnels (utilise find "
 "au lieu d'étudier la base de donnée de pacman)."
 
-#: quack.py:1034
+#: quack.py:1038
 #, python-brace-format
 msgid "Do not run {quack_cmd} as root!"
 msgstr "Ne lancez pas {quack_cmd} en tant que root !"
 
-#: quack.py:1052
+#: quack.py:1056
 msgid "No package specified (use -h for help)"
 msgstr "Aucun paquet spécifié (utiliser -h pour l’aide)"
 
