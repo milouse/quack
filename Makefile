@@ -8,7 +8,7 @@ MO_FILES   = $(PO_FILES:%.po=%.mo)
 DEST_MO    = $(L10N_LANGS:%=$(DEST)/share/locale/%/LC_MESSAGES/quack.mo)
 
 
-.PHONY: install lang uninstall uplang
+.PHONY: clean install lang uninstall uplang
 
 install: $(DEST_MO)
 	install -d -m755 $(DEST)/bin
@@ -20,6 +20,12 @@ uninstall:
 	rm -f $(DEST)/bin/quack
 	rm -rf $(DEST)/share/licenses/quack
 	rm -f $(DEST_MO)
+
+clean:
+	find $(PWD) -type d -name __pycache__ -print0 | \
+		xargs -0r rm -r
+	find $(PWD) -type d -empty ! -path "*/.git/*" -print0 | \
+		xargs -0r rmdir -p --ignore-fail-on-non-empty
 
 po/quack.pot:
 	mkdir -p po
