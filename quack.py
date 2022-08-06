@@ -93,12 +93,16 @@ class AurHelper:
         self.docker_image_built = False
         self.local_pkgs = subprocess.run(
             ["pacman", "-Q", "--color=never"],
-            check=True, stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
+            check=True, text=True,
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE
+        ).stdout.strip().split("\n")
         self.all_pkgs = subprocess.run(
             ["pacman", "--color=never", "-Slq"] + self.config["repos"],
-            check=True, stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
+            check=True, text=True,
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE
+        ).stdout.strip().split("\n")
 
     def is_devel(self, package):
         return re.search("-(?:bzr|cvs|git|hg|svn)$", package) is not None
@@ -213,7 +217,8 @@ class AurHelper:
             cmd.pop()  # Remove the last "-o"
             cmd = self.sudo_wrapper(cmd + [")"])
             p = subprocess.run(
-                cmd, stdout=subprocess.PIPE).stdout.decode().strip()
+                cmd, text=True, capture_output=True
+            ).stdout.strip()
         else:
             p = "\n".join(self.list_transac_files())
         if p == "":
@@ -239,8 +244,9 @@ class AurHelper:
             cmd.insert(1, "--nocolor")
         # Remove unnecessary empty line
         p = subprocess.run(
-            cmd, stdout=subprocess.PIPE).stdout.decode()
-        print(p.strip() + "\n")
+            cmd, text=True, capture_output=True
+        ).stdout.strip()
+        print(p + "\n")
         print_info(_("Old package versions kept in cache"), bold=False)
         if USE_COLOR == "never":
             cmd[2] = "-d"
@@ -248,17 +254,19 @@ class AurHelper:
             cmd[1] = "-d"
         # Remove unnecessary empty line here too.
         p = subprocess.run(
-            cmd, stdout=subprocess.PIPE).stdout.decode()
-        print(p.strip())
+            cmd, text=True, capture_output=True
+        ).stdout.strip()
+        print(p)
 
     def get_docker_images_list(self):
         images = subprocess.run(
             self.sudo_wrapper(
                 ["docker", "image", "ls", "packaging", "--quiet"]
             ),
-            check=True, stderr=subprocess.DEVNULL,
+            check=True, text=True,
+            stderr=subprocess.DEVNULL,
             stdout=subprocess.PIPE
-        ).stdout.decode().strip()
+        ).stdout.strip()
         if images == "":
             return []
         return images.split("\n")
@@ -270,9 +278,10 @@ class AurHelper:
                  "--filter", "ancestor=packaging",
                  "--filter", "status=exited", "--quiet"]
             ),
-            check=True, stderr=subprocess.DEVNULL,
+            check=True, text=True,
+            stderr=subprocess.DEVNULL,
             stdout=subprocess.PIPE
-        ).stdout.decode().strip()
+        ).stdout.strip()
         if containers == "":
             return []
         return containers.split("\n")
@@ -486,7 +495,8 @@ class AurHelper:
         # and 1.11.1. We need to use vercmp.
         ver_check = subprocess.run(
             ["vercmp", current_version, package["Version"]],
-            check=True, stdout=subprocess.PIPE).stdout.decode().strip()
+            check=True, text=True, capture_output=True
+        ).stdout.strip()
         if ver_check == "1":
             # Somehow we have a local version greater than upstream
             print_warning(
@@ -683,8 +693,9 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         pkg_info = res[0]
         pkg_info["FastForward"] = False
         pkg_info["CARCH"] = subprocess.run(
-            ["uname", "-m"], check=True,
-            stdout=subprocess.PIPE).stdout.decode().strip()
+            ["uname", "-m"],
+            check=True, text=True, capture_output=True
+        ).stdout.strip()
         pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.zst".format(
             pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
         pkg_info["TargetCachePath"] = pkg_file
@@ -698,8 +709,9 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
 
     def build_dry_run(self, pkg_info):
         buildable_pkgs = subprocess.run(
-            ["makepkg", "--packagelist"], check=True,
-            stdout=subprocess.PIPE).stdout.decode().split("\n")
+            ["makepkg", "--packagelist"],
+            check=True, text=True, capture_output=True
+        ).stdout.split("\n")
         allowed_pkgs = []
         for p in buildable_pkgs:
             if p.endswith("-any") or p.endswith("-" + pkg_info["CARCH"]):
