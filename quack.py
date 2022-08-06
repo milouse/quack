@@ -27,7 +27,7 @@ gettext.textdomain("quack")
 _ = gettext.gettext
 
 
-VERSION = "0.10"
+VERSION = "0.11"
 USE_COLOR = "never"
 
 
