@@ -27,7 +27,7 @@ gettext.textdomain("quack")
 _ = gettext.gettext
 
 
-VERSION = "0.9"
+VERSION = "0.10"
 USE_COLOR = "never"
 
 
@@ -43,7 +43,7 @@ def hilite(string, color=None, bold=False, underline=False):
         "magenta": "35",
         "cyan": "36"
     }
-    if color in color_map:
+    if color and color in color_map:
         attr.append(color_map[color])
     if bold:
         attr.append("1")
@@ -377,6 +377,7 @@ class AurHelper:
         return sorted(raw_json["results"], key=lambda p: p["Name"])
 
     def handle_aur_dependencies(self, pkg_info):
+        assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
         must_install = []
         for d in pkg_info["ExtDepends"]:
             ai = pkg_info.get("ExtDependsData", {}).get(d)
@@ -397,6 +398,7 @@ class AurHelper:
                 if aur.build(d) is None:
                     aur.close_temp_dir()
                     self.close_temp_dir(should_exit=True)
+                assert isinstance(aur.temp_dir, tempfile.TemporaryDirectory)
                 shutil.copyfile(
                     os.path.join(aur.temp_dir.name, pkgball),
                     destball
@@ -558,16 +560,10 @@ class AurHelper:
     def build_docker_image(self):
         if self.docker_image_built:
             return
-        bestmirror = "Server = https://mirror.netcologne.de/archlinux/$repo/os/$arch"  # noqa
-        # It's weird the result of the following request is not stable
-        # r = requests.get("https://www.archlinux.org/mirrorlist/?country=all&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on")  # noqa
-        # for line in r.text.split("\n"):
-        #     if line.startswith("#Server"):
-        #         bestmirror = line[1:]
-        #         break
+        assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
         dockercontent = """FROM archlinux/archlinux
 
-RUN echo '{mirror}' > /etc/pacman.d/mirrorlist && \
+RUN echo 'Server = https://mirrors.gandi.net/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist && \
     pacman -Syu --noconfirm && \
     pacman -S --noconfirm base-devel devtools pacman-contrib namcap
 
@@ -580,9 +576,7 @@ WORKDIR /home/package/pkg
 ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
 """
         with open("Dockerfile.quack", "w") as f:
-            f.write(
-                dockercontent.format(mirror=bestmirror, version=VERSION)
-            )
+            f.write(dockercontent)
         p = subprocess.run(self.sudo_wrapper(
             ["docker", "build", "-t", "packaging", "-f", "Dockerfile.quack",
              self.temp_dir.name]))
@@ -593,6 +587,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         print_error(_("Error while creating docker container."))
 
     def build_docker_roadmap(self, pkg_info):
+        assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
         roadmap = ["#!/usr/bin/env sh", "set -e",
                    "sudo pacman -Syu --noconfirm"]
         # Allow one to provides is own operations before building the
@@ -650,7 +645,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                 self.temp_dir.cleanup()
             except PermissionError:
                 print_error(_("A permission error occured while deleting "
-                              "the quack temp dir {folder}.")
+                              "the quack temp dir {folder}")
                             .format(foder=self.temp_dir.name))
             self.temp_dir = None
         if self.chroot_dir is not None:
@@ -725,15 +720,17 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         pkg_info = self.prepare_pkg_info(package)
         if pkg_info is None:
             print_error(_("{pkg} is NOT an AUR package.").format(pkg=package))
+        assert isinstance(pkg_info, dict)
         if pkg_info["FastForward"] is True:
             return pkg_info
         self.switch_to_temp_dir(pkg_info)
-        print_info(_("Package {pkg} is ready to be built in {path}.")
+        assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
+        print_info(_("Package {pkg} is ready to be built in {path}")
                    .format(pkg=hilite(package, "yellow", True),
                            path=self.temp_dir.name), bold=False)
         if not self.dry_run:
             print_info(_("You should REALLY take time to inspect its "
-                         "PKGBUILD."), bold=False)
+                         "PKGBUILD"), bold=False)
             check = question(_("When it's done, shall we continue?") +
                              " [y/N/q]")
             lc = str(check).lower()
@@ -752,26 +749,31 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         if self.dry_run:
             return self.build_dry_run(pkg_info)
         dependencies_packages = set(glob.glob("*.pkg.tar.zst"))
+        returncode = 1
         if self.jail_type is None:
             # Thus avoid integrity check as it has already be done.
-            p = subprocess.run(["makepkg", "-sr", "--skipinteg"])
+            returncode = subprocess.run(
+                ["makepkg", "-sr", "--skipinteg"]
+            ).returncode
         elif self.jail_type == "chroot":
             self.prepare_chroot_dir()
-            p = subprocess.run(["makechrootpkg", "-c", "-r",
-                                self.chroot_dir.name])
+            assert isinstance(self.chroot_dir, tempfile.TemporaryDirectory)
+            returncode = subprocess.run(
+                ["makechrootpkg", "-c", "-r", self.chroot_dir.name]
+            ).returncode
         elif self.jail_type == "docker":
             self.build_docker_image()
             self.build_docker_roadmap(pkg_info)
-            p = subprocess.run(self.sudo_wrapper(
+            returncode = subprocess.run(self.sudo_wrapper(
                 ["docker", "run", "--rm", "--mount",
                  "type=bind,source={},destination={}".format(
                      self.temp_dir.name, "/home/package/pkg"
-                 ), "packaging"]))
+                 ), "packaging"])).returncode
         else:
             self.close_temp_dir()
             print_error(_("Jail type {type} is not known.")
                         .format(self.jail_type))
-        if p.returncode != 0:
+        if returncode != 0:
             self.close_temp_dir(False)
             print_error(_("Unexpected build error for {pkg}.")
                         .format(pkg=package))
@@ -813,6 +815,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                 )
             )
         final_pkgs = []
+        p = _("<nothing>")
         try:
             for p in ps.split(" "):
                 pi = int(p)
@@ -886,6 +889,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             subsequent_indent=27 * " ",
             break_on_hyphens=False,
             break_long_words=False)
+        assert isinstance(res, dict)
         if "Maintainer" in res:
             res["Maintainer"] = "{0}  https://aur.archlinux.org/account/{0}" \
                 .format(res["Maintainer"])
