@@ -243,8 +243,10 @@ class AurHelper:
         if USE_COLOR == "never":
             cmd.insert(1, "--nocolor")
         # Remove unnecessary empty line
+        # Also we do not use capture_output as for strange reason
+        # it loses the ANSI colors.
         p = subprocess.run(
-            cmd, text=True, capture_output=True
+            cmd, text=True, stdout=subprocess.PIPE
         ).stdout.strip()
         print(p + "\n")
         print_info(_("Old package versions kept in cache"), bold=False)
@@ -254,7 +256,7 @@ class AurHelper:
             cmd[1] = "-d"
         # Remove unnecessary empty line here too.
         p = subprocess.run(
-            cmd, text=True, capture_output=True
+            cmd, text=True, stdout=subprocess.PIPE
         ).stdout.strip()
         print(p)
 
