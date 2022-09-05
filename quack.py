@@ -596,7 +596,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.docker_image_built = True
             return
         self.close_temp_dir()
-        print_error(_("Error while creating docker container."))
+        print_error(_("An error occured while creating docker container."))
 
     def build_docker_roadmap(self, pkg_info):
         assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
@@ -644,8 +644,10 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                             "base-devel"])
         if p.returncode != 0:
             self.close_temp_dir()
-            print_error(_("Error while creating the chroot dir in {folder}.")
-                        .format(folder=self.chroot_dir.name))
+            print_error(
+                _("An error occured while creating the chroot dir in {folder}.")
+                .format(folder=self.chroot_dir.name)
+            )
         # Make sure chroot is up to date
         subprocess.run(["arch-nspawn", "{}/root".format(self.chroot_dir.name),
                         "pacman", "-Syu"])
@@ -789,7 +791,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                         .format(self.jail_type))
         if returncode != 0:
             self.close_temp_dir(False)
-            print_error(_("Unexpected build error for {pkg}.")
+            print_error(_("An error occured while building {pkg}")
                         .format(pkg=package))
         all_pkgs = set(glob.glob("*.pkg.tar.zst"))
         pkg_info["BuiltPackages"] = list(all_pkgs - dependencies_packages)
