@@ -801,6 +801,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         pkg_info = self.build(package)
         if pkg_info is False:
             return False
+        assert isinstance(pkg_info, dict)
         built_packages = pkg_info["BuiltPackages"]
         if len(built_packages) == 0:
             return self.close_temp_dir(False)
