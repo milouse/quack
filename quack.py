@@ -400,7 +400,7 @@ class AurHelper:
             destball = os.path.join(self.temp_dir.name, pkgball)
             if ai["FastForward"] is False:
                 print_warning(_("The following package must be installed "
-                                "first: {pkg}.").format(pkg=ai["Name"]))
+                                "first: {pkg}").format(pkg=ai["Name"]))
                 aur = AurHelper(self.config, {
                     "jail_type": self.jail_type,
                     "dry_run": self.dry_run,
@@ -434,7 +434,7 @@ class AurHelper:
                 if not success:
                     self.close_temp_dir()
                     print_error(_("An error occured while installing "
-                                  "the dependency {pkg}.")
+                                  "the dependency {pkg}")
                                 .format(pkg=pkgdata[0]))
                 p = subprocess.run(
                     self.sudo_wrapper(["pacman", "-D", "--asdeps", pkgdata[0]])
@@ -502,7 +502,7 @@ class AurHelper:
         if ver_check == "1":
             # Somehow we have a local version greater than upstream
             print_warning(
-                _("Your system run a newer version of {pkg}.")
+                _("Your system run a newer version of {pkg}")
                 .format(pkg=package["Name"]))
             return False
         return True
@@ -645,7 +645,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         if p.returncode != 0:
             self.close_temp_dir()
             print_error(
-                _("An error occured while creating the chroot dir in {folder}.")
+                _("An error occured while creating the chroot dir in {folder}")
                 .format(folder=self.chroot_dir.name)
             )
         # Make sure chroot is up to date
@@ -707,7 +707,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
            os.path.isfile(pkg_file):
             pkg_info["BuiltPackages"] = [pkg_file]
             pkg_info["FastForward"] = True
-            print_info(_("Package {pkg} is already built as {pkgfile}.")
+            print_info(_("Package {pkg} is already built as {pkgfile}")
                        .format(pkg=package, pkgfile=pkg_file))
         return pkg_info
 
