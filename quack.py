@@ -573,15 +573,13 @@ class AurHelper:
         if self.docker_image_built:
             return
         assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
-        dockercontent = """FROM archlinux/archlinux
+        dockercontent = """FROM archlinux:base-devel
 
-RUN echo 'Server = https://mirrors.gandi.net/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist && \
-    pacman -Syu --noconfirm && \
-    pacman -S --noconfirm base-devel devtools pacman-contrib namcap
+RUN useradd -m -d /home/package -c 'Package Creation User' -s /usr/bin/bash -g users package && \
+    echo 'package ALL=(ALL) NOPASSWD: /usr/bin/pacman' >> /etc/sudoers && \
+    echo 'Server = https://mirrors.gandi.net/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
 
-RUN groupadd package && \
-    useradd -m -d /home/package -c 'Package Creation User' -s /usr/bin/bash -g package package && \
-    echo 'package ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN pacman -Syu --noconfirm && pacman -S --noconfirm devtools
 
 USER package
 WORKDIR /home/package/pkg
