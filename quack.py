@@ -27,7 +27,7 @@ gettext.textdomain("quack")
 _ = gettext.gettext
 
 
-VERSION = "0.10"
+VERSION = "0.11"
 USE_COLOR = "never"
 
 
@@ -93,12 +93,16 @@ class AurHelper:
         self.docker_image_built = False
         self.local_pkgs = subprocess.run(
             ["pacman", "-Q", "--color=never"],
-            check=True, stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
+            check=True, text=True,
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE
+        ).stdout.strip().split("\n")
         self.all_pkgs = subprocess.run(
             ["pacman", "--color=never", "-Slq"] + self.config["repos"],
-            check=True, stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE).stdout.decode().strip().split("\n")
+            check=True, text=True,
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE
+        ).stdout.strip().split("\n")
 
     def is_devel(self, package):
         return re.search("-(?:bzr|cvs|git|hg|svn)$", package) is not None
@@ -213,7 +217,8 @@ class AurHelper:
             cmd.pop()  # Remove the last "-o"
             cmd = self.sudo_wrapper(cmd + [")"])
             p = subprocess.run(
-                cmd, stdout=subprocess.PIPE).stdout.decode().strip()
+                cmd, text=True, capture_output=True
+            ).stdout.strip()
         else:
             p = "\n".join(self.list_transac_files())
         if p == "":
@@ -238,9 +243,12 @@ class AurHelper:
         if USE_COLOR == "never":
             cmd.insert(1, "--nocolor")
         # Remove unnecessary empty line
+        # Also we do not use capture_output as for strange reason
+        # it loses the ANSI colors.
         p = subprocess.run(
-            cmd, stdout=subprocess.PIPE).stdout.decode()
-        print(p.strip() + "\n")
+            cmd, text=True, stdout=subprocess.PIPE
+        ).stdout.strip()
+        print(p + "\n")
         print_info(_("Old package versions kept in cache"), bold=False)
         if USE_COLOR == "never":
             cmd[2] = "-d"
@@ -248,17 +256,19 @@ class AurHelper:
             cmd[1] = "-d"
         # Remove unnecessary empty line here too.
         p = subprocess.run(
-            cmd, stdout=subprocess.PIPE).stdout.decode()
-        print(p.strip())
+            cmd, text=True, stdout=subprocess.PIPE
+        ).stdout.strip()
+        print(p)
 
     def get_docker_images_list(self):
         images = subprocess.run(
             self.sudo_wrapper(
                 ["docker", "image", "ls", "packaging", "--quiet"]
             ),
-            check=True, stderr=subprocess.DEVNULL,
+            check=True, text=True,
+            stderr=subprocess.DEVNULL,
             stdout=subprocess.PIPE
-        ).stdout.decode().strip()
+        ).stdout.strip()
         if images == "":
             return []
         return images.split("\n")
@@ -270,9 +280,10 @@ class AurHelper:
                  "--filter", "ancestor=packaging",
                  "--filter", "status=exited", "--quiet"]
             ),
-            check=True, stderr=subprocess.DEVNULL,
+            check=True, text=True,
+            stderr=subprocess.DEVNULL,
             stdout=subprocess.PIPE
-        ).stdout.decode().strip()
+        ).stdout.strip()
         if containers == "":
             return []
         return containers.split("\n")
@@ -389,7 +400,7 @@ class AurHelper:
             destball = os.path.join(self.temp_dir.name, pkgball)
             if ai["FastForward"] is False:
                 print_warning(_("The following package must be installed "
-                                "first: {pkg}.").format(pkg=ai["Name"]))
+                                "first: {pkg}").format(pkg=ai["Name"]))
                 aur = AurHelper(self.config, {
                     "jail_type": self.jail_type,
                     "dry_run": self.dry_run,
@@ -423,7 +434,7 @@ class AurHelper:
                 if not success:
                     self.close_temp_dir()
                     print_error(_("An error occured while installing "
-                                  "the dependency {pkg}.")
+                                  "the dependency {pkg}")
                                 .format(pkg=pkgdata[0]))
                 p = subprocess.run(
                     self.sudo_wrapper(["pacman", "-D", "--asdeps", pkgdata[0]])
@@ -486,11 +497,12 @@ class AurHelper:
         # and 1.11.1. We need to use vercmp.
         ver_check = subprocess.run(
             ["vercmp", current_version, package["Version"]],
-            check=True, stdout=subprocess.PIPE).stdout.decode().strip()
+            check=True, text=True, capture_output=True
+        ).stdout.strip()
         if ver_check == "1":
             # Somehow we have a local version greater than upstream
             print_warning(
-                _("Your system run a newer version of {pkg}.")
+                _("Your system run a newer version of {pkg}")
                 .format(pkg=package["Name"]))
             return False
         return True
@@ -561,15 +573,13 @@ class AurHelper:
         if self.docker_image_built:
             return
         assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
-        dockercontent = """FROM archlinux/archlinux
+        dockercontent = """FROM archlinux:base-devel
 
-RUN echo 'Server = https://mirrors.gandi.net/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist && \
-    pacman -Syu --noconfirm && \
-    pacman -S --noconfirm base-devel devtools pacman-contrib namcap
+RUN useradd -m -d /home/package -c 'Package Creation User' -s /usr/bin/bash -g users package && \
+    echo 'package ALL=(ALL) NOPASSWD: /usr/bin/pacman' >> /etc/sudoers && \
+    echo 'Server = https://mirrors.gandi.net/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
 
-RUN groupadd package && \
-    useradd -m -d /home/package -c 'Package Creation User' -s /usr/bin/bash -g package package && \
-    echo 'package ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN pacman -Syu --noconfirm && pacman -S --noconfirm devtools
 
 USER package
 WORKDIR /home/package/pkg
@@ -584,7 +594,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.docker_image_built = True
             return
         self.close_temp_dir()
-        print_error(_("Error while creating docker container."))
+        print_error(_("An error occured while creating docker container."))
 
     def build_docker_roadmap(self, pkg_info):
         assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
@@ -632,8 +642,10 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                             "base-devel"])
         if p.returncode != 0:
             self.close_temp_dir()
-            print_error(_("Error while creating the chroot dir in {folder}.")
-                        .format(folder=self.chroot_dir.name))
+            print_error(
+                _("An error occured while creating the chroot dir in {folder}")
+                .format(folder=self.chroot_dir.name)
+            )
         # Make sure chroot is up to date
         subprocess.run(["arch-nspawn", "{}/root".format(self.chroot_dir.name),
                         "pacman", "-Syu"])
@@ -683,8 +695,9 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         pkg_info = res[0]
         pkg_info["FastForward"] = False
         pkg_info["CARCH"] = subprocess.run(
-            ["uname", "-m"], check=True,
-            stdout=subprocess.PIPE).stdout.decode().strip()
+            ["uname", "-m"],
+            check=True, text=True, capture_output=True
+        ).stdout.strip()
         pkg_file = "/var/cache/pacman/pkg/{}-{}-{}.pkg.tar.zst".format(
             pkg_info["PackageBase"], pkg_info["Version"], pkg_info["CARCH"])
         pkg_info["TargetCachePath"] = pkg_file
@@ -692,14 +705,15 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
            os.path.isfile(pkg_file):
             pkg_info["BuiltPackages"] = [pkg_file]
             pkg_info["FastForward"] = True
-            print_info(_("Package {pkg} is already built as {pkgfile}.")
+            print_info(_("Package {pkg} is already built as {pkgfile}")
                        .format(pkg=package, pkgfile=pkg_file))
         return pkg_info
 
     def build_dry_run(self, pkg_info):
         buildable_pkgs = subprocess.run(
-            ["makepkg", "--packagelist"], check=True,
-            stdout=subprocess.PIPE).stdout.decode().split("\n")
+            ["makepkg", "--packagelist"],
+            check=True, text=True, capture_output=True
+        ).stdout.split("\n")
         allowed_pkgs = []
         for p in buildable_pkgs:
             if p.endswith("-any") or p.endswith("-" + pkg_info["CARCH"]):
@@ -765,8 +779,8 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.build_docker_image()
             self.build_docker_roadmap(pkg_info)
             returncode = subprocess.run(self.sudo_wrapper(
-                ["docker", "run", "--rm", "--mount",
-                 "type=bind,source={},destination={}".format(
+                ["docker", "run", "--rm", "--name", "packaging",
+                 "--mount", "type=bind,source={},destination={}".format(
                      self.temp_dir.name, "/home/package/pkg"
                  ), "packaging"])).returncode
         else:
@@ -775,7 +789,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                         .format(self.jail_type))
         if returncode != 0:
             self.close_temp_dir(False)
-            print_error(_("Unexpected build error for {pkg}.")
+            print_error(_("An error occured while building {pkg}")
                         .format(pkg=package))
         all_pkgs = set(glob.glob("*.pkg.tar.zst"))
         pkg_info["BuiltPackages"] = list(all_pkgs - dependencies_packages)
@@ -785,6 +799,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
         pkg_info = self.build(package)
         if pkg_info is False:
             return False
+        assert isinstance(pkg_info, dict)
         built_packages = pkg_info["BuiltPackages"]
         if len(built_packages) == 0:
             return self.close_temp_dir(False)
