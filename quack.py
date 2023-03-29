@@ -780,6 +780,7 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
             self.build_docker_roadmap(pkg_info)
             returncode = subprocess.run(self.sudo_wrapper(
                 ["docker", "run", "--rm", "--name", "packaging",
+                 "--ulimit", "nofile=1024",
                  "--mount", "type=bind,source={},destination={}".format(
                      self.temp_dir.name, "/home/package/pkg"
                  ), "packaging"])).returncode
