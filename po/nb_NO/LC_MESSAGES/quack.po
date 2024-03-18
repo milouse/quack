@@ -1,13 +1,13 @@
 # Quack Translation Effort
-# Copyright (C) 2018-2023 Quack volunteers
+# Copyright (C) 2018-2024 Quack volunteers
 # This file is distributed under the same license as the Quack package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Quack 0.12\n"
+"Project-Id-Version: Quack 0.13\n"
 "Report-Msgid-Bugs-To: bugs@depar.is\n"
-"POT-Creation-Date: 2023-03-29 21:46+0200\n"
+"POT-Creation-Date: 2024-03-15 12:48+0100\n"
 "PO-Revision-Date: 2022-09-05 09:03+0200\n"
 "Last-Translator: Étienne Deparis <etienne@depar.is>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/quack/"
