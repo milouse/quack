@@ -10,6 +10,7 @@ import requests
 import tempfile
 import textwrap
 import subprocess
+from datetime import date
 from configparser import ConfigParser
 from xdg.BaseDirectory import xdg_cache_home
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
@@ -90,7 +91,6 @@ class AurHelper:
         self.editor = os.getenv("EDITOR", "nano")
         self.temp_dir = None
         self.chroot_dir = None
-        self.docker_image_built = False
         self.local_pkgs = subprocess.run(
             ["pacman", "-Q", "--color=never"],
             check=True, text=True,
@@ -570,31 +570,31 @@ class AurHelper:
             shutil.copyfile("/etc/makepkg.conf", "/tmp/makepkg.tmp.conf")
 
     def build_docker_image(self):
-        if self.docker_image_built:
-            return
-        assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
         dockercontent = """FROM archlinux:base-devel
 
 RUN useradd -m -d /home/package -c 'Package Creation User' -s /usr/bin/bash -g users package && \
+    mkdir -p /run/user/1000 && chown package:users /run/user/1000 && \
     echo 'package ALL=(ALL) NOPASSWD: /usr/bin/pacman' >> /etc/sudoers && \
-    echo 'Server = https://mirrors.gandi.net/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
-
-RUN pacman -Syu --noconfirm && pacman -S --noconfirm devtools
+    echo 'Server = https://mirrors.gandi.net/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist && \
+    pacman -Sy --noconfirm archlinux-keyring && \
+    pacman -S --noconfirm devtools
 
 USER package
 WORKDIR /home/package/pkg
+
+ARG CACHE_DATE="-"
+RUN sudo pacman -Syyu --noconfirm && sudo pacman -Scc
+
 ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
 """
-        with open("Dockerfile.quack", "w") as f:
-            f.write(dockercontent)
-        p = subprocess.run(self.sudo_wrapper(
-            ["docker", "build", "-t", "packaging", "-f", "Dockerfile.quack",
-             self.temp_dir.name]))
-        if p.returncode == 0:
-            self.docker_image_built = True
-            return
-        self.close_temp_dir()
-        print_error(_("An error occured while creating docker container."))
+        today = str(date.today())
+        p = subprocess.run(
+            self.sudo_wrapper(
+                ["docker", "build", "-t", "packaging",
+                 "--build-arg", f"CACHE_DATE={today}", "-"]
+            ), input=dockercontent, text=True
+        )
+        return p.returncode == 0
 
     def build_docker_roadmap(self, pkg_info):
         assert isinstance(self.temp_dir, tempfile.TemporaryDirectory)
@@ -776,7 +776,10 @@ ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
                 ["makechrootpkg", "-c", "-r", self.chroot_dir.name]
             ).returncode
         elif self.jail_type == "docker":
-            self.build_docker_image()
+            if not self.build_docker_image():
+                self.close_temp_dir()
+                print_error(_("An error occured while creating docker container."))
+                return pkg_info
             self.build_docker_roadmap(pkg_info)
             returncode = subprocess.run(self.sudo_wrapper(
                 ["docker", "run", "--rm", "--name", "packaging",

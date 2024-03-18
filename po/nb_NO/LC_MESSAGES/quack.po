@@ -19,11 +19,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.1\n"
 
-#: quack.py:56
+#: quack.py:57
 msgid "error:"
 msgstr "feil:"
 
-#: quack.py:63
+#: quack.py:64
 msgid "warning:"
 msgstr "advarsel:"
 
@@ -161,17 +161,13 @@ msgstr "Ønsker du å oppgradere pakkene ovenfor?"
 msgid "Impossible to clone {pkg} from AUR."
 msgstr "Kunne ikke klone {pkg} fra AUR."
 
-#: quack.py:554 quack.py:736 quack.py:902
+#: quack.py:554 quack.py:736 quack.py:905
 #, python-brace-format
 msgid "{pkg} is NOT an AUR package."
 msgstr "{pkg} er IKKE en AUR-pakke."
 
 #: quack.py:562
 msgid "Integrity file check fails."
-msgstr ""
-
-#: quack.py:597
-msgid "An error occured while creating docker container."
 msgstr ""
 
 #: quack.py:646
@@ -202,167 +198,171 @@ msgstr "Du burde VIRKELIG ta deg tid til å gjennomse dens PKGBUILD"
 msgid "When it's done, shall we continue?"
 msgstr "Når det er gjort, skal vi fortsette?"
 
-#: quack.py:789
+#: quack.py:781
+msgid "An error occured while creating docker container."
+msgstr ""
+
+#: quack.py:792
 #, python-brace-format
 msgid "Jail type {type} is not known."
 msgstr ""
 
-#: quack.py:793
+#: quack.py:796
 #, python-brace-format
 msgid "An error occured while building {pkg}"
 msgstr ""
 
-#: quack.py:816
+#: quack.py:819
 msgid "The following packages have been built:"
 msgstr "Følgende pakker har blitt bygd:"
 
-#: quack.py:821
+#: quack.py:824
 msgid "Which one do you really want to install?"
 msgstr "Hvilken ønsker du å installere?"
 
-#: quack.py:834
+#: quack.py:837
 msgid "<nothing>"
 msgstr ""
 
-#: quack.py:842
+#: quack.py:845
 #, python-brace-format
 msgid "{str} is not a valid input."
 msgstr "{str} er ikke gyldig inndata."
 
-#: quack.py:874
+#: quack.py:877
 msgid "[outdated]"
 msgstr "[utdatert]"
 
-#: quack.py:917
+#: quack.py:920
 #, python-brace-format
 msgid "Since {date}"
 msgstr "Siden {date}"
 
-#: quack.py:920
+#: quack.py:923
 msgid "Name"
 msgstr "Navn"
 
-#: quack.py:921
+#: quack.py:924
 msgid "Version"
 msgstr "Versjon"
 
-#: quack.py:922
+#: quack.py:925
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: quack.py:923
+#: quack.py:926
 msgid "URL"
 msgstr "Nettadresse"
 
-#: quack.py:924
+#: quack.py:927
 msgid "Licenses"
 msgstr "Lisenser"
 
-#: quack.py:925
+#: quack.py:928
 msgid "Provides"
 msgstr "Tilbyr"
 
-#: quack.py:926
+#: quack.py:929
 msgid "Depends On"
 msgstr "Avhenger av"
 
-#: quack.py:927
+#: quack.py:930
 msgid "Build Depends On"
 msgstr "Bygg avhenger av"
 
-#: quack.py:928
+#: quack.py:931
 msgid "Conflicts With"
 msgstr "Kolliderer med"
 
-#: quack.py:929
+#: quack.py:932
 msgid "Last Maintainer"
 msgstr "Siste vedlikeholder"
 
-#: quack.py:930
+#: quack.py:933
 msgid "Last Modified"
 msgstr "Sist endret"
 
-#: quack.py:931
+#: quack.py:934
 msgid "Out of Date"
 msgstr "Utdatert"
 
-#: quack.py:932
+#: quack.py:935
 msgid "Votes Number"
 msgstr "Stemmenummer"
 
-#: quack.py:933
+#: quack.py:936
 msgid "Popularity"
 msgstr "Popularitet"
 
-#: quack.py:934
+#: quack.py:937
 msgid "AUR Page"
 msgstr "AUR-side"
 
-#: quack.py:935
+#: quack.py:938
 msgid "Keywords"
 msgstr "Nøkkelord"
 
-#: quack.py:953
+#: quack.py:956
 #, python-format
 msgid "Display %(prog)s version information and exit"
 msgstr "Vis %(prog)s-versjonsinformasjon og avslutt"
 
-#: quack.py:957
+#: quack.py:960
 msgid "Specify when to enable coloring"
 msgstr ""
 
-#: quack.py:960
+#: quack.py:963
 #, python-format
 msgid "Allow %(prog)s to be run as root"
 msgstr "Tillat %(prog)s å kjøre som root"
 
-#: quack.py:962
+#: quack.py:965
 msgid "Commands"
 msgstr ""
 
-#: quack.py:965
+#: quack.py:968
 msgid "AUR related actions (default)"
 msgstr ""
 
-#: quack.py:969
+#: quack.py:972
 msgid "Find and list .pacsave, .pacorig or .pacnew files"
 msgstr ""
 
-#: quack.py:973
+#: quack.py:976
 msgid "AUR actions"
 msgstr ""
 
-#: quack.py:974
+#: quack.py:977
 msgid ""
 "Install action is implicit, when no other action is passed to the -A, --aur "
 "command"
 msgstr ""
 
-#: quack.py:978
+#: quack.py:981
 msgid "Display information on an AUR package and exit"
 msgstr ""
 
-#: quack.py:981
+#: quack.py:984
 msgid "List locally installed AUR packages and exit"
 msgstr ""
 
-#: quack.py:984
+#: quack.py:987
 msgid "Search AUR packages by name and exit"
 msgstr ""
 
-#: quack.py:986
+#: quack.py:989
 msgid "Upgrade installed AUR packages"
 msgstr ""
 
-#: quack.py:988
+#: quack.py:991
 msgid "Install and Upgrade options"
 msgstr ""
 
-#: quack.py:990
+#: quack.py:993
 msgid "Force install or upgrade action"
 msgstr ""
 
-#: quack.py:992
+#: quack.py:995
 msgid ""
 "Download package info and try to resolve dependencies, but do not build or "
 "install anything"
@@ -370,53 +370,53 @@ msgstr ""
 "Last ned pakkeinfo og prøv å løse avhengigheter, men ikke bygg eller "
 "installer noe"
 
-#: quack.py:997
+#: quack.py:1000
 msgid ""
 "Run install and upgrade action in a docker (by default) or a chroot jail. "
 "Use --jail=none or --no-jail to prevent the use of a jail"
 msgstr ""
 
-#: quack.py:1001
+#: quack.py:1004
 msgid "Prevent install and upgrade action to be run in a jail"
 msgstr ""
 
-#: quack.py:1004
+#: quack.py:1007
 msgid "List, Install and Upgrade options"
 msgstr ""
 
-#: quack.py:1006
+#: quack.py:1009
 msgid "Include devel packages (which name has a trailing -svn, -git…)"
 msgstr ""
 
-#: quack.py:1009
+#: quack.py:1012
 msgid "Install, Info and Search options"
 msgstr ""
 
-#: quack.py:1011
+#: quack.py:1014
 msgid ""
 "One or more package name to install, look for, or display information about"
 msgstr ""
 
-#: quack.py:1014
+#: quack.py:1017
 msgid "Cleanup actions"
 msgstr ""
 
-#: quack.py:1017
+#: quack.py:1020
 msgid "Actually cleanup things instead of just listing them"
 msgstr ""
 
-#: quack.py:1021
+#: quack.py:1024
 msgid ""
 "Make a deep search of transactional files instead of a quick search (use "
 "find instead of pacman db)."
 msgstr ""
 
-#: quack.py:1054
+#: quack.py:1057
 #, python-brace-format
 msgid "Do not run {quack_cmd} as root!"
 msgstr "Ikke kjør {quack_cmd} som root!"
 
-#: quack.py:1072
+#: quack.py:1075
 msgid "No package specified (use -h for help)"
 msgstr "Ingen mål angitt (bruk -h for hjelp)"
 
