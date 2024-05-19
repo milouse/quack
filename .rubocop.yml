@@ -1,0 +1,44 @@
+---
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.0
+
+require:
+- rubocop-performance
+
+Layout/LineLength:
+  Max: 80
+
+Metrics/AbcSize:
+  Enabled: no
+
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/ModuleLength:
+  Max: 120
+
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Style:
+  Severity: warning
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/ConditionalAssignment:
+  EnforcedStyle: assign_inside_condition
+
+Style/PreferredHashMethods:
+  EnforcedStyle: verbose
+
+Style/RegexpLiteral:
+  EnforcedStyle: slashes
+  AllowInnerSlashes: no
+
+Style/StringConcatenation:
+  Enabled: no

@@ -3,8 +3,9 @@
 
 * Translations
 
-Quack use gettext files for its translation. You can grab them from the
-source code tree and send your changes as a pull request.
+Quack use yaml files in the ~locales~ subfolder for its translation. You
+can grab them from the source code tree and send your changes as a pull
+request.
 
 * Code
 
