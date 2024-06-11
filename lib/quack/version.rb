@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module Quack
-  VERSION = '0.99'
+  VERSION = '1.0'
 end
