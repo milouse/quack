@@ -1,2 +1,2 @@
 .ruby-version
-po/*/LC_MESSAGES/*.mo
+Gemfile.lock
