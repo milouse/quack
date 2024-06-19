@@ -102,9 +102,9 @@ module L10n
 
         @locale = lang
         @locale_file = i18n_file
-        return
+        break
       end
-      raise 'No translations file found'
+      raise 'No translations file found' unless @locale_file
     end
 
     def format_time(time, format)

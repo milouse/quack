@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './lib/quack/version'
+require_relative 'lib/quack/version'
 
 Gem::Specification.new do |spec|
   spec.name        = 'quack'

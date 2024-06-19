@@ -119,9 +119,7 @@ module Quack
         "https://aur.archlinux.org/#{package['PackageBase']}.git",
         @tmpdir
       )
-      unless success
-        raise L10n.t('jail.clone_failure', package: package.name)
-      end
+      raise L10n.t('jail.clone_failure', package: package.name) unless success
 
       Dir.chdir @tmpdir
 

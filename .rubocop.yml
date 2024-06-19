@@ -13,16 +13,14 @@ Metrics/AbcSize:
   Enabled: no
 
 Metrics/MethodLength:
-  Max: 20
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+    - method_call
 
 Metrics/ModuleLength:
   Max: 120
-
-Metrics/PerceivedComplexity:
-  Max: 10
-
-Metrics/CyclomaticComplexity:
-  Max: 10
 
 Style:
   Severity: warning
@@ -35,10 +33,3 @@ Style/ConditionalAssignment:
 
 Style/PreferredHashMethods:
   EnforcedStyle: verbose
-
-Style/RegexpLiteral:
-  EnforcedStyle: slashes
-  AllowInnerSlashes: no
-
-Style/StringConcatenation:
-  Enabled: no

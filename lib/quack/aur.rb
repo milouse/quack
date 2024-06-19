@@ -27,13 +27,14 @@ module Quack
     end
 
     def info(packages)
+      info_fields = %w[Name Version Description URL License Provides Depends
+                       MakeDepends Conflicts Maintainer LastModified OutOfDate
+                       NumVotes Popularity AurPage Keywords].freeze
       packages.each do |package_name|
         package = Package.details(package_name)
         next unless package
 
-        %w[Name Version Description URL License Provides Depends MakeDepends
-           Conflicts Maintainer LastModified OutOfDate NumVotes Popularity
-           AurPage Keywords].each { info_line(_1, package) }
+        info_fields.each { info_line(_1, package) }
 
         next unless package.local?
 

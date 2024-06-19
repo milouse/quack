@@ -65,7 +65,7 @@ module Quack
             has_backup = true
             next
           elsif has_backup
-            backup_prefix = '/' + line.split("\t").first
+            backup_prefix = "/#{line.split("\t").first}"
             suffixes.each do |file_ext|
               test_file = "#{backup_prefix}.#{file_ext}"
               results << test_file if File.exist?(test_file)

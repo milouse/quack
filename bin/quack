@@ -43,14 +43,10 @@ end
 parser.define(
   '--color [WHEN]', %i[always never auto],
   L10n.t('cli.color_help'), L10n.t('cli.color_choices')
-) do
-  params[:color] = _1
-end
+) { params[:color] = _1 }
 parser.define(
   '-l', '--list', L10n.t('cli.list_help'), L10n.t('cli.list_help_2')
-) do
-  params[:action] = :list
-end
+) { params[:action] = :list }
 
 parser.separator ''
 parser.separator L10n.t('cli.aur_actions_title')
