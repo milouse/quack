@@ -3,11 +3,11 @@
 require_relative '../helper'
 require_relative '../jail'
 
-module Quack
+module QuackAur
   class Docker < Jail
     def build
-      unless Quack.which('docker')
-        Quack.print_error(
+      unless QuackAur.which('docker')
+        QuackAur.print_error(
           'jail.missing_dependency',
           package: 'docker', jail: 'docker'
         )
@@ -18,19 +18,19 @@ module Quack
 
     class << self
       def containers_list
-        command = Quack.sudo_wrapper(
+        command = QuackAur.sudo_wrapper(
           ['docker', 'container', 'ls', '--all',
            '--filter', 'ancestor=packaging',
            '--filter', 'status=exited', '--quiet']
         )
-        Quack.capture_no_err command
+        QuackAur.capture_no_err command
       end
 
       def images_list
-        command = Quack.sudo_wrapper(
+        command = QuackAur.sudo_wrapper(
           %w[docker image ls packaging --quiet]
         )
-        Quack.capture_no_err command
+        QuackAur.capture_no_err command
       end
 
       %i[container image].each do |what|
@@ -40,7 +40,7 @@ module Quack
           return number if number.zero?
 
           system(
-            *Quack.sudo_wrapper(%W[docker #{what} rm] + objects),
+            *QuackAur.sudo_wrapper(%W[docker #{what} rm] + objects),
             exception: true
           )
           number
@@ -64,7 +64,7 @@ module Quack
       build_docker_roadmap
 
       system(
-        *Quack.sudo_wrapper(
+        *QuackAur.sudo_wrapper(
           ['docker', 'run', '--rm', '--name', 'packaging',
            '--ulimit', 'nofile=1024', '--mount',
            "type=bind,source=#{@tmpdir},destination=/home/package/pkg",
@@ -95,7 +95,7 @@ module Quack
       File.write('Dockerfile.quack', dockerfile)
       today = Time.now.strftime('%Y-%m-%d')
       system(
-        *Quack.sudo_wrapper(
+        *QuackAur.sudo_wrapper(
           ['docker', 'build', '-t', 'packaging',
            '--build-arg', "CACHE_DATE=#{today}", '-']
         ), in: 'Dockerfile.quack'

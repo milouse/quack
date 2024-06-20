@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative 'lib/quack/version'
+require_relative 'lib/quack_aur/version'
 
 Gem::Specification.new do |spec|
-  spec.name        = 'quack'
-  spec.version     = Quack::VERSION
-  spec.summary     = 'A Qualitative and Usable Aur paCKage helper'
+  spec.name        = 'quack_aur'
+  spec.version     = QuackAur::VERSION
+  spec.summary     = 'A Qualitative and Usable pACKage helper for AUR'
   spec.authors     = ['Étienne Deparis']
   spec.email       = 'etienne@depar.is'
   spec.metadata    = {
@@ -15,14 +15,14 @@ Gem::Specification.new do |spec|
   }
   spec.files = [
     'lib/l10n.rb',
-    'lib/quack/aur.rb',
-    'lib/quack/cleaner.rb',
-    'lib/quack/helper.rb',
-    'lib/quack/jail.rb',
-    'lib/quack/jails/chroot.rb',
-    'lib/quack/jails/docker.rb',
-    'lib/quack/package.rb',
-    'lib/quack/version.rb',
+    'lib/quack_aur/aur.rb',
+    'lib/quack_aur/cleaner.rb',
+    'lib/quack_aur/helper.rb',
+    'lib/quack_aur/jail.rb',
+    'lib/quack_aur/jails/chroot.rb',
+    'lib/quack_aur/jails/docker.rb',
+    'lib/quack_aur/package.rb',
+    'lib/quack_aur/version.rb',
     # Translations
     'locales/en.yml',
     'locales/fr.yml',
@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
     'README.org',
     'LICENSE'
   ]
-  spec.executables = ['quack']
+  spec.executables = ['quackaur']
   spec.homepage    = 'https://git.umaneti.net/quack/about/'
   spec.license     = 'WTFPL'
 

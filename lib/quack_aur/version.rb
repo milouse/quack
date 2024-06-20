@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-module Quack
+module QuackAur
   VERSION = '1.1'
 end

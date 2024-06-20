@@ -4,7 +4,7 @@ require 'open3'
 require 'rainbow'
 require_relative '../l10n'
 
-module Quack
+module QuackAur
   def self.setup_color_mode(mode)
     mode ||= :auto
     return mode if mode == :auto
@@ -107,7 +107,7 @@ module Quack
     command.insert(0, 'sudo')
     return command if system?(guard)
 
-    Quack.print_warning('sudo_warning')
+    QuackAur.print_warning('sudo_warning')
     $stdin.gets # wait for user input
     command
   end

@@ -5,7 +5,7 @@ require 'open3'
 require 'net/http'
 require_relative 'helper'
 
-module Quack
+module QuackAur
   # A Package hold information related to individual AUR package.
   #
   # This class alone cannot be used to actually install or upgrade
@@ -50,7 +50,7 @@ module Quack
       return true if @data['LocalVersion']
 
       version_rx = /\AVersion +: (?<version>[a-z0-9_.-]+)\z/
-      Quack.capture_no_err(
+      QuackAur.capture_no_err(
         %W[pacman -Qi #{@data['Name']}]
       ).each do |line|
         check = version_rx.match(line)
@@ -67,13 +67,13 @@ module Quack
       return true if Package.devel?(@data['Name'])
       return false if @data['LocalVersion'] == @data['Version']
 
-      check = Quack.capture_no_err(
+      check = QuackAur.capture_no_err(
         ['vercmp', @data['LocalVersion'], @data['Version']]
       ).first.to_i
       return true if check == -1
 
       if check == 1
-        Quack.print_warning('build.newer_version', package: @data['Name'])
+        QuackAur.print_warning('build.newer_version', package: @data['Name'])
       end
       false
     end
@@ -88,7 +88,7 @@ module Quack
           # Remove fixed versionning
           real_name = package_name.split(/[<>=]+/, 2).first.strip
           # Is it an officially supported package?
-          next if Quack.system?('pacman', '-Si', real_name)
+          next if QuackAur.system?('pacman', '-Si', real_name)
 
           package = Package.details(real_name)
           # It may happen for some virtual packages or group, which will
@@ -128,7 +128,7 @@ module Quack
       end
 
       def local?(package_name)
-        Quack.system?('pacman', '-Qi', package_name)
+        QuackAur.system?('pacman', '-Qi', package_name)
       end
 
       def details(package_name)

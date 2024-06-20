@@ -5,11 +5,11 @@ require_relative 'package'
 require_relative 'jails/chroot'
 require_relative 'jails/docker'
 
-module Quack
+module QuackAur
   # Permit operation on AUR Packages
   class Aur
     def initialize(options)
-      @color = Quack.setup_color_mode options.delete(:color)
+      @color = QuackAur.setup_color_mode options.delete(:color)
       @jail = options.delete(:jail) || :docker
       @options = options
     end
@@ -21,7 +21,7 @@ module Quack
       result.each do |package|
         next unless @options[:with_devel] || !Package.devel?(package.name)
 
-        display_name = Quack.color_package(package)
+        display_name = QuackAur.color_package(package)
         puts "#{display_name}\n    #{package.description}"
       end
     end
@@ -41,7 +41,7 @@ module Quack
         tarballs = package['BuiltPackages']
         next unless tarballs.any?
 
-        Quack.print_log(
+        QuackAur.print_log(
           'build.package_already_built',
           name: package.name,
           packages: tarballs.join('  ')
@@ -87,19 +87,19 @@ module Quack
     private
 
     def do_install(package)
-      jail_klass = Kernel.const_get("::Quack::#{@jail.capitalize}")
+      jail_klass = Kernel.const_get("::QuackAur::#{@jail.capitalize}")
       jail = jail_klass.new(package, @options)
       built_packages = jail.build
       return if built_packages.empty?
 
-      Quack.print_log('build.built_list', new_line: true)
-      Quack.print_result built_packages.join('  ')
+      QuackAur.print_log('build.built_list', new_line: true)
+      QuackAur.print_result built_packages.join('  ')
       puts ''
-      check = Quack.ask_question('build.install_question', choices: '[y/N]')
+      check = QuackAur.ask_question('build.install_question', choices: '[y/N]')
       if check == 'y'
         jail.install
       else
-        Quack.print_result('build.no_install')
+        QuackAur.print_result('build.no_install')
       end
     end
 
@@ -112,7 +112,7 @@ module Quack
       else
         choices = "[1…#{number}/A/q]"
       end
-      what = Quack.ask_question(
+      what = QuackAur.ask_question(
         'build.what_to_upgrade',
         choices: choices, number: number
       )

@@ -15,7 +15,7 @@ cli:
     Sans aucun autre argument, l’action par défaut va être d’installer les
     paquets dont les noms sont donnés à la suite de la ligne de commande.
   shared_options_title: Options partagées
-  version_help: Affiche la version de quack et quitte aussitôt.
+  version_help: Affiche la version de quackaur et quitte aussitôt.
   color_help: Specifie quand la couleur doit être utilisée.
   color_choices: >-
     Les choix disponibles sont ‘auto’ (par défaut), ‘always’ (toujours) ou

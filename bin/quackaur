@@ -3,18 +3,18 @@
 
 require 'optparse'
 require_relative '../lib/l10n'
-require_relative '../lib/quack/version'
+require_relative '../lib/quack_aur/version'
 
 params = { color: :auto, jail: :docker }
 parser = OptionParser.new
 parser.banner = <<~BANNER
   A Qualitative and Usable Aur paCKage helper
 
-  Usage: quack -h
-         quack -A [--devel] package [package ...]
-         quack -A (-l, -u) [--devel]
-         quack -A (-s, -i) package [package ...]
-         quack -C (-l, -c)
+  Usage: quackaur -h
+         quackaur -A [--devel] package [package ...]
+         quackaur -A (-l, -u) [--devel]
+         quackaur -A (-s, -i) package [package ...]
+         quackaur -C (-l, -c)
 
   Commands
 BANNER
@@ -37,7 +37,7 @@ end
 parser.separator ''
 parser.separator L10n.t('cli.shared_options_title')
 parser.define('-v', '--version', L10n.t('cli.version_help')) do
-  puts "quack - v#{Quack::VERSION}"
+  puts "quackaur - v#{QuackAur::VERSION}"
   exit
 end
 parser.define(
@@ -110,8 +110,8 @@ rescue RuntimeError => e
 end
 
 if params[:operation] == :aur
-  require_relative '../lib/quack/aur'
-  aur = Quack::Aur.new(params)
+  require_relative '../lib/quack_aur/aur'
+  aur = QuackAur::Aur.new(params)
   action = params[:action] || :install
   if %i[list upgrade].include?(action)
     aur.send action
@@ -120,7 +120,7 @@ if params[:operation] == :aur
   end
 
 elsif params[:operation] == :clean
-  require_relative '../lib/quack/cleaner'
-  cleaner = Quack::Cleaner.new(params)
+  require_relative '../lib/quack_aur/cleaner'
+  cleaner = QuackAur::Cleaner.new(params)
   cleaner.send(params[:action] || :list)
 end

@@ -4,7 +4,7 @@ require 'fileutils'
 require 'tmpdir'
 require_relative 'helper'
 
-module Quack
+module QuackAur
   class Jail
     def initialize(package, options = {})
       @tmpdir = nil
@@ -35,11 +35,11 @@ module Quack
         puts "sudo cp #{@built_packages.join(' ')} /var/cache/pacman/pkg/"
         puts "rm #{@built_packages.join(' ')}"
       else
-        system(*Quack.sudo_wrapper(deps_install)) if dependencies.any?
-        system(*Quack.sudo_wrapper(main_install))
+        system(*QuackAur.sudo_wrapper(deps_install)) if dependencies.any?
+        system(*QuackAur.sudo_wrapper(main_install))
         cp_cmd = %w[cp /var/cache/pacman/pkg/]
         cp_cmd.insert(1, @built_packages)
-        system(*Quack.sudo_wrapper(cp_cmd.flatten))
+        system(*QuackAur.sudo_wrapper(cp_cmd.flatten))
         FileUtils.rm(@built_packages)
       end
     end
@@ -47,7 +47,7 @@ module Quack
     private
 
     def buildable_packages(package)
-      Quack.capture_no_err(
+      QuackAur.capture_no_err(
         %w[makepkg --packagelist]
       ).filter_map do |tarball_path|
         tarball = File.basename(tarball_path, '.pkg.tar.zst')
@@ -72,9 +72,9 @@ module Quack
     end
 
     def user_accepts_dependencies(dependencies)
-      Quack.print_log('jail.dependencies_list')
-      Quack.print_result(dependencies.map(&:name).join('  '))
-      check = Quack.ask_question(
+      QuackAur.print_log('jail.dependencies_list')
+      QuackAur.print_result(dependencies.map(&:name).join('  '))
+      check = QuackAur.ask_question(
         'jail.validate_dependency', choices: '[y/N/q]'
       )
       exit if check == 'q'
@@ -83,8 +83,8 @@ module Quack
     end
 
     def user_verification
-      Quack.print_log('jail.user_verification.message')
-      check = Quack.ask_question(
+      QuackAur.print_log('jail.user_verification.message')
+      check = QuackAur.ask_question(
         'jail.user_verification.question', choices: '[y/N/q]'
       )
       exit if check == 'q'
@@ -113,7 +113,7 @@ module Quack
 
     def switch_to_tmpdir(package)
       @origindir = Dir.pwd
-      @tmpdir = Dir.mktmpdir 'quack_'
+      @tmpdir = Dir.mktmpdir 'quack_aur_'
       success = system(
         'git', 'clone',
         "https://aur.archlinux.org/#{package['PackageBase']}.git",
@@ -127,7 +127,7 @@ module Quack
         raise L10n.t('jail.pkgbuild_missing', package: package.name)
       end
 
-      Quack.print_log(
+      QuackAur.print_log(
         'jail.ready_to_build',
         package: Rainbow(package.name).yellow.bold,
         tmpdir: @tmpdir
@@ -163,7 +163,7 @@ module Quack
       package['BuiltPackages'] = built_packages
       @built_packages += built_packages
     rescue RuntimeError => e
-      Quack.print_error e, skip_translate: true
+      QuackAur.print_error e, skip_translate: true
     ensure
       close_tmpdir
     end

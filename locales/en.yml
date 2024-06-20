@@ -15,7 +15,7 @@ cli:
     Without any other option, the default is to install packages,
     whose names are given on command line.
   shared_options_title: Shared Options
-  version_help: Display quack version and quit.
+  version_help: Display quackaur version and quit.
   color_help: Specify when to enable coloring.
   color_choices: Possible choices are ‘auto’ (default), ‘always’ or ‘never’.
   list_help: With -A list installed AUR packages.

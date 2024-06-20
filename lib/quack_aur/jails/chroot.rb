@@ -3,11 +3,11 @@
 require_relative '../helper'
 require_relative '../jail'
 
-module Quack
+module QuackAur
   class Chroot < Jail
     def build
-      unless Quack.which('mkarchroot')
-        Quack.print_error(
+      unless QuackAur.which('mkarchroot')
+        QuackAur.print_error(
           'jail.missing_dependency',
           package: 'devtools', jail: 'chroot'
         )
@@ -19,7 +19,7 @@ module Quack
     class << self
       def chrootdir_path
         xdg_cache = File.expand_path(ENV.fetch('XDG_CACHE_HOME', '~/.cache'))
-        File.expand_path('quack/chroot', xdg_cache)
+        File.expand_path('quack_aur/chroot', xdg_cache)
       end
     end
 
