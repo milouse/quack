@@ -1,184 +1,188 @@
 ---
-test: !declinable
-  0: test
-warning: 'attention :'
-error: 'erreur :'
-sudo_warning: >-
-  Vous êtes sur le point d’exécuter une commande avec ‘sudo’ et un mot de passe
-  va vous être demandé. Appuyez sur Entrée pour continuer.
-cli:
-  clean_help: Différentes opérations de nettoyage.
-  clean_help_2: Sans aucun autre argument, -l (liste) est implicitement utilisé.
-  ca_mutually_exclusive: -C ne peut pas être utilisée lorsque -A est déjà présente.
-  ac_mutually_exclusive: -A ne peut pas être utilisée lorsque -C est déjà présente.
-  ac_required: Merci d’entrer l’une des opérande -A ou -C.
-  aur_help: Différentes opérations pour AUR.
-  aur_help_2: >-
-    Sans aucun autre argument, l’action par défaut va être d’installer les
-    paquets dont les noms sont donnés à la suite de la ligne de commande.
-  shared_options_title: Options partagées
-  version_help: Affiche la version de quackaur et quitte aussitôt.
-  color_help: Specifie quand la couleur doit être utilisée.
-  color_choices: >-
-    Les choix disponibles sont ‘auto’ (par défaut), ‘always’ (toujours) ou
-    ‘never’ (jamais).
-  list_help: Avec -A, liste les paquets installés depuis AUR.
-  list_help_2: Avec -C, liste les éléments pouvant être nettoyés.
-  aur_actions_title: Opérations liées à AUR
-  info_help: Affiche les informations à propos d’un paquet AUR.
-  search_help: Cherche des paquets sur AUR.
-  upgrade_help: Mets à jour les paquets AUR déjà installés si nécessaire.
-  aur_options_title: Options pour les opérations liée à AUR
-  devel_help: >-
-    Inclus les paquets de versions en développement (dont les noms se
-    terminent par -svn, -git…).
-  force_help: >-
-    Force la reconstruction d’un paquet déjà construit (et gardé en cache).
-  jail_help: Isole les opérations d’installation ou de mise à jour.
-  jail_choices: Les choix disponibles sont ‘docker’ (par défaut) ou ‘chroot’.
-  no_jail_help: Ne pas isoler les opérations d’installation ou de mise à jour.
-  dry_run_help: >-
-    Télécharge les informations du paquet et essaye de résoudre ses dépendances,
-    mais n’effectue pas sa compilation n’installe rien.
-  clean_actions_title: Opérations de nettoyage
-  do_clean_help: Supprime réellement les éléments détéctés.
-  clean_options_title: Options pour les opérations de nettoyage
-  dsearch_help: >-
-    Utilise find au lieu d’étudier la base de donnée de pacman pour identifier
-    les fichiers *.pac*.
-info:
-  installed: installé
-  installed_version: 'installé : %<version>s'
-  outdated: périmé
-  outdated_since: Depuis le %<date>s
-  info_line:
-    name: Nom
-    version: Version
-    description: Description
-    url: URL
-    license: Licences
-    provides: Fournit
-    depends: Dépend de
-    makedepends: Construction dépend de
-    conflicts: En conflit avec
-    maintainer: Dernier empaqueteur
-    lastmodified: Dernière modification
-    outofdate: Périmé
-    numvotes: Nombre de votes
-    popularity: Popularité
-    aurpage: Page AUR
-    keywords: Mots-clés
-build:
-  package_already_built: >-
-    Le paquet %<name>s a déjà été construit dans %<packages>s
-  built_list: 'Les paquets suivants ont été construits :'
-  install_question: >-
-    Ils vont être installé maintenant. Voullez-vous continuer ?
-  no_install: >-
-    Pas de souci, tous les paquets construits sont conservés dans le dossier
-    courrant.
-  what_to_upgrade: !declinable
-    1: Souhaitez-vous le mettre à jour ?
-    other: Lesquels souhaitez-vous mettre à jour ?
-  newer_version: >-
-    Votre système utilise une version plus récente de %<package>s
-jail:
-  docker_dry_run:
-    build_image: construction de l’image docker
-    roadmap: contenu du fichier roadmap.sh
-    run: docker run
-  integrity_failure: Le contrôle d’intégrité du fichier a échoué !
-  dependencies_list: >-
-    Ce paquet requiert que ces autres paquets AUR soient construits et installés
-    d’abord :
-  validate_dependency: Pouvons-nous continuer ?
-  user_verification:
-    message: Vous devriez VRAIMENT prendre le temps d’inspécter son PKGBUILD.
-    question: Lorsque c’est fait, pouvons-nous continuer ?
-  clone_failure: 'Impossible de cloner %<package>s depuis AUR!'
-  pkgbuild_missing: >-
-    Le dépôt de %<package>s ne contient pas de fichier PKGBUILD !
-  ready_to_build: >-
-    Le paquet %<package>s est prêt à être construit dans %<tmpdir>s.
-  no_package_built: 'Aucun paquet n’a pu être construit!'
-  missing_dependency: >-
-    Le paquet ‘%<package>s’ est requis pour pouvoir utiliser l’isolation de type
-    %<jail>s!
-cleaner:
-  orphaned_packages: Paquets orphelins
-  no_orphaned_packages: 0 paquet orphelin trouvé
-  transac_files: Fichiers transactionnels de pacman
-  no_transac_files: 0 fichier transactionnel trouvé
-  removing_packages: Suppression des paquets conservés en cache…
-  no_paccache: >-
-    paccache n'est pas installé sur votre système.
-    Il est fourni au sein du paquet « pacman-contrib ».
-  removed_packages: Paquets supprimés conservés en cache
-  old_packages: Anciennes versions des paquets conservées en cache
-  docker:
-    images: Images Docker
-    containers: Containers Docker
-    images_found: !declinable
-      0: 0 image docker trouvée
-      1: 1 image docker trouvée
-      other: '%<number>i images docker trouvées'
-    containers_found: !declinable
-      0: 0 container docker trouvé
-      1: 1 container docker trouvé
-      other: '%<number>i containers docker trouvés'
-    removing_images: Suppression des images dockers inutiles…
-    removed_images: !declinable
-      0: aucune image candidate trouvée à supprimer
-      1: 'terminé : 1 image supprimée'
-      other: 'terminé : %<number>i images supprimées'
-    removing_containers: Suppression des containers dockers inutiles…
-    removed_containers: !declinable
-      0: aucun container candidat trouvé à supprimer
-      1: 'terminé : 1 container supprimé'
-      other: 'terminé : %<number>i containers supprimés'
-locale:
+fr:
+  warning: 'attention :'
+  error: 'erreur :'
+  sudo_warning: >-
+    Vous êtes sur le point d’exécuter une commande avec ‘sudo’ et un mot de passe
+    va vous être demandé. Appuyez sur Entrée pour continuer.
+  cli:
+    clean_help: Différentes opérations de nettoyage.
+    clean_help_2: Sans aucun autre argument, -l (liste) est implicitement utilisé.
+    ca_mutually_exclusive: -C ne peut pas être utilisée lorsque -A est déjà présente.
+    ac_mutually_exclusive: -A ne peut pas être utilisée lorsque -C est déjà présente.
+    ac_required: Merci d’entrer l’une des opérande -A ou -C.
+    aur_help: Différentes opérations pour AUR.
+    aur_help_2: >-
+      Sans aucun autre argument, l’action par défaut va être d’installer les
+      paquets dont les noms sont donnés à la suite de la ligne de commande.
+    shared_options_title: Options partagées
+    version_help: Affiche la version de quackaur et quitte aussitôt.
+    color_help: Specifie quand la couleur doit être utilisée.
+    color_choices: >-
+      Les choix disponibles sont ‘auto’ (par défaut), ‘always’ (toujours) ou
+      ‘never’ (jamais).
+    list_help: Avec -A, liste les paquets installés depuis AUR.
+    list_help_2: Avec -C, liste les éléments pouvant être nettoyés.
+    aur_actions_title: Opérations liées à AUR
+    info_help: Affiche les informations à propos d’un paquet AUR.
+    search_help: Cherche des paquets sur AUR.
+    upgrade_help: Mets à jour les paquets AUR déjà installés si nécessaire.
+    aur_options_title: Options pour les opérations liée à AUR
+    devel_help: >-
+      Inclus les paquets de versions en développement (dont les noms se
+      terminent par -svn, -git…).
+    force_help: >-
+      Force la reconstruction d’un paquet déjà construit (et gardé en cache).
+    jail_help: Isole les opérations d’installation ou de mise à jour.
+    jail_choices: Les choix disponibles sont ‘docker’ (par défaut) ou ‘chroot’.
+    no_jail_help: Ne pas isoler les opérations d’installation ou de mise à jour.
+    dry_run_help: >-
+      Télécharge les informations du paquet et essaye de résoudre ses dépendances,
+      mais n’effectue pas sa compilation n’installe rien.
+    clean_actions_title: Opérations de nettoyage
+    do_clean_help: Supprime réellement les éléments détéctés.
+    clean_options_title: Options pour les opérations de nettoyage
+    dsearch_help: >-
+      Utilise find au lieu d’étudier la base de donnée de pacman pour identifier
+      les fichiers *.pac*.
+  info:
+    installed: installé
+    installed_version: 'installé : %{version}'
+    outdated: périmé
+    outdated_since: Depuis le %{date}
+    info_line:
+      name: Nom
+      version: Version
+      description: Description
+      url: URL
+      license: Licences
+      provides: Fournit
+      depends: Dépend de
+      makedepends: Construction dépend de
+      conflicts: En conflit avec
+      maintainer: Dernier empaqueteur
+      lastmodified: Dernière modification
+      outofdate: Périmé
+      numvotes: Nombre de votes
+      popularity: Popularité
+      aurpage: Page AUR
+      keywords: Mots-clés
+  build:
+    package_already_built: >-
+      Le paquet %{name} a déjà été construit dans %{packages}
+    built_list: 'Les paquets suivants ont été construits :'
+    install_question: >-
+      Ils vont être installé maintenant. Voullez-vous continuer ?
+    no_install: >-
+      Pas de souci, tous les paquets construits sont conservés dans le dossier
+      courrant.
+    what_to_upgrade:
+      one: Souhaitez-vous le mettre à jour ?
+      other: Lesquels souhaitez-vous mettre à jour ?
+    newer_version: >-
+      Votre système utilise une version plus récente de %{package}
+  jail:
+    docker_dry_run:
+      build_image: construction de l’image docker
+      roadmap: contenu du fichier roadmap.sh
+      run: docker run
+    integrity_failure: Le contrôle d’intégrité du fichier a échoué !
+    dependencies_list: >-
+      Ce paquet requiert que ces autres paquets AUR soient construits et installés
+      d’abord :
+    validate_dependency: Pouvons-nous continuer ?
+    user_verification:
+      message: Vous devriez VRAIMENT prendre le temps d’inspécter son PKGBUILD.
+      question: Lorsque c’est fait, pouvons-nous continuer ?
+    clone_failure: 'Impossible de cloner %{package} depuis AUR!'
+    pkgbuild_missing: >-
+      Le dépôt de %{package} ne contient pas de fichier PKGBUILD !
+    ready_to_build: >-
+      Le paquet %{package} est prêt à être construit dans %{tmpdir}.
+    no_package_built: 'Aucun paquet n’a pu être construit!'
+    missing_dependency: >-
+      Le paquet ‘%{package}’ est requis pour pouvoir utiliser l’isolation de type
+      %{jail}!
+  cleaner:
+    orphaned_packages: Paquets orphelins
+    no_orphaned_packages: 0 paquet orphelin trouvé
+    transac_files: Fichiers transactionnels de pacman
+    no_transac_files: 0 fichier transactionnel trouvé
+    removing_packages: Suppression des paquets conservés en cache…
+    no_paccache: >-
+      paccache n'est pas installé sur votre système.
+      Il est fourni au sein du paquet « pacman-contrib ».
+    removed_packages: Paquets supprimés conservés en cache
+    old_packages: Anciennes versions des paquets conservées en cache
+    docker:
+      images: Images Docker
+      containers: Containers Docker
+      images_found:
+        zero: 0 image docker trouvée
+        one: 1 image docker trouvée
+        other: '%{count} images docker trouvées'
+      containers_found:
+        zero: 0 container docker trouvé
+        one: 1 container docker trouvé
+        other: '%{count} containers docker trouvés'
+      removing_images: Suppression des images dockers inutiles…
+      removed_images:
+        zero: aucune image candidate trouvée à supprimer
+        one: 'terminé : 1 image supprimée'
+        other: 'terminé : %{count} images supprimées'
+      removing_containers: Suppression des containers dockers inutiles…
+      removed_containers:
+        zero: aucun container candidat trouvé à supprimer
+        one: 'terminé : 1 container supprimé'
+        other: 'terminé : %{count} containers supprimés'
   time:
-    long: '%a %d %b %Y %R'
-    short: '%d/%m/%Y %R'
-    months:
-      - janvier
-      - février
-      - mars
-      - avril
-      - mai
-      - juin
-      - juillet
-      - août
-      - septembre
-      - octobre
-      - novembre
-      - décembre
-    days:
-      - lundi
-      - mardi
-      - mercredi
-      - jeudi
-      - vendredi
-      - samedi
-      - dimanche
-    short_months:
-      - jan.
-      - feb.
-      - mar.
-      - avr.
-      - mai
-      - juin
-      - juil.
-      - aôut
-      - sep.
-      - oct.
-      - nov.
-      - dec.
-    short_days:
-      - lun.
-      - mar.
-      - mer.
-      - jeu.
-      - ven.
-      - sam.
-      - dim.
+    formats:
+      default: '%a %-d %b %Y %R'
+      short: '%d/%m/%Y %R'
+  date:
+    abbr_day_names:
+    - dim
+    - lun
+    - mar
+    - mer
+    - jeu
+    - ven
+    - sam
+    abbr_month_names:
+    -
+    - jan.
+    - fév.
+    - mars
+    - avr.
+    - mai
+    - juin
+    - juil.
+    - août
+    - sept.
+    - oct.
+    - nov.
+    - déc.
+    day_names:
+    - dimanche
+    - lundi
+    - mardi
+    - mercredi
+    - jeudi
+    - vendredi
+    - samedi
+    formats:
+      default: '%d/%m/%Y'
+    month_names:
+    -
+    - janvier
+    - février
+    - mars
+    - avril
+    - mai
+    - juin
+    - juillet
+    - août
+    - septembre
+    - octobre
+    - novembre
+    - décembre

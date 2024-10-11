@@ -22,9 +22,6 @@ Gem::Specification.new do |spec|
     'lib/quack_aur/jails/docker.rb',
     'lib/quack_aur/package.rb',
     'lib/quack_aur/version.rb',
-    'lib/trsl.rb',
-    'lib/trsl/declinable.rb',
-    'lib/trsl/locale.rb',
     # Translations
     'locales/en.yml',
     'locales/fr.yml',
@@ -38,7 +35,8 @@ Gem::Specification.new do |spec|
   spec.license     = 'WTFPL'
 
   spec.required_ruby_version = '>= 3.0'
-  spec.add_runtime_dependency 'rainbow', '~> 3.1'
+  spec.add_dependency 'i18n', '~> 1.14'
+  spec.add_dependency 'rainbow', '~> 3.1'
 
   spec.requirements << 'git'
   spec.requirements << 'pacman'

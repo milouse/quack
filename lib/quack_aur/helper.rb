@@ -2,7 +2,7 @@
 
 require 'open3'
 require 'rainbow'
-require_relative '../trsl'
+require_relative 'i18n'
 
 module QuackAur
   def self.setup_color_mode(mode)
@@ -15,7 +15,7 @@ module QuackAur
 
   def self.print_log(message, opts = {})
     new_line = opts.delete(:new_line)
-    message = Trsl[message, opts]
+    message = I18n.t message, **opts
     prefix = Rainbow('::').blue.bold
     prefix = "\n#{prefix}" if new_line
     puts "#{prefix} #{message}"
@@ -23,19 +23,21 @@ module QuackAur
 
   def self.print_result(message, opts = {})
     prefix = Rainbow('==>').green.bold
-    message = Rainbow(Trsl[message, opts]).bold
+    translated = I18n.t(message, **opts)
+    translated = message if translated.start_with?('Translation missing:')
+    message = Rainbow(translated).bold
     puts "#{prefix} #{message}"
   end
 
   def self.print_warning(message, opts = {})
-    prefix = Rainbow(Trsl['warning']).yellow.bold
-    message = Trsl[message, opts]
+    prefix = Rainbow(I18n.t('warning')).yellow.bold
+    message = I18n.t message, **opts
     warn "#{prefix} #{message}"
   end
 
   def self.print_error(message, opts = {})
-    prefix = Rainbow(Trsl['error']).red.bold
-    message = Trsl[message, opts] unless opts.delete(:skip_translate)
+    prefix = Rainbow(I18n.t('error')).red.bold
+    message = I18n.t(message, **opts) unless opts.delete(:skip_translate)
     warn "#{prefix} #{message}"
   end
 
@@ -43,7 +45,7 @@ module QuackAur
     choices = opts.delete(:choices)
     message = [
       Rainbow('::').blue.bold,
-      Rainbow(Trsl[message, opts]).bold,
+      Rainbow(I18n.t(message, **opts)).bold,
       choices,
       '> '
     ].compact
@@ -61,16 +63,17 @@ module QuackAur
     ]
     if package.local?
       if package_version == package['LocalVersion']
-        installed_label = Trsl['info.installed']
+        installed_label = I18n.t('info.installed')
       else
-        installed_label = Trsl[
-          'info.installed_version', version: package['LocalVersion']
-        ]
+        installed_label = I18n.t(
+          'info.installed_version',
+          version: package['LocalVersion']
+        )
       end
       colored_name << Rainbow(format('[%s]', installed_label)).cyan.bold
     end
     if package.outdated?
-      outlabel = format('[%s]', Trsl['info.outdated'])
+      outlabel = format('[%s]', I18n.t('info.outdated'))
       colored_name << Rainbow(outlabel).red.bold
     end
     colored_name.join(' ')

@@ -101,7 +101,7 @@ module QuackAur
         QuackAur.print_log "cleaner.docker.#{what}", new_line: true
         number = Docker.send(:"#{what}_list").length
         QuackAur.print_result(
-          "cleaner.docker.#{what}_found", number: number
+          "cleaner.docker.#{what}_found", count: number
         )
       end
     end
@@ -115,7 +115,7 @@ module QuackAur
         )
         number = Docker.send(:"prune_#{what}")
         QuackAur.print_result(
-          "cleaner.docker.removed_#{what}", number: number
+          "cleaner.docker.removed_#{what}", count: number
         )
       end
     end

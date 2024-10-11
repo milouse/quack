@@ -114,7 +114,7 @@ module QuackAur
       end
       what = QuackAur.ask_question(
         'build.what_to_upgrade',
-        choices: choices, number: number
+        choices: choices, count: number
       )
       return if %w[n q].include?(what)
 
@@ -140,11 +140,11 @@ module QuackAur
     end
 
     def convert_value_time(value, title)
-      value = Trsl.l(value)
+      value = I18n.l value
       return value unless title == 'OutOfDate'
 
       Rainbow(
-        Trsl['info.outdated_since', date: value]
+        I18n.t(info.outdated_since, date: value)
       ).red.bold
     end
 
@@ -154,7 +154,7 @@ module QuackAur
       if private_methods.include?(convert_method)
         value = send(convert_method, value, title)
       end
-      label = Trsl["info.info_line.#{title.downcase}"].ljust(25)
+      label = I18n.t("info.info_line.#{title.downcase}").ljust(25)
       label = Rainbow("#{label}:").bold
       puts "#{label} #{value}"
     end
