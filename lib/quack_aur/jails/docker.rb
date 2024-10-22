@@ -4,6 +4,7 @@ require_relative '../helper'
 require_relative '../jail'
 
 module QuackAur
+  # Isolate package building in a docker container
   class Docker < Jail
     def build
       unless QuackAur.which('docker')
@@ -12,6 +13,11 @@ module QuackAur
           package: 'docker', jail: 'docker'
         )
         return []
+      end
+      unless @dry_run
+        Dir.mktmpdir('quack_aur_') do |path|
+          Dir.chdir(path) { build_docker_image }
+        end
       end
       super
     end
@@ -59,8 +65,6 @@ module QuackAur
     end
 
     def build_current
-      return unless build_docker_image
-
       build_docker_roadmap
 
       system(
@@ -77,47 +81,64 @@ module QuackAur
       dockerfile = <<~DOCKER
         FROM archlinux:base-devel
 
-        RUN useradd -m -d /home/package -c 'Package Creation User' -s /usr/bin/bash -g users package && \
-            mkdir -p /run/user/1000 && chown package:users /run/user/1000 && \
-            echo 'package ALL=(ALL) NOPASSWD: /usr/bin/pacman' >> /etc/sudoers && \
-            echo 'Server = https://mirrors.gandi.net/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist && \
-            pacman -Sy --noconfirm archlinux-keyring && \
+        RUN useradd -m -d /home/package -c 'Package Creation User' -s /usr/bin/bash -g users package && \\
+            mkdir -p /run/user/1000 && chown package:users /run/user/1000 && \\
+            echo 'package ALL=(ALL) NOPASSWD: /usr/bin/pacman' >> /etc/sudoers && \\
+            sed -i 's/^#IgnorePkg *= *$/IgnorePkg = pacman-mirrorlist/' /etc/pacman.conf
+
+        COPY mirrorlist /etc/pacman.d/mirrorlist
+
+        RUN pacman -Syy && pacman -S --noconfirm archlinux-keyring && \\
             pacman -S --noconfirm devtools
+
+        # Little hack to be able to force update of base image
+        ARG CACHE_DATE="-"
+        RUN pacman -Syu --noconfirm && pacman -Scc
+
+        # Do it only now in case the file is overwritten by a previous update
+        RUN sed -i 's/^OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge debug lto)$/OPTIONS=(strip docs !libtool !staticlibs !emptydirs zipman purge !debug lto)/' /etc/makepkg.conf
 
         USER package
         WORKDIR /home/package/pkg
 
-        ARG CACHE_DATE="-"
-        RUN sudo pacman -Syyu --noconfirm && sudo pacman -Scc
-
-        ENTRYPOINT ["/usr/bin/sh", "roadmap.sh"]
+        ENTRYPOINT ["./roadmap.sh"]
       DOCKER
-      File.write('Dockerfile.quack', dockerfile)
+      File.write('Dockerfile', dockerfile)
+      FileUtils.cp('/etc/pacman.d/mirrorlist', 'mirrorlist')
       today = Time.now.strftime('%Y-%m-%d')
       system(
         *QuackAur.sudo_wrapper(
           ['docker', 'build', '-t', 'packaging',
-           '--build-arg', "CACHE_DATE=#{today}", '-']
-        ), in: 'Dockerfile.quack'
+           '--build-arg', "CACHE_DATE=#{today}", '.']
+        )
       )
     end
 
-    def build_docker_roadmap
-      roadmap = ['#!/usr/bin/env sh', 'set -e', 'sudo pacman -Syyu --noconfirm']
+    def end_user_dependencies_lines
       # Allow one to provides is own operations before building the
       # package. It may by usefull to install other invisible dependencies.
       my_roadmap_file = File.expand_path 'my.roadmap.sh', @tmpdir
-      if File.exist?(my_roadmap_file)
-        roadmap += File.readlines(my_roadmap_file).map(&:chomp)
-      end
-      @built_packages.each do |dependency|
+      return [] unless File.exist?(my_roadmap_file)
+
+      File.readlines(my_roadmap_file).map(&:chomp)
+    end
+
+    def build_dependencies_lines
+      @built_packages.filter_map do |dependency|
         local_file = File.expand_path dependency, @origindir
         FileUtils.cp local_file, @tmpdir
         install_line = "sudo pacman -U --asdeps --noconfirm #{dependency}"
         next if roadmap.include?(install_line)
 
-        roadmap << install_line
+        install_line
       end
+    end
+
+    def build_docker_roadmap
+      roadmap = ['#!/usr/bin/env sh', 'set -e',
+                 'sudo pacman -Syu --noconfirm']
+      roadmap += end_user_dependencies_lines
+      roadmap += build_dependencies_lines
       roadmap << 'exec makepkg -s --noconfirm --skipinteg'
       roadmap_content = roadmap.join("\n")
       if @dry_run
@@ -125,6 +146,7 @@ module QuackAur
         return
       end
       File.write('roadmap.sh', roadmap_content)
+      File.chmod(0o755, 'roadmap.sh')
     end
   end
 end
