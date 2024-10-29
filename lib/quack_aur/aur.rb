@@ -140,11 +140,11 @@ module QuackAur
     end
 
     def convert_value_time(value, title)
-      value = L10n.l(value)
+      value = Trsl.l(value)
       return value unless title == 'OutOfDate'
 
       Rainbow(
-        L10n.t('info.outdated_since', date: value)
+        Trsl['info.outdated_since', date: value]
       ).red.bold
     end
 
@@ -154,7 +154,7 @@ module QuackAur
       if private_methods.include?(convert_method)
         value = send(convert_method, value, title)
       end
-      label = L10n.t("info.info_line.#{title.downcase}").ljust(25)
+      label = Trsl["info.info_line.#{title.downcase}"].ljust(25)
       label = Rainbow("#{label}:").bold
       puts "#{label} #{value}"
     end

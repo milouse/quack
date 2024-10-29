@@ -1,4 +1,6 @@
 ---
+test: !declinable
+  0: test
 warning: 'attention :'
 error: 'erreur :'
 sudo_warning: >-
@@ -75,7 +77,7 @@ build:
   no_install: >-
     Pas de souci, tous les paquets construits sont conservés dans le dossier
     courrant.
-  what_to_upgrade:
+  what_to_upgrade: !declinable
     1: Souhaitez-vous le mettre à jour ?
     other: Lesquels souhaitez-vous mettre à jour ?
   newer_version: >-
@@ -116,21 +118,21 @@ cleaner:
   docker:
     images: Images Docker
     containers: Containers Docker
-    images_found:
+    images_found: !declinable
       0: 0 image docker trouvée
       1: 1 image docker trouvée
       other: '%<number>i images docker trouvées'
-    containers_found:
+    containers_found: !declinable
       0: 0 container docker trouvé
       1: 1 container docker trouvé
       other: '%<number>i containers docker trouvés'
     removing_images: Suppression des images dockers inutiles…
-    removed_images:
+    removed_images: !declinable
       0: aucune image candidate trouvée à supprimer
       1: 'terminé : 1 image supprimée'
       other: 'terminé : %<number>i images supprimées'
     removing_containers: Suppression des containers dockers inutiles…
-    removed_containers:
+    removed_containers: !declinable
       0: aucun container candidat trouvé à supprimer
       1: 'terminé : 1 container supprimé'
       other: 'terminé : %<number>i containers supprimés'

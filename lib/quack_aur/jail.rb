@@ -68,7 +68,7 @@ module QuackAur
     def check_package_integrity
       return if system('makepkg', '--verifysource')
 
-      raise L10n.t('jail.integrity_failure')
+      raise Trsl['jail.integrity_failure']
     end
 
     def user_accepts_dependencies(dependencies)
@@ -119,12 +119,12 @@ module QuackAur
         "https://aur.archlinux.org/#{package['PackageBase']}.git",
         @tmpdir
       )
-      raise L10n.t('jail.clone_failure', package: package.name) unless success
+      raise Trsl['jail.clone_failure', package: package.name] unless success
 
       Dir.chdir @tmpdir
 
       unless File.exist?('PKGBUILD')
-        raise L10n.t('jail.pkgbuild_missing', package: package.name)
+        raise Trsl['jail.pkgbuild_missing', package: package.name]
       end
 
       QuackAur.print_log(
@@ -157,7 +157,7 @@ module QuackAur
           FileUtils.mv file, dest_file, force: true, verbose: true, secure: true
           file
         end
-        raise L10n.t('jail.no_package_built') if built_packages.empty?
+        raise Trsl['jail.no_package_built'] if built_packages.empty?
       end
 
       package['BuiltPackages'] = built_packages

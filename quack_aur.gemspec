@@ -14,7 +14,6 @@ Gem::Specification.new do |spec|
     'funding_uri' => 'https://liberapay.com/milouse'
   }
   spec.files = [
-    'lib/l10n.rb',
     'lib/quack_aur/aur.rb',
     'lib/quack_aur/cleaner.rb',
     'lib/quack_aur/helper.rb',
@@ -23,6 +22,9 @@ Gem::Specification.new do |spec|
     'lib/quack_aur/jails/docker.rb',
     'lib/quack_aur/package.rb',
     'lib/quack_aur/version.rb',
+    'lib/trsl.rb',
+    'lib/trsl/declinable.rb',
+    'lib/trsl/locale.rb',
     # Translations
     'locales/en.yml',
     'locales/fr.yml',

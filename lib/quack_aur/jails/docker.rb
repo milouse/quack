@@ -51,11 +51,11 @@ module QuackAur
     private
 
     def build_dry_run
-      puts "[dry-run] #{L10n.t('jail.docker_dry_run.build_image')}"
-      puts "[dry-run] #{L10n.t('jail.docker_dry_run.roadmap')} >>>>"
+      puts "[dry-run] #{Trsl['jail.docker_dry_run.build_image']}"
+      puts "[dry-run] #{Trsl['jail.docker_dry_run.roadmap']} >>>>"
       build_docker_roadmap
       puts '<<<<'
-      puts "[dry-run] #{L10n.t('jail.docker_dry_run.run')}"
+      puts "[dry-run] #{Trsl['jail.docker_dry_run.run']}"
     end
 
     def build_current
