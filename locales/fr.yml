@@ -78,7 +78,7 @@ fr:
       other: Ils vont être installé maintenant. Voulez-vous continuer ?
     no_install: >-
       Pas de souci, tous les paquets construits sont conservés dans le dossier
-      courrant.
+      courant.
     what_to_upgrade:
       one: Souhaitez-vous le mettre à jour ?
       other: Lesquels souhaitez-vous mettre à jour ?
