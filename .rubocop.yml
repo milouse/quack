@@ -4,13 +4,21 @@ AllCops:
   TargetRubyVersion: 3.0
 
 require:
-- rubocop-performance
+  - rubocop-performance
+  - rubocop-rspec
 
 Layout/LineLength:
   Max: 80
 
 Metrics/AbcSize:
   Enabled: no
+
+Metrics/ClassLength:
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+    - method_call
 
 Metrics/MethodLength:
   CountAsOne:
@@ -21,6 +29,19 @@ Metrics/MethodLength:
 
 Metrics/ModuleLength:
   Max: 120
+
+Naming/RescuedExceptionsVariableName:
+  PreferredName: error
+
+RSpec:
+  Severity: warning
+
+RSpec/ExampleLength:
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+    - method_call
 
 Style:
   Severity: warning

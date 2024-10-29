@@ -106,8 +106,8 @@ begin
   argv = parser.parse!
 
   raise Trsl['cli.ac_required'] unless params.has_key?(:operation)
-rescue RuntimeError => e
-  warn e
+rescue RuntimeError => error
+  warn error
   exit 2
 end
 

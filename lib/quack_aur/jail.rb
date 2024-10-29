@@ -162,8 +162,8 @@ module QuackAur
 
       package['BuiltPackages'] = built_packages
       @built_packages += built_packages
-    rescue RuntimeError => e
-      QuackAur.print_error e, skip_translate: true
+    rescue RuntimeError => error
+      QuackAur.print_error error, skip_translate: true
     ensure
       close_tmpdir
     end
