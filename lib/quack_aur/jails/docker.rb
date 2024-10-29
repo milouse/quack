@@ -136,17 +136,16 @@ module QuackAur
 
     def build_docker_roadmap
       roadmap = ['#!/usr/bin/env sh', 'set -e',
-                 'sudo pacman -Syu --noconfirm']
-      roadmap += end_user_dependencies_lines
-      roadmap += build_dependencies_lines
+                 'sudo pacman -Syu --noconfirm'] \
+                + end_user_dependencies_lines \
+                + build_dependencies_lines
       roadmap << 'exec makepkg -s --noconfirm --skipinteg'
-      roadmap_content = roadmap.join("\n")
       if @dry_run
-        puts roadmap_content
+        puts roadmap
         return
       end
-      File.write('roadmap.sh', roadmap_content)
-      File.chmod(0o755, 'roadmap.sh')
+      File.write 'roadmap.sh', roadmap.join("\n")
+      File.chmod 0o755, 'roadmap.sh'
     end
   end
 end

@@ -5,6 +5,7 @@ require 'tmpdir'
 require_relative 'helper'
 
 module QuackAur
+  # Generic isolated builder
   class Jail
     def initialize(package, options = {})
       @tmpdir = nil

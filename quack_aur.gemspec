@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.homepage    = 'https://git.umaneti.net/quack/about/'
   spec.license     = 'WTFPL'
 
-  spec.required_ruby_version = '>= 3.0'
+  spec.required_ruby_version = '>= 3.1'
   spec.add_dependency 'i18n', '~> 1.14'
   spec.add_dependency 'rainbow', '~> 3.1'
 

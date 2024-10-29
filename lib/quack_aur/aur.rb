@@ -106,16 +106,13 @@ module QuackAur
     def do_upgrade(packages)
       return if packages.empty?
 
-      number = packages.length
-      if number == 1
+      count = packages.length
+      if count == 1
         choices = '[Y/n]'
       else
-        choices = "[1…#{number}/A/q]"
+        choices = "[1…#{count}/A/q]"
       end
-      what = QuackAur.ask_question(
-        'build.what_to_upgrade',
-        choices: choices, count: number
-      )
+      what = QuackAur.ask_question('build.what_to_upgrade', choices:, count:)
       return if %w[n q].include?(what)
 
       unless what == '' || %w[a y].include?(what)
@@ -124,15 +121,19 @@ module QuackAur
       packages.each { do_install _1 }
     end
 
+    def convert_dependencies_array(value)
+      value.map do |package|
+        if Package.local?(package)
+          Rainbow(package).underline
+        else
+          package
+        end
+      end
+    end
+
     def convert_value_array(value, title)
       if %w[Depends MakeDepends].include?(title)
-        value.map! do |package|
-          if Package.local?(package)
-            Rainbow(package).underline
-          else
-            package
-          end
-        end
+        value = convert_dependencies_array value
       end
       return '--' if value.empty?
 

@@ -4,6 +4,7 @@ require_relative '../helper'
 require_relative '../jail'
 
 module QuackAur
+  # Isolate package building in a docker container
   class Chroot < Jail
     def build
       unless QuackAur.which('mkarchroot')

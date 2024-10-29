@@ -6,6 +6,7 @@ require_relative 'jails/docker'
 require_relative 'helper'
 
 module QuackAur
+  # Tool to clean system from orphaned packages or docker leftovers
   class Cleaner
     def initialize(options)
       @color = QuackAur.setup_color_mode options[:color]

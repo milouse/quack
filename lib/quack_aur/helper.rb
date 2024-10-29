@@ -4,6 +4,7 @@ require 'open3'
 require 'rainbow'
 require_relative 'i18n'
 
+# Various utilitary methods
 module QuackAur
   def self.setup_color_mode(mode)
     mode ||= :auto
@@ -99,16 +100,20 @@ module QuackAur
     system?('which', executable)
   end
 
-  def self.sudo_wrapper(command)
-    executable = command.first
-    if command.any? && %w[docker pacman].include?(executable)
+  def self.sudo_guard?(binary)
+    if binary && %w[docker pacman].include?(binary)
       # Some people authorize docker or pacman in their sudoers
-      guard = %W[sudo -n #{executable} --version]
+      guard = %W[sudo -n #{binary} --version]
     else
       guard = %w[sudo -n true]
     end
+    system?(guard)
+  end
+
+  def self.sudo_wrapper(command)
+    binary = command.first
     command.insert(0, 'sudo')
-    return command if system?(guard)
+    return command if sudo_guard?(binary)
 
     QuackAur.print_warning('sudo_warning')
     $stdin.gets # wait for user input

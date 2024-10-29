@@ -1,7 +1,7 @@
 ---
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.1
 
 require:
   - rubocop-performance
@@ -51,6 +51,9 @@ Style/Alias:
 
 Style/ConditionalAssignment:
   EnforcedStyle: assign_inside_condition
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: consistent
 
 Style/PreferredHashMethods:
   EnforcedStyle: verbose
