@@ -70,9 +70,12 @@ fr:
   build:
     package_already_built: >-
       Le paquet %{name} a déjà été construit dans %{packages}
-    built_list: 'Les paquets suivants ont été construits :'
-    install_question: >-
-      Ils vont être installé maintenant. Voullez-vous continuer ?
+    built_list:
+      one: 'Le paquet suivant a été construit :'
+      other: 'Les paquets suivants ont été construits :'
+    install_question:
+      one: Il va être installé maintenant. Voulez-vous continuer ?
+      other: Ils vont être installé maintenant. Voulez-vous continuer ?
     no_install: >-
       Pas de souci, tous les paquets construits sont conservés dans le dossier
       courrant.

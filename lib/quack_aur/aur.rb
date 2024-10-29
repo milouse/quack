@@ -92,10 +92,13 @@ module QuackAur
       built_packages = jail.build
       return if built_packages.empty?
 
-      QuackAur.print_log('build.built_list', new_line: true)
+      count = built_packages.length
+      QuackAur.print_log('build.built_list', new_line: true, count: count)
       QuackAur.print_result built_packages.join('  ')
       puts ''
-      check = QuackAur.ask_question('build.install_question', choices: '[y/N]')
+      check = QuackAur.ask_question(
+        'build.install_question', choices: '[y/N]', count: count
+      )
       if check == 'y'
         jail.install
       else

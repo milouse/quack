@@ -63,9 +63,12 @@ en:
   build:
     package_already_built: >-
       Package %{name} has already been built in %{packages}
-    built_list: 'The following packages have been built:'
-    install_question: >-
-      They will be all installed now. Do you want to proceed?
+    built_list:
+      one: 'The following package has been built:'
+      other: 'The following packages have been built:'
+    install_question:
+      one: It will be installed now. Do you want to proceed?
+      other: They will be all installed now. Do you want to proceed?
     no_install: >-
       This is fine. All built packages stay in your current directory.
     what_to_upgrade:
