@@ -1,10 +1,11 @@
 ---
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.1
 
 require:
-- rubocop-performance
+  - rubocop-performance
+  - rubocop-rspec
 
 Layout/LineLength:
   Max: 80
@@ -12,17 +13,35 @@ Layout/LineLength:
 Metrics/AbcSize:
   Enabled: no
 
+Metrics/ClassLength:
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+    - method_call
+
 Metrics/MethodLength:
-  Max: 20
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+    - method_call
 
 Metrics/ModuleLength:
   Max: 120
 
-Metrics/PerceivedComplexity:
-  Max: 10
+Naming/RescuedExceptionsVariableName:
+  PreferredName: error
 
-Metrics/CyclomaticComplexity:
-  Max: 10
+RSpec:
+  Severity: warning
+
+RSpec/ExampleLength:
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+    - method_call
 
 Style:
   Severity: warning
@@ -33,12 +52,8 @@ Style/Alias:
 Style/ConditionalAssignment:
   EnforcedStyle: assign_inside_condition
 
+Style/HashSyntax:
+  EnforcedShorthandSyntax: consistent
+
 Style/PreferredHashMethods:
   EnforcedStyle: verbose
-
-Style/RegexpLiteral:
-  EnforcedStyle: slashes
-  AllowInnerSlashes: no
-
-Style/StringConcatenation:
-  Enabled: no

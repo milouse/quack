@@ -1,0 +1,128 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'optparse'
+require_relative '../lib/quack_aur/version'
+require_relative '../lib/quack_aur/i18n'
+
+I18n.default_locale = (ENV['LANG'] || 'en').split('_', 2).first
+
+params = { color: :auto, jail: :docker }
+parser = OptionParser.new
+parser.banner = <<~BANNER
+  A Qualitative and Usable Aur paCKage helper
+
+  Usage: quackaur -h
+         quackaur -A [--devel] package [package ...]
+         quackaur -A (-l, -u) [--devel]
+         quackaur -A (-s, -i) package [package ...]
+         quackaur -C (-l, -c)
+
+  Commands
+BANNER
+
+parser.define_head(
+  '-C', '--clean', I18n.t('cli.clean_help'), I18n.t('cli.clean_help_2')
+) do
+  raise I18n.t('cli.ca_mutually_exclusive') if params[:aur]
+
+  params[:operation] = :clean
+end
+parser.define_head(
+  '-A', '--aur', I18n.t('cli.aur_help'), I18n.t('cli.aur_help_2')
+) do
+  raise I18n.t('cli.ac_mutually_exclusive') if params[:clean]
+
+  params[:operation] = :aur
+end
+
+parser.separator ''
+parser.separator I18n.t('cli.shared_options_title')
+parser.define('-v', '--version', I18n.t('cli.version_help')) do
+  puts "quackaur - v#{QuackAur::VERSION}"
+  exit
+end
+parser.define(
+  '--color [WHEN]', %i[always never auto],
+  I18n.t('cli.color_help'), I18n.t('cli.color_choices')
+) { params[:color] = _1 }
+parser.define(
+  '-l', '--list', I18n.t('cli.list_help'), I18n.t('cli.list_help_2')
+) { params[:action] = :list }
+
+parser.separator ''
+parser.separator I18n.t('cli.aur_actions_title')
+parser.define('-i', '--info', I18n.t('cli.info_help')) do
+  params[:action] = :info
+end
+parser.define('-s', '--search', I18n.t('cli.search_help')) do
+  params[:action] = :search
+end
+parser.define('-u', '--upgrade', I18n.t('cli.upgrade_help')) do
+  params[:action] = :upgrade
+end
+
+parser.separator ''
+parser.separator I18n.t('cli.aur_options_title')
+parser.define('--devel', I18n.t('cli.devel_help')) do
+  params[:with_devel] = true
+end
+parser.define('--force', I18n.t('cli.force_help')) do
+  params[:force] = true
+end
+parser.define(
+  '-j', '--jail [JAIL]', %i[docker chroot],
+  I18n.t('cli.jail_help'),
+  I18n.t('cli.jail_choices')
+) { params[:jail] = _1 }
+parser.define('--no-jail', I18n.t('cli.no_jail_help')) do
+  params[:jail] = :none
+end
+parser.define('-n', '--dry-run', I18n.t('cli.dry_run_help')) do
+  params[:dry_run] = true
+end
+
+parser.separator ''
+parser.separator I18n.t('cli.clean_actions_title')
+parser.define('-c', '--do-clean', I18n.t('cli.do_clean_help')) do
+  params[:action] = :purge
+end
+
+parser.separator ''
+parser.separator I18n.t('cli.clean_options_title')
+parser.define('-d', '--deep-search', I18n.t('cli.dsearch_help')) do
+  params[:deep_search] = true
+end
+
+# rubocop:disable Layout/HeredocIndentation
+parser.separator <<-FOOTER
+     _         _
+  __(.)>    __(.)<  Quack Quack
+~~\\___)~~~~~\\___)~~~~~~~~~~~~~~~~~~
+FOOTER
+# rubocop:enable Layout/HeredocIndentation
+
+begin
+  argv = parser.parse!
+
+  raise I18n.t('cli.ac_required') unless params.has_key?(:operation)
+rescue RuntimeError => error
+  warn error
+  exit 2
+end
+
+if params[:operation] == :aur
+  require_relative '../lib/quack_aur/aur'
+  aur = QuackAur::Aur.new(params)
+  action = params[:action] || :install
+  if %i[list upgrade].include?(action)
+    aur.send action
+  else
+    aur.send action, argv
+  end
+
+elsif params[:operation] == :clean
+  require_relative '../lib/quack_aur/cleaner'
+  cleaner = QuackAur::Cleaner.new(params)
+  cleaner.send(params[:action] || :list)
+end

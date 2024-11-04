@@ -1,126 +1,177 @@
 ---
-warning: 'warning:'
-error: 'error:'
-sudo_warning: >-
-  You are going to run a ‘sudo’ command and a password will be prompted. Press
-  Enter to continue.
-cli:
-  clean_help: Various cleanup related operations.
-  clean_help_2: Without any other option, the -l option (list) is implied.
-  ca_mutually_exclusive: -C cannot be used when -A is already given.
-  ac_mutually_exclusive: -A cannot be used when -C is already given.
-  ac_required: Please use at least -A or -C option.
-  aur_help: AUR related actions.
-  aur_help_2: >-
-    Without any other option, the default is to install packages,
-    whose names are given on command line.
-  shared_options_title: Shared Options
-  version_help: Display quack version and quit.
-  color_help: Specify when to enable coloring.
-  color_choices: Possible choices are ‘auto’ (default), ‘always’ or ‘never’.
-  list_help: With -A list installed AUR packages.
-  list_help_2: With -C list garbage.
-  aur_actions_title: AUR Command Actions
-  info_help: Display information about an AUR package.
-  search_help: Search AUR packages.
-  upgrade_help: Upgrade installed AUR packages.
-  aur_options_title: AUR Command Options
-  devel_help: Include devel packages (whose names ends with -svn, -git…).
-  force_help: Force a rebuild of an already built (and kept in cache) package.
-  jail_help: Isolate install or upgrade action.
-  jail_choices: Possible choices are ‘docker’ (default) or ‘chroot’.
-  no_jail_help: Do not isolate install or upgrade action.
-  dry_run_help: >-
-    Download package info and try to resolve dependencies,
-    but do not build or install anything.
-  clean_actions_title: Clean Command Actions
-  do_clean_help: Actually purge detected garbage.
-  clean_options_title: Clean Command Options
-  dsearch_help: Use find instead of pacman db to search for *.pac* files.
-info:
-  installed: installed
-  installed_version: 'installed: %<version>s'
-  outdated: outdated
-  outdated_since: Since %<date>s
-  info_line:
-    name: Name
-    version: Version
-    description: Description
-    url: URL
-    license: Licenses
-    provides: Provides
-    depends: Depends On
-    makedepends: Build Depends On
-    conflicts: Conflicts With
-    maintainer: Last Maintainer
-    lastmodified: Last Modified
-    outofdate: Out of Date
-    numvotes: Votes number
-    popularity: Popularity
-    aurpage: AUR Page
-    keywords: Keywords
-build:
-  package_already_built: >-
-    Package %<name>s has already been built in %<packages>s
-  built_list: 'The following packages have been built:'
-  install_question: >-
-    They will be all installed now. Do you want to proceed?
-  no_install: >-
-    This is fine. All built packages stay in your current directory.
-  what_to_upgrade:
-    1: Do you want to upgrade it?
-    other: Which ones do you want to upgrade?
-  newer_version: 'Your system run a newer version of %<package>s'
-jail:
-  docker_dry_run:
-    build_image: build docker image
-    roadmap: roadmap.sh content
-    run: docker run
-  integrity_failure: Integrity file check fails!
-  dependencies_list: >-
-    This package requires the following other AUR packages to be built and
-    installed first:
-  validate_dependency: Shall we continue?
-  user_verification:
-    message: You should REALLY take time to inspect its PKGBUILD.
-    question: When it’s done, shall we continue?
-  clone_failure: 'Impossible to clone %<package>s from AUR!'
-  pkgbuild_missing: '%<package>s repository does not contain a PKGBUILD file!'
-  ready_to_build: 'Package %<package>s is ready to be built in %<tmpdir>s.'
-  no_package_built: 'No packages built!'
-  missing_dependency: >-
-    The package ‘%<package>s’ is required to use the %<jail>s jail!
-cleaner:
-  orphaned_packages: Orphaned packages
-  no_orphaned_packages: 0 orphaned packages found
-  transac_files: Pacman post transaction files
-  no_transac_files: 0 transactional files found
-  removing_packages: Removing packages kept in cache…
-  no_paccache: >-
-    paccache is not installed on your system.
-    It is provided in the ‘pacman-contrib’ package.
-  removed_packages: Removed packages kept in cache
-  old_packages: Old package versions kept in cache
-  docker:
-    images: Docker images
-    containers: Docker containers
-    images_found:
-      1: 1 docker image found
-      other: '%<number>i docker images found'
-    containers_found:
-      1: 1 docker container found
-      other: '%<number>i docker containers found'
-    removing_images: Removing leftover docker images…
-    removed_images:
-      0: no candidate images found for pruning
-      1: 'finished: 1 image removed'
-      other: 'finished: %<number>i images removed'
-    removing_containers: Removing leftover docker containers…
-    removed_containers:
-      0: no candidate containers found for pruning
-      1: 'finished: 1 container removed'
-      other: 'finished: %<number>i containers removed'
-locale:
+en:
+  warning: 'warning:'
+  error: 'error:'
+  sudo_warning: >-
+    You are going to run a ‘sudo’ command and a password will be prompted. Press
+    Enter to continue.
+  cli:
+    clean_help: Various cleanup related operations.
+    clean_help_2: Without any other option, the -l option (list) is implied.
+    ca_mutually_exclusive: -C cannot be used when -A is already given.
+    ac_mutually_exclusive: -A cannot be used when -C is already given.
+    ac_required: Please use at least -A or -C option.
+    aur_help: AUR related actions.
+    aur_help_2: >-
+      Without any other option, the default is to install packages,
+      whose names are given on command line.
+    shared_options_title: Shared Options
+    version_help: Display quackaur version and quit.
+    color_help: Specify when to enable coloring.
+    color_choices: Possible choices are ‘auto’ (default), ‘always’ or ‘never’.
+    list_help: With -A list installed AUR packages.
+    list_help_2: With -C list garbage.
+    aur_actions_title: AUR Command Actions
+    info_help: Display information about an AUR package.
+    search_help: Search AUR packages.
+    upgrade_help: Upgrade installed AUR packages.
+    aur_options_title: AUR Command Options
+    devel_help: Include devel packages (whose names ends with -svn, -git…).
+    force_help: Force a rebuild of an already built (and kept in cache) package.
+    jail_help: Isolate install or upgrade action.
+    jail_choices: Possible choices are ‘docker’ (default) or ‘chroot’.
+    no_jail_help: Do not isolate install or upgrade action.
+    dry_run_help: >-
+      Download package info and try to resolve dependencies,
+      but do not build or install anything.
+    clean_actions_title: Clean Command Actions
+    do_clean_help: Actually purge detected garbage.
+    clean_options_title: Clean Command Options
+    dsearch_help: Use find instead of pacman db to search for *.pac* files.
+  info:
+    installed: installed
+    installed_version: 'installed: %{version}'
+    outdated: outdated
+    outdated_since: Since %{date}
+    info_line:
+      name: Name
+      version: Version
+      description: Description
+      url: URL
+      license: Licenses
+      provides: Provides
+      depends: Depends On
+      makedepends: Build Depends On
+      conflicts: Conflicts With
+      maintainer: Last Maintainer
+      lastmodified: Last Modified
+      outofdate: Out of Date
+      numvotes: Votes number
+      popularity: Popularity
+      aurpage: AUR Page
+      keywords: Keywords
+  build:
+    package_already_built: >-
+      Package %{name} has already been built in %{packages}
+    built_list:
+      one: 'The following package has been built:'
+      other: 'The following packages have been built:'
+    install_question:
+      one: It will be installed now. Do you want to proceed?
+      other: They will be all installed now. Do you want to proceed?
+    no_install: >-
+      This is fine. All built packages stay in your current directory.
+    what_to_upgrade:
+      one: Do you want to upgrade it?
+      other: Which ones do you want to upgrade?
+    newer_version: 'Your system run a newer version of %{package}'
+  jail:
+    docker_dry_run:
+      build_image: build docker image
+      roadmap: roadmap.sh content
+      run: docker run
+    integrity_failure: Integrity file check fails!
+    dependencies_list: >-
+      This package requires the following other AUR packages to be built and
+      installed first:
+    validate_dependency: Shall we continue?
+    user_verification:
+      message: You should REALLY take time to inspect its PKGBUILD.
+      question: When it’s done, shall we continue?
+    clone_failure: 'Impossible to clone %{package} from AUR!'
+    pkgbuild_missing: '%{package} repository does not contain a PKGBUILD file!'
+    ready_to_build: 'Package %{package} is ready to be built in %{tmpdir}.'
+    no_package_built: 'No packages built!'
+    missing_dependency: >-
+      The package ‘%{package}’ is required to use the %{jail} jail!
+  cleaner:
+    orphaned_packages: Orphaned packages
+    no_orphaned_packages: 0 orphaned packages found
+    transac_files: Pacman post transaction files
+    no_transac_files: 0 transactional files found
+    removing_packages: Removing packages kept in cache…
+    no_paccache: >-
+      paccache is not installed on your system.
+      It is provided in the ‘pacman-contrib’ package.
+    removed_packages: Removed packages kept in cache
+    old_packages: Old package versions kept in cache
+    docker:
+      images: Docker images
+      containers: Docker containers
+      images_found:
+        one: 1 docker image found
+        other: '%{count} docker images found'
+      containers_found:
+        one: 1 docker container found
+        other: '%{count} docker containers found'
+      removing_images: Removing leftover docker images…
+      removed_images:
+        zero: no candidate images found for pruning
+        one: 'finished: 1 image removed'
+        other: 'finished: %{count} images removed'
+      removing_containers: Removing leftover docker containers…
+      removed_containers:
+        zero: no candidate containers found for pruning
+        one: 'finished: 1 container removed'
+        other: 'finished: %{count} containers removed'
   time:
-    long: '%c'
-    short: '%D %R'
+    formats:
+      default: '%c'
+      short: '%D %R'
+  date:
+    abbr_day_names:
+    - Sun
+    - Mon
+    - Tue
+    - Wed
+    - Thu
+    - Fri
+    - Sat
+    abbr_month_names:
+    -
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - May
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Oct
+    - Nov
+    - Dec
+    day_names:
+    - Sunday
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    formats:
+      default: '%Y-%m-%d'
+    month_names:
+    -
+    - January
+    - February
+    - March
+    - April
+    - May
+    - June
+    - July
+    - August
+    - September
+    - October
+    - November
+    - December

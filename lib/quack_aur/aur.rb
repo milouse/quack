@@ -5,11 +5,11 @@ require_relative 'package'
 require_relative 'jails/chroot'
 require_relative 'jails/docker'
 
-module Quack
+module QuackAur
   # Permit operation on AUR Packages
   class Aur
     def initialize(options)
-      @color = Quack.setup_color_mode options.delete(:color)
+      @color = QuackAur.setup_color_mode options.delete(:color)
       @jail = options.delete(:jail) || :docker
       @options = options
     end
@@ -21,26 +21,27 @@ module Quack
       result.each do |package|
         next unless @options[:with_devel] || !Package.devel?(package.name)
 
-        display_name = Quack.color_package(package)
+        display_name = QuackAur.color_package(package)
         puts "#{display_name}\n    #{package.description}"
       end
     end
 
     def info(packages)
+      info_fields = %w[Name Version Description URL License Provides Depends
+                       MakeDepends Conflicts Maintainer LastModified OutOfDate
+                       NumVotes Popularity AurPage Keywords].freeze
       packages.each do |package_name|
         package = Package.details(package_name)
         next unless package
 
-        %w[Name Version Description URL License Provides Depends MakeDepends
-           Conflicts Maintainer LastModified OutOfDate NumVotes Popularity
-           AurPage Keywords].each { info_line(_1, package) }
+        info_fields.each { info_line(_1, package) }
 
         next unless package.local?
 
         tarballs = package['BuiltPackages']
         next unless tarballs.any?
 
-        Quack.print_log(
+        QuackAur.print_log(
           'build.package_already_built',
           name: package.name,
           packages: tarballs.join('  ')
@@ -86,35 +87,35 @@ module Quack
     private
 
     def do_install(package)
-      jail_klass = Kernel.const_get("::Quack::#{@jail.capitalize}")
+      jail_klass = Kernel.const_get("::QuackAur::#{@jail.capitalize}")
       jail = jail_klass.new(package, @options)
       built_packages = jail.build
       return if built_packages.empty?
 
-      Quack.print_log('build.built_list', new_line: true)
-      Quack.print_result built_packages.join('  ')
+      count = built_packages.length
+      QuackAur.print_log('build.built_list', new_line: true, count: count)
+      QuackAur.print_result built_packages.join('  ')
       puts ''
-      check = Quack.ask_question('build.install_question', choices: '[y/N]')
+      check = QuackAur.ask_question(
+        'build.install_question', choices: '[y/N]', count: count
+      )
       if check == 'y'
         jail.install
       else
-        Quack.print_result('build.no_install')
+        QuackAur.print_result('build.no_install')
       end
     end
 
     def do_upgrade(packages)
       return if packages.empty?
 
-      number = packages.length
-      if number == 1
+      count = packages.length
+      if count == 1
         choices = '[Y/n]'
       else
-        choices = "[1…#{number}/A/q]"
+        choices = "[1…#{count}/A/q]"
       end
-      what = Quack.ask_question(
-        'build.what_to_upgrade',
-        choices: choices, number: number
-      )
+      what = QuackAur.ask_question('build.what_to_upgrade', choices:, count:)
       return if %w[n q].include?(what)
 
       unless what == '' || %w[a y].include?(what)
@@ -123,15 +124,19 @@ module Quack
       packages.each { do_install _1 }
     end
 
+    def convert_dependencies_array(value)
+      value.map do |package|
+        if Package.local?(package)
+          Rainbow(package).underline
+        else
+          package
+        end
+      end
+    end
+
     def convert_value_array(value, title)
       if %w[Depends MakeDepends].include?(title)
-        value.map! do |package|
-          if Package.local?(package)
-            Rainbow(package).underline
-          else
-            package
-          end
-        end
+        value = convert_dependencies_array value
       end
       return '--' if value.empty?
 
@@ -139,11 +144,11 @@ module Quack
     end
 
     def convert_value_time(value, title)
-      value = L10n.l(value)
+      value = I18n.l value
       return value unless title == 'OutOfDate'
 
       Rainbow(
-        L10n.t('info.outdated_since', date: value)
+        I18n.t(info.outdated_since, date: value)
       ).red.bold
     end
 
@@ -153,7 +158,7 @@ module Quack
       if private_methods.include?(convert_method)
         value = send(convert_method, value, title)
       end
-      label = L10n.t("info.info_line.#{title.downcase}").ljust(25)
+      label = I18n.t("info.info_line.#{title.downcase}").ljust(25)
       label = Rainbow("#{label}:").bold
       puts "#{label} #{value}"
     end

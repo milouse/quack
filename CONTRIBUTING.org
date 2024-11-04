@@ -3,9 +3,8 @@
 
 * Translations
 
-Quack use yaml files in the ~locales~ subfolder for its translation. You
-can grab them from the source code tree and send your changes as a pull
-request.
+QuackAur use yaml files in the ~locales~ subfolder for its translation. You can
+grab them from the source code tree and send your changes as a pull request.
 
 * Code
 
@@ -13,3 +12,8 @@ The canonical repository is located at
 [[https://git.umaneti.net/quack]]. Mirror exists on [[https://framagit.org/milouse/quack][Framagit]] and on [[https://github.com/milouse/quack][Github]].
 
 Merge request and issues are accepted on all mirrors.
+
+Please note that for historical reason, those repository are only named "quack",
+even if the resulting gem is "quack_aur". Long time ago, quack was a python
+script, and I discovered only after rewriting it to ruby that another unrelated
+gem was already named quack, and thus was obliged to change the name.
