@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
     'lib/quack_aur/aur.rb',
     'lib/quack_aur/cleaner.rb',
     'lib/quack_aur/helper.rb',
+    'lib/quack_aur/i18n.rb',
     'lib/quack_aur/jail.rb',
     'lib/quack_aur/jails/chroot.rb',
     'lib/quack_aur/jails/docker.rb',
